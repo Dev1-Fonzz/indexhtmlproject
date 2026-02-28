@@ -114,9 +114,6 @@
         .badge-draft { background: #e2e8f0; color: #4a5568; }
         .badge-verified { background: #bee3f8; color: #2a4365; }
         .badge-notverified { background: #fed7d7; color: #822727; }
-        .badge-paid { background: #9ae6b4; color: #22543d; }
-        .badge-process { background: #faf089; color: #744210; }
-        .badge-unpaid { background: #e2e8f0; color: #4a5568; }
         
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -133,39 +130,28 @@
         .btn-edit { background: #bee3f8; color: #2a4365; }
         .btn-delete { background: #fed7d7; color: #c53030; }
         .btn-view { background: #c6f6d5; color: #22543d; }
-        .btn-verify { background: #c6f6d5; color: #22543d; }
         
         .admin-filter-btn { transition: all 0.2s; border: 1px solid transparent; }
-        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); ring: 2px solid #9D50BB; }
+        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); }
         
         .password-blur { filter: blur(4px); cursor: pointer; transition: filter 0.2s; user-select: none; }
         .password-blur:hover { filter: blur(0); }
         .password-blur.revealed { filter: none; cursor: default; }
         
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { background: white; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }        .toast.success { background: var(--success-green); }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success-green); }
         .toast.error { background: var(--error-red); }
         .toast.warning { background: #dd6b20; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
         @media (max-width: 768px) {
-            .custom-table { min-width: 1200px; font-size: 0.58rem; }
-            .custom-table th, .custom-table td { padding: 8px 6px; }
+            .custom-table { min-width: 1200px; font-size: 0.58rem; }            .custom-table th, .custom-table td { padding: 8px 6px; }
             .glass-panel { border-radius: 16px; }
             .btn-glitter { padding: 10px 16px; }
         }
         
-        @media print {
-            .glass-panel { box-shadow: none; border: 1px solid #ccc; }
-            .btn-glitter, .action-btn { display: none; }
-        }
-        
-        /* Vendor-specific */
         .stat-card { transition: all 0.2s; cursor: default; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(102,126,234,0.3); }
-        .commission-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -194,7 +180,8 @@
             </button>
             <div id="auth-nav">
                 <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register Account</button>            </div>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register Account</button>
+            </div>
             <div id="vendor-nav" class="hidden-section flex items-center gap-2 md:gap-3">
                 <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
@@ -208,7 +195,6 @@
 
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
-
         <!-- 1. LOGIN -->
         <section id="view-login" class="max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
@@ -243,7 +229,8 @@
                 </div>
                 <div class="bg-purple-50 p-3 rounded-lg mt-4 text-xs text-purple-800 border border-purple-200">
                     <strong>📋 Terma & Syarat:</strong>
-                    <ul class="list-disc pl-4 mt-1 space-y-1">                        <li>Komisen platform: <strong>RM0.01 - RM5.00</strong> setiap jualan (ditetapkan admin)</li>
+                    <ul class="list-disc pl-4 mt-1 space-y-1">
+                        <li>Komisen platform: <strong>RM0.01 - RM5.00</strong> setiap jualan (ditetapkan admin)</li>
                         <li>Produk perlu diluluskan admin sebelum live</li>
                         <li>Withdrawal minimum: <strong>RM50</strong>, diproses 1-3 hari bekerja</li>
                         <li>Vendor bertanggungjawab atas stok & penghantaran</li>
@@ -257,15 +244,12 @@
                 <p class="text-center mt-4 text-xs text-gray-500">✅ Permohonan disemak dalam 24-48 jam</p>
             </div>
         </section>
-
         <!-- 3. VENDOR DASHBOARD -->
         <section id="view-dashboard" class="hidden-section">
-            <!-- Approval Notice -->
             <div id="approval-notice" class="hidden-section glass-panel p-4 mb-4 bg-yellow-50 border-l-4 border-yellow-400">
                 <div class="flex items-start gap-3"><i class="fas fa-clock text-yellow-600 mt-1"></i><div><h4 class="font-bold text-yellow-800">Permohonan Dalam Semakan</h4><p class="text-xs text-yellow-700">Akaun vendor sedang diproses. Anda akan dimaklumkan melalui email apabila diluluskan.</p></div></div>
             </div>
             
-            <!-- Stats Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-purple-600" id="stat-total-sales">RM 0.00</div><div class="text-[10px] text-gray-600">📈 Total Sales</div></div>
                 <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-green-600" id="stat-earnings">RM 0.00</div><div class="text-[10px] text-gray-600">💰 Net Earnings</div></div>
@@ -273,7 +257,6 @@
                 <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-pink-600" id="stat-products">0</div><div class="text-[10px] text-gray-600">🛍️ Active Products</div></div>
             </div>
 
-            <!-- Quick Actions -->
             <div class="glass-panel p-4 mb-6">
                 <h3 class="font-bold text-purple-700 mb-3 text-sm">⚡ Quick Actions</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -284,46 +267,44 @@
                 </div>
             </div>
 
-            <!-- Recent Orders -->
             <div class="glass-panel p-4">
                 <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-purple-700 text-sm">🕐 Recent Orders</h3><button onclick="navTo('orders-verify')" class="text-[10px] text-purple-600 hover:underline">View All →</button></div>
                 <div id="recent-orders-list" class="space-y-2 max-h-60 overflow-y-auto"><div class="text-center text-gray-500 py-4 text-xs"><div class="loader mx-auto mb-2"></div>Loading...</div></div>
             </div>
         </section>
 
-        <!-- 4. ORDER VERIFICATION TABLE -->
-        <section id="view-orders-verify" class="hidden-section">            <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">✅ Order Verification (Customer Purchases)</h2>
+        <!-- 4. ORDER VERIFICATION -->
+        <section id="view-orders-verify" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6">
+                <h2 class="text-xl font-bold glitter-text mb-4">✅ Order Verification</h2>
                 <div class="flex overflow-x-auto gap-2 mb-4 pb-2 border-b border-gray-200">
                     <button onclick="filterVerifyOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
                     <button onclick="filterVerifyOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
                     <button onclick="filterVerifyOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
                     <button onclick="filterVerifyOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
                     <button onclick="filterVerifyOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
-                    <button onclick="filterVerifyOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>
                     <button onclick="filterVerifyOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
                 </div>
                 <div class="table-container">
                     <table class="custom-table">
                         <thead><tr>
-                            <th>UAC</th><th>Username</th><th>Item Name</th><th>Item Code</th><th>Address</th><th>Qty</th><th>Total</th>
-                            <th>Payment</th><th>Payment Status</th><th>Tracking No</th><th>Order ID</th><th>Current Status</th><th>Category</th><th>Actions</th>
+                            <th>UAC</th><th>Username</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th>
+                            <th>Payment</th><th>Payment Status</th><th>Tracking</th><th>Order ID</th><th>Status</th><th>Category</th><th>Actions</th>
                         </tr></thead>
                         <tbody id="verify-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
-                    </table>
-                </div>
+                    </table>                </div>
             </div>
         </section>
 
-        <!-- 5. ORDER MANAGEMENT TABLE -->
+        <!-- 5. ORDER MANAGEMENT -->
         <section id="view-orders-manage" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">📦 Order Management (Vendor Fulfillment)</h2>
-                <div class="flex gap-2 mb-4"><input type="text" id="order-search" placeholder="Search orders..." class="w-40 text-xs py-1 m-0" onkeyup="filterManageOrders()"><select id="order-category" class="w-36 text-xs py-1 m-0" onchange="filterManageOrders()"><option value="all">All Categories</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+                <h2 class="text-xl font-bold glitter-text mb-4">📦 Order Fulfillment</h2>
+                <div class="flex gap-2 mb-4"><input type="text" id="order-search" placeholder="Search orders..." class="w-40 text-xs py-1 m-0" onkeyup="filterManageOrders()"><select id="order-category" class="w-36 text-xs py-1 m-0" onchange="filterManageOrders()"><option value="all">All</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
                 <div class="table-container">
                     <table class="custom-table">
                         <thead><tr>
-                            <th>UAC</th><th>Username</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th><th>Payment</th><th>Payment Status</th><th>Delivery</th><th>Tracking</th><th>Order ID</th><th>Cancel</th><th>Message</th>
+                            <th>UAC</th><th>Customer</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th><th>Payment</th><th>Payment Status</th><th>Delivery</th><th>Tracking</th><th>Order ID</th><th>Cancel</th><th>Chat</th>
                         </tr></thead>
                         <tbody id="manage-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
                     </table>
@@ -341,47 +322,33 @@
                         <input type="url" id="prod-img-url" placeholder="https://i.postimg.cc/xxxx/product.jpg" class="m-0">
                         <div id="prod-img-preview" class="mt-2 hidden"><img class="w-20 h-20 object-cover rounded-lg border"></div>
                         <p class="text-[10px] text-gray-500 mt-1">💡 Upload di <a href="https://postimages.org/" target="_blank" class="text-purple-600 underline">postimages.org</a> → Copy "Direct link" → Paste sini</p>
-                    </div>                    <input type="text" id="prod-name" placeholder="Item Name *" required maxlength="100">
+                    </div>
+                    <input type="text" id="prod-name" placeholder="Item Name *" required maxlength="100">
                     <input type="number" id="prod-price" placeholder="Cost Price (RM) - Optional" min="0" step="0.01">
                     <input type="number" id="prod-sell" placeholder="Selling Price (RM) *" required min="0.01" step="0.01">
                     <input type="text" id="prod-variation" placeholder="Variation (Size/Color)" maxlength="50">
                     <textarea id="prod-desc" placeholder="Description" class="md:col-span-2 lg:col-span-3" maxlength="500" rows="2"></textarea>
                     <input type="text" id="prod-country" placeholder="Country of Origin" maxlength="50">
-                    <input type="url" id="prod-link" placeholder="Optional Link (Website/Video)" maxlength="200">
+                    <input type="url" id="prod-link" placeholder="Optional Link" maxlength="200">
                     <input type="text" id="prod-label" placeholder="Label (e.g. Best Seller)" maxlength="30">
-                    <input type="text" id="prod-event" placeholder="Event (e.g. Ramadan Sale)" maxlength="30">
+                    <input type="text" id="prod-event" placeholder="Event (e.g. Ramadan)" maxlength="30">
                     <input type="text" id="prod-unique" placeholder="Unique Code (Auto)" readonly class="bg-gray-100">
-                    <select id="prod-status"><option value="Public">✅ Public</option><option value="Private">🔒 Private</option><option value="Out of Stock">❌ Out of Stock</option></select>
+                    <select id="prod-status"><option value="draft">💾 Draft</option><option value="pending">📤 Submit for Approval</option></select>
                     <div class="md:col-span-2 lg:col-span-3 flex gap-4 text-xs"><label class="flex items-center gap-1"><input type="checkbox" id="prod-review" checked> Allow Reviews</label><label class="flex items-center gap-1"><input type="checkbox" id="prod-featured"> Featured</label></div>
                 </div>
                 <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg disabled:opacity-50" id="add-prod-btn"><i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT</button>
             </div>
-            <!-- Product List -->
             <div class="glass-panel p-4 md:p-6">
-                <div class="flex justify-between items-center mb-4 flex-wrap gap-2"><h3 class="font-bold text-purple-700">📋 Launched Products</h3><div class="flex gap-2"><input type="text" id="prod-search" placeholder="Search..." class="w-32 text-xs py-1 m-0" onkeyup="renderProducts()"><select id="prod-filter" class="w-28 text-xs py-1 m-0" onchange="renderProducts()"><option value="all">All</option><option value="Public">Public</option><option value="Private">Private</option><option value="Out of Stock">Out of Stock</option></select></div></div>
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2"><h3 class="font-bold text-purple-700">📋 My Products</h3><div class="flex gap-2"><input type="text" id="prod-search" placeholder="Search..." class="w-32 text-xs py-1 m-0" onkeyup="renderProducts()"><select id="prod-filter" class="w-28 text-xs py-1 m-0" onchange="renderProducts()"><option value="all">All</option><option value="Public">Public</option><option value="Private">Private</option><option value="Out of Stock">Out of Stock</option></select></div></div>
                 <div class="table-container">
-                    <table class="custom-table">
-                        <thead><tr><th>#</th><th>Image</th><th>Name</th><th>Price</th><th>Rating</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Reviews</th><th>Edit</th><th>Delete</th></tr></thead>
+                    <table class="custom-table">                        <thead><tr><th>#</th><th>Image</th><th>Name</th><th>Price</th><th>Rating</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Reviews</th><th>Edit</th><th>Delete</th></tr></thead>
                         <tbody id="product-list"><tr><td colspan="11" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- 7. VENDOR BUSINESS MANAGEMENT -->
-        <section id="view-vendor-mgmt" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">📊 Vendor Business Management</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="glass-panel p-4"><h4 class="font-bold text-purple-700 mb-2">Today's Stats</h4><div class="space-y-2 text-xs"><div class="flex justify-between"><span>Orders Today:</span><strong id="vm-orders-today">0</strong></div><div class="flex justify-between"><span>Sales Today:</span><strong id="vm-sales-today">RM 0.00</strong></div><div class="flex justify-between"><span>Commission Deducted:</span><strong id="vm-commission">RM 0.00</strong></div></div></div>
-                    <div class="glass-panel p-4"><h4 class="font-bold text-purple-700 mb-2">Account Info</h4><div class="space-y-2 text-xs"><div class="flex justify-between"><span>Status:</span><span id="vm-status" class="badge badge-active">ACTIVE</span></div><div class="flex justify-between"><span>Active Products:</span><strong id="vm-products">0</strong></div><div class="flex justify-between"><span>Payment Info:</span><span id="vm-payment" class="text-[10px]">-</span></div></div></div>
-                    <div class="glass-panel p-4"><h4 class="font-bold text-purple-700 mb-2">Income Status</h4><div class="space-y-2 text-xs"><div class="flex justify-between"><span>Total Earned:</span><strong id="vm-total">RM 0.00</strong></div><div class="flex justify-between"><span>Paid Out:</span><strong id="vm-paid">RM 0.00</strong></div><div class="flex justify-between"><span>Pending:</span><strong id="vm-pending">RM 0.00</strong></div></div></div>
-                </div>
-                <div class="mt-4"><h4 class="font-bold text-purple-700 mb-2">📜 Transaction History</h4><div class="table-container"><table class="custom-table"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="vm-transactions"><tr><td colspan="5" class="text-center py-6 text-gray-500 text-xs">No transactions</td></tr></tbody></table></div></div>
-            </div>
-        </section>
-
-        <!-- 8. PROFILE & SETTINGS -->
+        <!-- 7. PROFILE & SETTINGS -->
         <section id="view-profile" class="hidden-section max-w-3xl mx-auto">
             <div class="glass-panel p-6">
                 <h2 class="text-xl font-bold glitter-text mb-6">⚙️ Seller Information</h2>
@@ -390,7 +357,8 @@
                     <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="prof-business"></div>
                     <div><label class="block text-xs font-bold mb-1">Description</label><textarea id="prof-desc" rows="2" maxlength="200"></textarea></div>
                     <div><label class="block text-xs font-bold mb-1">Phone Number</label><input type="tel" id="prof-phone"></div>
-                    <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="prof-email" disabled class="bg-gray-100"></div>                    <div><label class="block text-xs font-bold mb-1">UAC</label><input type="text" id="prof-uac" disabled class="bg-gray-100 font-mono"></div>
+                    <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="prof-email" disabled class="bg-gray-100"></div>
+                    <div><label class="block text-xs font-bold mb-1">UAC</label><input type="text" id="prof-uac" disabled class="bg-gray-100 font-mono"></div>
                     <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Shop Address</label><textarea id="prof-address" rows="3" maxlength="500" placeholder="House No, Building, Street, Unit, Postal Code, Full Name, Phone"></textarea><div class="flex gap-2 mt-1"><label class="text-[10px] flex items-center gap-1"><input type="checkbox" id="prof-frequent"> Frequent</label><select class="w-auto py-0 px-1 text-[10px] m-0"><option>Home</option><option>Work</option></select></div></div>
                     <div class="md:col-span-2"><h4 class="font-bold text-sm text-purple-700 mb-2 mt-4">💳 Payment Information</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><input type="text" id="prof-bank-name" placeholder="Account Holder Name"><select id="prof-bank-type"><option value="">Select...</option><option value="Maybank">Maybank</option><option value="CIMB">CIMB</option><option value="Public Bank">Public Bank</option><option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option><option value="DuitNow QR">DuitNow QR</option></select><input type="text" id="prof-bank-num" placeholder="Account Number / QR Link" class="md:col-span-2"></div></div>
                 </div>
@@ -399,54 +367,7 @@
             </div>
         </section>
 
-        <!-- 9. ADMIN DASHBOARD (Role: admin only) -->
-        <section id="view-admin" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl"><div class="flex justify-between items-center"><div><h2 class="text-2xl md:text-3xl font-bold">ADMIN MANAGEMENT CENTER</h2><p class="text-white/80 text-xs md:text-sm">Urus Vendor, Pesanan, Produk & Live Chat</p></div><i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i></div></div>
-            
-            <!-- Admin Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div class="glass-panel p-3 text-center cursor-pointer" onclick="showAdminTab('tab-users')"><div class="text-2xl font-bold text-purple-600" id="admin-stat-users">-</div><div class="text-[10px] text-gray-600">🫂 Total Vendors</div></div>
-                <div class="glass-panel p-3 text-center cursor-pointer" onclick="showAdminTab('tab-orders')"><div class="text-2xl font-bold text-pink-600" id="admin-stat-orders">-</div><div class="text-[10px] text-gray-600">📥 Total Orders</div></div>
-                <div class="glass-panel p-3 text-center"><div class="text-2xl font-bold text-green-600" id="admin-stat-revenue">RM -</div><div class="text-[10px] text-gray-600">📮 Platform Revenue</div></div>
-                <div class="glass-panel p-3 text-center"><div class="text-2xl font-bold text-orange-600" id="admin-stat-commission">RM -</div><div class="text-[10px] text-gray-600">💰 Commission Rate</div></div>
-            </div>
-            
-            <!-- Admin Tabs -->
-            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs whitespace-nowrap"><i class="fas fa-users mr-1"></i> Vendor Database</button>
-                <button onclick="showAdminTab('tab-salary')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs whitespace-nowrap"><i class="fas fa-money-bill mr-1"></i> Salary Management</button>
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs whitespace-nowrap"><i class="fas fa-box mr-1"></i> All Products</button>
-                <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs whitespace-nowrap"><i class="fas fa-headset mr-1"></i> Live Chat</button>
-            </div>
-            
-            <!-- Tab: Vendor Database -->
-            <div id="tab-users" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <div class="flex justify-between items-center mb-4 flex-wrap gap-2"><h3 class="font-bold text-purple-700 text-lg">📊 Vendor Account Database</h3><div class="flex gap-2"><input type="text" id="admin-user-search" placeholder="Search..." class="w-40 text-xs py-1 m-0" onkeyup="renderAdminUsers()"><select id="admin-user-status" class="w-32 text-xs py-1 m-0" onchange="renderAdminUsers()"><option value="all">All Status</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option><option value="BLOCKED">Blocked</option><option value="PENDING">Pending</option></select></div></div>
-                <div class="table-container"><table class="custom-table"><thead><tr><th>UAC</th><th>Seller</th><th>Business</th><th>Description</th><th>Password</th><th>Phone</th><th>Email</th><th>Address</th><th>Status</th><th>Orders Today</th><th>Pending</th><th>Sales</th><th>Commission</th><th>Products</th><th>Payment Info</th><th>Delete</th><th>In Use?</th><th>Log Cache</th></tr></thead><tbody id="admin-user-list"><tr><td colspan="18" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody></table></div>
-            </div>
-            
-            <!-- Tab: Salary Management -->
-            <div id="tab-salary" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-purple-700 text-lg">💰 Vendor Salary Management</h3><div class="flex items-center gap-2 text-xs"><span>Commission Rate:</span><input type="number" id="admin-commission" class="w-20 text-xs py-1 m-0" min="0.01" max="5" step="0.01" value="0.10"><button onclick="updateCommission()" class="px-3 py-1 bg-purple-500 text-white rounded text-xs">Set</button></div></div>
-                <p class="text-xs text-gray-600 mb-4">*Commission deducted per sale: RM0.01 - RM5.00 (admin configurable)</p>
-                <div class="table-container"><table class="custom-table"><thead><tr><th>UAC</th><th>Seller</th><th>Business</th><th>Phone</th><th>Address</th><th>Status</th><th>Orders Today</th><th>Total Sales</th><th>Commission Deducted</th><th>Active Products</th><th>Payment Info</th><th>Income Status</th><th>Transaction History</th><th>Message Vendor</th></tr></thead><tbody id="admin-salary-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody></table></div>
-            </div>
-            
-            <!-- Tab: All Products -->
-            <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6">
-                <h3 class="font-bold text-purple-700 mb-4">📦 All Products (All Vendors)</h3>
-                <div class="flex gap-2 mb-3"><input type="text" id="admin-prod-search" placeholder="Search..." class="w-40 text-xs py-1 m-0" onkeyup="renderAdminProducts()"><select id="admin-prod-status" class="w-32 text-xs py-1 m-0" onchange="renderAdminProducts()"><option value="all">All</option><option value="Public">Public</option><option value="Private">Private</option><option value="Out of Stock">Out of Stock</option></select></div>
-                <div class="table-container"><table class="custom-table"><thead><tr><th>#</th><th>Image</th><th>Name</th><th>Price</th><th>Rating</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Vendor</th><th>Edit</th><th>Delete</th></tr></thead><tbody id="admin-prod-list"><tr><td colspan="11" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody></table></div>
-            </div>
-            
-            <!-- Tab: Live Chat Admin -->            <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
-                <h3 class="font-bold text-pink-700 mb-4">🎧 Live Agent Dashboard (Admin)</h3>
-                <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30"><div class="text-center text-gray-500 mt-10">Loading contacts...</div></div>
-                <div id="admin-active-chat" class="hidden-section flex-1 flex flex-col"><div class="flex items-center justify-between border-b pb-2 mb-2"><button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back</button><span class="font-bold text-purple-700" id="admin-chat-target">Customer</span><button onclick="deleteConversation()" class="text-xs text-red-500 hover:underline">Delete</button></div><div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div><div class="flex gap-2"><button onclick="document.getElementById('admin-file-input').click()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button><input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)"><textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..." maxlength="1000"></textarea><button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button></div></div>
-            </div>
-        </section>
-
-        <!-- 10. LIVE CHAT -->
+        <!-- 8. LIVE CHAT -->
         <section id="view-chat" class="hidden-section">
             <div class="glass-panel p-4 h-[80vh] flex flex-col">
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2"><i class="fas fa-headset"></i> Live Chat</h2>
@@ -470,33 +391,32 @@
         </section>
 
     </main>
-
     <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs", authDomain: "mfd-store.firebaseapp.com", projectId: "mfd-store", storageBucket: "mfd-store.firebasestorage.app", messagingSenderId: "1039564529069", appId: "1:1039564529069:web:bc7c752f3618e6cb879524" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUser = null, vendorData = {}, allProducts = [], allOrders = [], allUsers = [], allTransactions = [];
-        let currentChatPartner = null, unsubscribeChat = null, unsubscribeOrders = null, unsubscribeProducts = null, unsubscribeUsers = null;
-        const COMMISSION_DEFAULT = 0.10; // Default 10% or RM0.10 per sale
+        let currentUser = null, vendorData = {}, allProducts = [], allOrders = [];
+        let currentChatPartner = null, unsubscribeChat = null, unsubscribeOrders = null, unsubscribeProducts = null;
+        const COMMISSION_DEFAULT = 0.10;
 
         // ===== UTILITIES =====
         window.playSound = (type) => { try { const s = {click:document.getElementById('snd-click'),success:document.getElementById('snd-success'),error:document.getElementById('snd-error'),msg:document.getElementById('snd-msg')}; if(s[type]){s[type].currentTime=0;s[type].play().catch(()=>{});} } catch(e){} };
-        function showToast(msg,type='success',dur=3000){const c=document.getElementById('toast-container'),t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'} mr-2"></i>${msg}`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100%)';setTimeout(()=>t.remove(),300);},dur);}        function formatRM(a){return'RM '+parseFloat(a||0).toFixed(2);}
+        function showToast(msg,type='success',dur=3000){const c=document.getElementById('toast-container'),t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'} mr-2"></i>${msg}`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100%)';setTimeout(()=>t.remove(),300);},dur);}
+        function formatRM(a){return'RM '+parseFloat(a||0).toFixed(2);}
         function formatDate(ts){if(!ts)return'-';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('ms-MY',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
         function isValidImageUrl(u){if(!u||!u.startsWith('https://'))return false;const ext=['.jpg','.jpeg','.png','.webp','.gif'];if(!ext.some(e=>u.toLowerCase().endsWith(e)))return false;const dom=['postimg.cc','i.postimg.cc','postimages.org'];try{if(!dom.includes(new URL(u).hostname))return false;}catch(e){return false;}return u.length<500;}
         function genUAC(){return"VENFD-"+Math.random().toString(36).substr(2,8).toUpperCase();}
         function genItemCode(){return"ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase();}
 
         // ===== NAVIGATION =====
-        window.navTo = (v) => { playSound('click'); document.querySelectorAll('section').forEach(e=>e.classList.add('hidden-section')); const t=document.getElementById(`view-${v}`); if(t)t.classList.remove('hidden-section'); window.scrollTo(0,0); if(v==='dashboard'&&currentUser)loadDashboard(); if(v==='products'&&currentUser)loadProducts(); if(v==='orders-verify'&&currentUser)loadOrders('verify'); if(v==='orders-manage'&&currentUser)loadOrders('manage'); if(v==='vendor-mgmt'&&currentUser)loadVendorMgmt(); if(v==='profile'&&currentUser)loadProfile(); if(v==='chat'&&currentUser)loadChatList(); if(v==='admin'&&currentUser)loadAdmin(); };
-        window.showAdminTab = (id) => { document.querySelectorAll('.admin-tab').forEach(e=>e.classList.add('hidden-section')); const t=document.getElementById(id); if(t)t.classList.remove('hidden-section'); if(id==='tab-chat')setTimeout(loadChatList,100); };
+        window.navTo = (v) => { playSound('click'); document.querySelectorAll('section').forEach(e=>e.classList.add('hidden-section')); const t=document.getElementById(`view-${v}`); if(t)t.classList.remove('hidden-section'); window.scrollTo(0,0); if(v==='dashboard'&&currentUser)loadDashboard(); if(v==='products'&&currentUser)loadProducts(); if(v==='orders-verify'&&currentUser)loadOrders('verify'); if(v==='orders-manage'&&currentUser)loadOrders('manage'); if(v==='profile'&&currentUser)loadProfile(); if(v==='chat'&&currentUser)loadChatList(); };
 
         // ===== AUTH =====
         window.doRegister = async () => {
@@ -519,8 +439,7 @@
             finally{btn.disabled=false;btn.innerHTML='LOGIN NOW';}
         };
         window.doGoogleSignIn = async (e) => { if(e&&e.preventDefault)e.preventDefault(); const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});const btn=document.querySelector('button[onclick*="doGoogleSignIn"]');if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i>Connecting...';} try{const result=await signInWithPopup(auth,provider),user=result.user;const userRef=doc(db,"users",user.uid),userSnap=await getDoc(userRef);if(!userSnap.exists()){const uac=genUAC();await setDoc(userRef,{username:user.displayName||`User_${uac.split('-')[1]}`,email:user.email,phone:'',uac:uac,role:'vendor',status:'PENDING',vendorProfile:{sellerName:uac,businessName:user.displayName||'New Business',description:'',approvalStatus:'pending',commissionRate:COMMISSION_DEFAULT,bankDetails:{}},createdAt:serverTimestamp(),logCache:serverTimestamp(),provider:'google',photoURL:user.photoURL||''});showToast('✅ Akaun Google didaftarkan!','success');}else{showToast('✅ Login dengan Google berjaya!','success');}}catch(err){console.error('Google Sign-In Error:',err);let msg='Google login gagal';if(err.code){if(err.code==='auth/popup-closed-by-user')msg='Login dibatalkan';else if(err.code==='auth/popup-blocked')msg='Popup diblocker browser';else if(err.code==='auth/operation-not-allowed')msg='Google Sign-In belum enabled di Firebase';else if(err.code==='auth/unauthorized-domain')msg='Domain tidak authorized';else msg='Error: '+err.code;}showToast('❌ '+msg,'error');}finally{const buttons=document.querySelectorAll('button[onclick*="doGoogleSignIn"]');buttons.forEach(b=>{b.disabled=false;const isReg=b.innerText.includes('Register');b.innerHTML=`<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> ${isReg?'Sign up with Google':'Continue with Google'}`;});}};
-        window.logout = () => { signOut(auth); playSound('click'); showToast('✅ Logged out','success'); navTo('login'); };
-        window.deleteAccount = async () => { if(!confirm("⚠️ Padam akaun secara kekal?"))return; try{await updateDoc(doc(db,"users",currentUser.uid),{status:'INACTIVE',deletedAt:serverTimestamp(),logCache:serverTimestamp()});await signOut(auth);showToast('✅ Akaun dinyahaktifkan','success');navTo('login');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+        window.logout = () => { signOut(auth); playSound('click'); showToast('✅ Logged out','success'); navTo('login'); };        window.deleteAccount = async () => { if(!confirm("⚠️ Padam akaun secara kekal?"))return; try{await updateDoc(doc(db,"users",currentUser.uid),{status:'INACTIVE',deletedAt:serverTimestamp(),logCache:serverTimestamp()});await signOut(auth);showToast('✅ Akaun dinyahaktifkan','success');navTo('login');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
 
         // ===== AUTH STATE =====
         onAuthStateChanged(auth, async (user) => {
@@ -537,8 +456,8 @@
                         document.getElementById('nav-uac').innerText = vendorData.uac;
                         const notice = document.getElementById('approval-notice');
                         if(vendorData.vendorProfile?.approvalStatus==='pending')notice.classList.remove('hidden-section');
-                        else notice.classList.add('hidden-section');                        if(vendorData.role==='admin')navTo('admin');
-                        else navTo('dashboard');
+                        else notice.classList.add('hidden-section');
+                        navTo('dashboard');
                     }
                 }catch(e){console.error('Auth error:',e);navTo('login');}
             }else{
@@ -569,23 +488,23 @@
             }catch(e){console.error('Dashboard error:',e);}
         }
 
-        // ===== PRODUCTS =====
-        document.getElementById('prod-img-url')?.addEventListener('input',function(e){const u=e.target.value.trim(),pv=document.getElementById('prod-img-preview'),img=pv.querySelector('img');if(isValidImageUrl(u)){img.src=u;img.onerror=()=>showToast('⚠️ Link gambar tidak valid','warning');pv.classList.remove('hidden');}else{pv.classList.add('hidden');}});
+        // ===== PRODUCTS =====        document.getElementById('prod-img-url')?.addEventListener('input',function(e){const u=e.target.value.trim(),pv=document.getElementById('prod-img-preview'),img=pv.querySelector('img');if(isValidImageUrl(u)){img.src=u;img.onerror=()=>showToast('⚠️ Link gambar tidak valid','warning');pv.classList.remove('hidden');}else{pv.classList.add('hidden');}});
         document.getElementById('prod-name')?.addEventListener('input',function(){const el=document.getElementById('prod-unique');if(el&&!el.value)el.value=genItemCode();});
 
         window.addProduct = async () => {
-            const name=document.getElementById('prod-name').value.trim(),sell=parseFloat(document.getElementById('prod-sell').value),img=document.getElementById('prod-img-url').value.trim(),stock=100,btn=document.getElementById('add-prod-btn');
+            const name=document.getElementById('prod-name').value.trim(),sell=parseFloat(document.getElementById('prod-sell').value),img=document.getElementById('prod-img-url').value.trim(),btn=document.getElementById('add-prod-btn');
             if(!name||!sell||!img){showToast('Lengkapkan field wajib','error');return;} if(!isValidImageUrl(img)){showToast('URL gambar tidak sah','error');return;}
             btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Processing...';
             try{
-                await addDoc(collection(db,"products"),{name:name,price:parseFloat(document.getElementById('prod-price').value)||0,priceSell:sell,imageUrl:img,stock:stock,status:document.getElementById('prod-status').value||'Public',vendorId:currentUser.uid,vendorName:vendorData.username,description:document.getElementById('prod-desc').value.trim()||'',variation:document.getElementById('prod-variation').value.trim()||'',country:document.getElementById('prod-country').value.trim()||'',link:document.getElementById('prod-link').value.trim()||'',label:document.getElementById('prod-label').value.trim()||'',event:document.getElementById('prod-event').value.trim()||'',uniqueCode:document.getElementById('prod-unique').value||genItemCode(),totalSold:0,rating:5.0,revenue:0,allowReviews:document.getElementById('prod-review').checked,featured:document.getElementById('prod-featured').checked,reviews:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-                showToast('✅ Produk berjaya dilancarkan!','success');
+                await addDoc(collection(db,"products"),{name:name,price:parseFloat(document.getElementById('prod-price').value)||0,priceSell:sell,imageUrl:img,stock:100,status:document.getElementById('prod-status').value||'draft',vendorId:currentUser.uid,vendorName:vendorData.username,description:document.getElementById('prod-desc').value.trim()||'',variation:document.getElementById('prod-variation').value.trim()||'',country:document.getElementById('prod-country').value.trim()||'',link:document.getElementById('prod-link').value.trim()||'',label:document.getElementById('prod-label').value.trim()||'',event:document.getElementById('prod-event').value.trim()||'',uniqueCode:document.getElementById('prod-unique').value||genItemCode(),totalSold:0,rating:5.0,revenue:0,allowReviews:document.getElementById('prod-review').checked,featured:document.getElementById('prod-featured').checked,reviews:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+                showToast('✅ Produk berjaya dihantar!','success');
                 document.querySelectorAll('#view-products input:not([readonly]), #view-products textarea').forEach(i=>{if(i.type!=='checkbox')i.value='';});
                 document.getElementById('prod-img-preview').classList.add('hidden');document.getElementById('prod-unique').value='';
                 loadProducts();
             }catch(e){console.error('Add product error:',e);showToast('❌ Gagal: '+(e.message||'Unknown'),'error');}
             finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT';}
         };
+
         async function loadProducts(){
             if(!currentUser)return; if(unsubscribeProducts)unsubscribeProducts();
             unsubscribeProducts=onSnapshot(query(collection(db,"products"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")),(snap)=>{allProducts=[];snap.forEach(d=>allProducts.push({id:d.id,...d.data()}));renderProducts();});
@@ -619,82 +538,31 @@
         window.updateOrderStatus = async (id,newStatus) => { if(!confirm(`Tukar status kepada ${newStatus}?`)){loadOrders('verify');return;} try{await updateDoc(doc(db,"orders",id),{status:newStatus,category:newStatus,updatedAt:serverTimestamp()});showToast('✅ Status dikemaskini','success');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
         window.cancelOrder = async (id) => { if(!confirm('Batal pesanan ini?'))return; try{await updateDoc(doc(db,"orders",id),{status:'Cancelled',category:'Cancelled',updatedAt:serverTimestamp()});showToast('❌ Pesanan dibatalkan','warning');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
         window.openChatWithCustomer = (uid,name) => { currentChatPartner=uid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(uid); };
-
-        // ===== VENDOR MGMT =====
-        async function loadVendorMgmt(){
-            if(!currentUser)return;
-            try{
-                const txSnap=await getDocs(query(collection(db,"vendor_transactions"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")));
-                let total=0,paid=0,pending=0,txHtml='';
-                txSnap.forEach(d=>{const t=d.data();if(t.type==='earning')total+=t.amount;if(t.type==='withdrawal'){if(t.status==='paid')paid+=t.amount;if(t.status==='pending')pending+=t.amount;}const badge=t.type==='earning'?'badge-approved':t.status==='paid'?'badge-paid':t.status==='pending'?'badge-process':'badge-unpaid';const label=t.type==='earning'?'💰 Komisen':'📤 Withdrawal';txHtml+=`<tr><td>${formatDate(t.createdAt)}</td><td>${label}</td><td class="text-[10px]">${t.description||'-'}</td><td class="font-bold ${t.type==='earning'?'text-green-600':'text-red-600'}">${t.type==='earning'?'+':'-'}${formatRM(t.amount)}</td><td><span class="badge ${badge}">${t.status||'completed'}</span></td></tr>`;});
-                document.getElementById('vm-total').innerText=formatRM(total);document.getElementById('vm-paid').innerText=formatRM(paid);document.getElementById('vm-pending').innerText=formatRM(pending);
-                document.getElementById('vm-transactions').innerHTML=txHtml||`<tr><td colspan="5" class="text-center py-6 text-gray-500 text-xs">Tiada transaksi</td></tr>`;
-            }catch(e){console.error('VendorMgmt error:',e);}
-        }
-
         // ===== PROFILE =====
         async function loadProfile(){
             if(!currentUser)return; const vp=vendorData.vendorProfile||{};
-            document.getElementById('prof-seller').value=vendorData.username;document.getElementById('prof-business').value=vp.businessName||'';document.getElementById('prof-desc').value=vp.description||'';document.getElementById('prof-phone').value=vendorData.phone||'';document.getElementById('prof-email').value=vendorData.email||'';document.getElementById('prof-uac').value=vendorData.uac;document.getElementById('prof-address').value=vp.address||'';document.getElementById('prof-status').innerText=vendorData.status;document.getElementById('prof-status').className=`badge ${vendorData.status==='ACTIVE'?'badge-active':vendorData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;document.getElementById('prof-log').innerText=formatDate(vendorData.logCache);            const bd=vp.bankDetails||{};document.getElementById('prof-bank-name').value=bd.accountName||'';document.getElementById('prof-bank-type').value=bd.bankName||'';document.getElementById('prof-bank-num').value=bd.accountNumber||'';
+            document.getElementById('prof-seller').value=vendorData.username;document.getElementById('prof-business').value=vp.businessName||'';document.getElementById('prof-desc').value=vp.description||'';document.getElementById('prof-phone').value=vendorData.phone||'';document.getElementById('prof-email').value=vendorData.email||'';document.getElementById('prof-uac').value=vendorData.uac;document.getElementById('prof-address').value=vp.address||'';document.getElementById('prof-status').innerText=vendorData.status;document.getElementById('prof-status').className=`badge ${vendorData.status==='ACTIVE'?'badge-active':vendorData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;document.getElementById('prof-log').innerText=formatDate(vendorData.logCache);
+            const bd=vp.bankDetails||{};document.getElementById('prof-bank-name').value=bd.accountName||'';document.getElementById('prof-bank-type').value=bd.bankName||'';document.getElementById('prof-bank-num').value=bd.accountNumber||'';
         }
         window.updateProfile = async () => {
             const phone=document.getElementById('prof-phone').value.trim(),desc=document.getElementById('prof-desc').value.trim(),addr=document.getElementById('prof-address').value.trim(),bn=document.getElementById('prof-bank-name').value.trim(),bt=document.getElementById('prof-bank-type').value,bn2=document.getElementById('prof-bank-num').value.trim();
             try{await updateDoc(doc(db,"users",currentUser.uid),{phone, 'vendorProfile.description':desc, 'vendorProfile.address':addr, 'vendorProfile.bankDetails':{accountName:bn,bankName:bt,accountNumber:bn2,updatedAt:serverTimestamp()},logCache:serverTimestamp()});showToast('✅ Profil dikemaskini!','success');loadProfile();}catch(e){showToast('❌ Gagal: '+e.message,'error');}
         };
 
-        // ===== ADMIN =====
-        async function loadAdmin(){
-            if(vendorData.role!=='admin'){showToast('❌ Akses ditolak','error');return navTo('dashboard');}
-            try{
-                const [usersSnap,ordersSnap,prodsSnap]=await Promise.all([getDocs(collection(db,"users")),getDocs(collection(db,"orders")),getDocs(collection(db,"products"))]);
-                allUsers=usersSnap.docs.map(d=>({id:d.id,...d.data()}));const allOrds=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
-                document.getElementById('admin-stat-users').innerText=allUsers.filter(u=>u.role==='vendor').length;document.getElementById('admin-stat-orders').innerText=allOrds.length;
-                const rev=allOrds.filter(o=>o.status==='Completed').reduce((s,o)=>s+(o.total||0),0);document.getElementById('admin-stat-revenue').innerText=formatRM(rev*COMMISSION_DEFAULT);
-                document.getElementById('admin-stat-commission').innerText='RM '+(vendorData.adminConfig?.commissionRate||COMMISSION_DEFAULT).toFixed(2);
-                renderAdminUsers();renderAdminProducts();
-            }catch(e){console.error('Admin load error:',e);}
-        }
-        function renderAdminUsers(){
-            const tbody=document.getElementById('admin-user-list'),search=(document.getElementById('admin-user-search')?.value||'').toLowerCase(),status=document.getElementById('admin-user-status')?.value||'all';
-            let filtered=allUsers.filter(u=>u.role==='vendor'&&((!search||u.username?.toLowerCase().includes(search)||u.vendorProfile?.businessName?.toLowerCase().includes(search))&&(status==='all'||u.status===status)));
-            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="18" class="text-center py-8 text-gray-500 text-xs">Tiada vendor</td></tr>`;return;}
-            tbody.innerHTML=filtered.map(u=>{const vp=u.vendorProfile||{};return`<tr><td class="font-mono text-[10px]">${u.uac||'-'}</td><td class="font-bold text-xs">${u.username||'-'}</td><td class="text-xs">${vp.businessName||'-'}</td><td class="text-[10px] max-w-[100px] truncate">${vp.description||'-'}</td><td><span class="password-blur" onclick="this.classList.toggle('revealed')">••••••</span></td><td>${u.phone||'-'}</td><td class="text-[10px]">${u.email||'-'}</td><td class="text-[10px] max-w-[100px] truncate">${vp.address||'-'}</td><td><span class="badge ${u.status==='ACTIVE'?'badge-active':u.status==='BLOCKED'?'badge-blocked':u.status==='PENDING'?'badge-pending':'badge-inactive'}">${u.status||'UNKNOWN'}</span></td><td class="text-center">-</td><td class="text-center">-</td><td class="font-bold">RM -</td><td class="font-bold text-purple-600">RM ${(vp.commissionRate||COMMISSION_DEFAULT).toFixed(2)}</td><td class="text-center">-</td><td class="text-[10px]">${vp.bankDetails?.bankName||'-'}</td><td class="text-center"><button onclick="deleteVendor('${u.id}')" class="action-btn btn-delete">Delete</button></td><td class="text-center">⚪</td><td class="text-[10px]">${formatDate(u.logCache)}</td></tr>`;}).join('');
-        }
-        function renderAdminProducts(){
-            const tbody=document.getElementById('admin-prod-list'),search=(document.getElementById('admin-prod-search')?.value||'').toLowerCase(),status=document.getElementById('admin-prod-status')?.value||'all';
-            let filtered=allProducts.filter(p=>(!search||p.name?.toLowerCase().includes(search))&&(status==='all'||p.status===status));
-            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="11" class="text-center py-8 text-gray-500 text-xs">Tiada produk</td></tr>`;return;}
-            tbody.innerHTML=filtered.map((p,i)=>{const rev=(p.priceSell-p.price)*(p.totalSold||0);return`<tr><td>${i+1}</td><td><img src="${p.imageUrl||'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover bg-gray-200"></td><td class="font-bold text-xs max-w-[150px] truncate">${p.name}</td><td class="font-bold text-purple-600">${formatRM(p.priceSell)}</td><td>⭐${(p.rating||5).toFixed(1)}</td><td><span class="badge ${p.status==='Public'?'badge-active':p.status==='Private'?'badge-private':'badge-outstock'}">${p.status}</span></td><td class="text-center">${p.totalSold||0}</td><td class="font-bold text-green-600">${formatRM(rev)}</td><td class="text-[10px]">${p.vendorName||'-'}</td><td><button class="action-btn btn-edit">Edit</button></td><td><button class="action-btn btn-delete">Padam</button></td></tr>`;}).join('');
-        }
-        window.updateCommission = async () => {
-            const rate=parseFloat(document.getElementById('admin-commission').value);if(!rate||rate<0.01||rate>5){showToast('Commission: RM0.01 - RM5.00','error');return;}
-            try{await updateDoc(doc(db,"system/config"),{commissionRate:rate,updatedAt:serverTimestamp()},{merge:true});showToast('✅ Commission rate dikemaskini','success');}catch(e){showToast('❌ Gagal: '+e.message,'error');}
-        };
-        window.deleteVendor = async (uid) => { if(!confirm('Padam vendor ini?'))return; try{await updateDoc(doc(db,"users",uid),{status:'BLOCKED',blockedAt:serverTimestamp()});showToast('✅ Vendor diblock','success');loadAdmin();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-
         // ===== CHAT =====
         async function loadChatList(){
             if(!currentUser)return; const list=document.getElementById('chat-list-view');
-            if(vendorData.role==='admin'){
-                list.innerHTML='<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
-                const q=query(collection(db,"chats"),where("participants","array-contains",currentUser.uid));
-                if(unsubscribeChat)unsubscribeChat();
-                unsubscribeChat=onSnapshot(q,(snap)=>{list.innerHTML="";if(snap.empty){list.innerHTML="<p class='text-center text-gray-500 mt-10'>Tiada perbualan.</p>";return;}snap.forEach(ds=>{const d=ds.data(),pid=d.participants?.find(id=>id!==currentUser.uid);if(pid)getDoc(doc(db,"users",pid)).then(ps=>{if(ps.exists()){const p=ps.data();list.innerHTML+=`<div onclick="openAdminChat('${pid}','${p.username||'Unknown'}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white">${(p.username||'?')[0]}</div><div><h4 class="font-bold text-sm">${p.username||'Unknown'}</h4><p class="text-xs text-gray-500 truncate w-40">${d.lastMessage||'-'}</p></div></div><span class="text-[10px] text-gray-400">${d.lastTime?new Date(d.lastTime.toDate?.()).toLocaleTimeString():''}</span></div>`;}}).catch(()=>{});});});
-            }else{
-                const adminQ=query(collection(db,"users"),where("role","==","admin"),limit(1));
-                try{const adminSnap=await getDocs(adminQ);if(adminSnap.empty){list.innerHTML="<p class='text-center text-red-500'>Tiada Admin tersedia.</p>";return;}const adminDoc=adminSnap.docs[0];list.innerHTML=`<div onclick="openChat('${adminDoc.id}','${adminDoc.data().username||'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;}catch(e){list.innerHTML="<p class='text-center text-red-500'>Gagal memuat support.</p>";}
-            }
-        }        function loadChatMessages(partnerId){
+            const adminQ=query(collection(db,"users"),where("role","==","admin"),limit(1));
+            try{const adminSnap=await getDocs(adminQ);if(adminSnap.empty){list.innerHTML="<p class='text-center text-red-500'>Tiada Admin tersedia.</p>";return;}const adminDoc=adminSnap.docs[0];list.innerHTML=`<div onclick="openChat('${adminDoc.id}','${adminDoc.data().username||'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;}catch(e){list.innerHTML="<p class='text-center text-red-500'>Gagal memuat support.</p>";}
+        }
+        function loadChatMessages(partnerId){
             const chatId=[currentUser.uid,partnerId].sort().join('_'),msgContainer=document.getElementById('chat-messages');
             if(unsubscribeChat)unsubscribeChat();
             unsubscribeChat=onSnapshot(query(collection(db,`chats/${chatId}/messages`),orderBy("timestamp","asc"),limit(100)),(snap)=>{msgContainer.innerHTML="";snap.forEach(d=>{const m=d.data(),isMe=m.senderId===currentUser.uid;let c='';if(m.type==='text')c=`<p class="text-sm">${m.text||''}</p>`;else if(m.type==='image')c=`<img src="${m.url||''}" class="msg-img" alt="Image">`;else if(m.type==='location')c=`<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address||''}</div>`;msgContainer.innerHTML+=`<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${c}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate?.()).toLocaleTimeString():''}</div></div>`;});msgContainer.scrollTop=msgContainer.scrollHeight;if(snap.size>0)playSound('msg');});
         }
         window.openChat = (pid,name) => { currentChatPartner=pid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(pid); };
-        window.openAdminChat = (pid,name) => { currentChatPartner=pid; document.getElementById('admin-chat-list').classList.add('hidden-section'); document.getElementById('admin-active-chat').classList.remove('hidden-section'); document.getElementById('admin-chat-target').innerText=name; loadChatMessages(pid); };
         window.closeChat = () => { if(unsubscribeChat)unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
-        window.closeAdminChat = () => { if(unsubscribeChat)unsubscribeChat(); document.getElementById('admin-active-chat').classList.add('hidden-section'); document.getElementById('admin-chat-list').classList.remove('hidden-section'); };
         window.sendMessage = async () => { const input=document.getElementById('msg-input'),text=input?.value?.trim(); if(!text||!currentChatPartner)return; await saveMessage(text,'text'); input.value=''; };
-        window.sendAdminMessage = async () => { const input=document.getElementById('admin-msg-input'),text=input?.value?.trim(); if(!text||!currentChatPartner)return; await saveMessage(text,'text'); input.value=''; };
         async function saveMessage(text,type,url=null,address=null){
             const chatId=[currentUser.uid,currentChatPartner].sort().join('_');
             await addDoc(collection(db,`chats/${chatId}/messages`),{senderId:currentUser.uid,text:text||'',type,url,address,timestamp:serverTimestamp(),read:false,isPinned:false});
@@ -702,14 +570,12 @@
             playSound('msg');
         }
         window.handleFileUpload = async (input) => { const file=input?.files?.[0]; if(!file||!currentChatPartner)return; if(file.size>5*1024*1024){showToast('❌ Gambar terlalu besar (max 5MB)','error');input.value='';return;} if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showToast('❌ Format tidak disokong','error');input.value='';return;} try{const u=URL.createObjectURL(file);await saveMessage('','image',u);showToast('✅ Gambar dihantar','success',1500);}catch(e){showToast('❌ Upload gagal: '+e.message,'error');}finally{if(input)input.value='';} };
-        window.handleAdminFileUpload = window.handleFileUpload;
         window.sendLocation = async () => { const addr=prompt("Masukkan alamat/lokasi:"); if(addr?.trim()){await saveMessage('','location',null,addr.trim());} };
         window.copyChatID = () => { if(currentChatPartner){navigator.clipboard.writeText(currentChatPartner);showToast('✅ ID disalin!','success',1500);} };
         window.blockContact = async () => { if(!confirm("Block pengguna ini?"))return; try{await updateDoc(doc(db,"users",currentChatPartner),{status:'BLOCKED'});showToast('✅ Pengguna diblock','success');closeChat();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-        window.deleteConversation = async () => { if(!confirm("Padam perbualan ini?"))return; alert("Sila padam manual di Firebase Console > Firestore > chats collection"); };
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('audio').forEach(a=>a.load());const qr=document.getElementById('qr-payment'),hint=document.getElementById('qr-hint');if(qr){qr.classList.add('blur-md');}if(hint){hint.innerHTML='👆 Klik untuk jelas';}});
+        document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('audio').forEach(a=>a.load());});
         document.addEventListener('visibilitychange',()=>{if(document.hidden)console.log('Page hidden');else console.log('Page visible');});
     </script>
 </body>
