@@ -1233,7 +1233,12 @@ window.doGoogleSignIn = async () => {
             unsubscribeUsers = onSnapshot(doc(db, "users", currentUser.uid), (d) => {
                 if(d.exists()) { 
                     userData = d.data(); 
-                    updateDashUI(); 
+                    updateDashUI();
+                    // Handle Google profile picture
+const avatarEl = document.querySelector('#view-dashboard .w-16.h-16, #view-dashboard .w-20.h-20');
+if (avatarEl && userData.photoURL) {
+  avatarEl.innerHTML = `<img src="${userData.photoURL}" class="w-full h-full rounded-full object-cover" alt="Profile">`;
+}
                 } else { 
                     showToast('❌ Data pengguna tidak dijumpai', 'error'); 
                 }
@@ -1265,11 +1270,6 @@ window.doGoogleSignIn = async () => {
                 'dash-uac-display': userData.uac,
                 'dash-phone': userData.phone,
                 'dash-address': userData.address || ""
-            // Handle Google profile picture
-const avatarEl = document.querySelector('#view-dashboard .w-16.h-16, #view-dashboard .w-20.h-20');
-if (avatarEl && userData.photoURL) {
-  avatarEl.innerHTML = `<img src="${userData.photoURL}" class="w-full h-full rounded-full object-cover" alt="Profile">`;
-}
             };
             
             Object.entries(els).forEach(([id, val]) => {
