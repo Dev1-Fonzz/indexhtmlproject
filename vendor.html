@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vendor Dashboard | MFD Store</title>
+    
+    <!-- Libraries - SAME AS index.html -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== COPY PASTE CSS DARI index.html ===== */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-dark: #2d3748;
+            --error-red: #e53e3e;
+            --success-green: #38a169;
+            --warning-orange: #dd6b20;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
+        .glitter-text {
+            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
+            -webkit-background-clip: text;            background-clip: text;
+            color: transparent;
+            background-size: 300% auto;
+            animation: shine 4s linear infinite;
+            font-weight: 800;
+        }
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
+            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
+            background-size: 300% 300%;
+            animation: gradientMove 4s ease infinite;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+        }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        
+        .hidden-section { display: none !important; }
+        input, select, textarea {
+            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
+        input:disabled, select:disabled, textarea:disabled { background: #edf2f7; cursor: not-allowed; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .badge-pending { background: #feebc8; color: #744210; }
+        .badge-approved { background: #c6f6d5; color: #22543d; }
+        .badge-rejected { background: #fed7d7; color: #822727; }
+        .badge-draft { background: #e2e8f0; color: #4a5568; }
+        .badge-active { background: #c6f6d5; color: #22543d; }
+        .badge-inactive { background: #e2e8f0; color: #4a5568; }
+        .badge-to-pay { background: #feebc8; color: #744210; }
+        .badge-to-ship { background: #bee3f8; color: #2a4365; }
+        .badge-completed { background: #9ae6b4; color: #22543d; }
+        .badge-cancelled { background: #fed7d7; color: #822727; }
+        
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Table */
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; font-size: 0.65rem; }
+        .custom-table th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 12px 8px; text-align: left; font-weight: 700; 
+            border-bottom: 2px solid #e2e8f0; color: white; 
+            position: sticky; top: 0; z-index: 10; white-space: nowrap;
+        }
+        .custom-table td { 
+            padding: 10px 8px; border-bottom: 1px solid #edf2f7; 
+            background: rgba(255,255,255,0.5); vertical-align: middle; 
+            color: #2d3748; white-space: nowrap; max-width: 200px; 
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
+        
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success-green); }
+        .toast.error { background: var(--error-red); }
+        .toast.warning { background: var(--warning-orange); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .custom-table { min-width: 800px; font-size: 0.6rem; }
+            .custom-table th, .custom-table td { padding: 8px 6px; }
+            .glass-panel { border-radius: 16px; }
+        }
+        
+        /* Vendor-specific */
+        .stat-card { transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(102,126,234,0.3); }
+        .commission-rate-badge { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; padding: 2px 8px; border-radius: 12px; 
+            font-size: 0.7rem; font-weight: bold; 
+        }
+    </style>
+</head>
+<body class="p-0 md:p-4">
+
+    <!-- AUDIO EFFECTS -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
+        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('dashboard')">
+            <i class="fas fa-store"></i> MFD VENDOR
+        </div>
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="playSound('click'); navTo('chat')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
+                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
+                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">!</span>
+            </button>
+            <div id="auth-nav">
+                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Daftar Vendor</button>
+            </div>
+            <div id="vendor-nav" class="hidden-section flex items-center gap-2 md:gap-3">
+                <div class="text-right hidden md:block">
+                    <div id="nav-vendor-name" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[120px]"></div>
+                    <div id="nav-commission" class="text-[10px] text-purple-500 font-mono"></div>
+                </div>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm" title="Dashboard"><i class="fas fa-home"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
+
+        <!-- 1. LOGIN / REGISTER -->
+        <section id="view-login" class="max-w-md mx-auto mt-10">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Vendor</h2>
+                <input type="email" id="login-email" placeholder="Email Address" autocomplete="email" required>
+                <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="login-btn">LOGIN</button>
+                <p class="text-center mt-6 text-sm text-gray-600">Belum ada akaun vendor? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="navTo('register')">Daftar Sekarang</span></p>
+            </div>
+        </section>
+
+        <section id="view-register" class="hidden-section max-w-lg mx-auto mt-6">
+            <div class="glass-panel p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-4 glitter-text">Daftar Sebagai Vendor</h2>
+                <p class="text-center text-xs text-gray-600 mb-6">Sertai rangkaian penjual MFD Store • Komisen adil • Support 24/7</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="reg-business" placeholder="Nama Bisnes *" required maxlength="50">
+                    <input type="tel" id="reg-phone" placeholder="No. Telefon (WhatsApp) *" pattern="[0-9+\-\s()]{10,}" required>                    <input type="email" id="reg-email" placeholder="Email *" autocomplete="email" required>
+                    <input type="password" id="reg-pass" placeholder="Password (min 6 karakter) *" minlength="6" required>
+                    <input type="text" id="reg-ic" placeholder="No. IC / Passport (Optional)" maxlength="20" class="md:col-span-2">
+                    <textarea id="reg-desc" placeholder="Deskripsi Bisnes (Contoh: Jual aksesori telefon, baju muslimah, dll)" class="md:col-span-2" maxlength="200" rows="2"></textarea>
+                </div>
+                
+                <div class="bg-purple-50 p-3 rounded-lg mt-4 text-xs text-purple-800 border border-purple-200">
+                    <strong>📋 Terma & Syarat Vendor:</strong>
+                    <ul class="list-disc pl-4 mt-1 space-y-1">
+                        <li>Komisen platform: <strong>10%</strong> dari setiap jualan (telus & tetap)</li>
+                        <li>Produk perlu diluluskan admin sebelum live</li>
+                        <li>Withdrawal minimum: <strong>RM50</strong>, diproses dalam 1-3 hari bekerja</li>
+                        <li>Vendor bertanggungjawab atas stok & penghantaran produk sendiri</li>
+                    </ul>
+                </div>
+                
+                <label class="flex items-center gap-2 mt-4 text-xs">
+                    <input type="checkbox" id="reg-agree" required class="w-4 h-4 accent-purple-500">
+                    <span>Saya bersetuju dengan <a href="#" class="text-purple-600 underline" onclick="alert('Terma lengkap akan disediakan dalam fasa seterusnya.')">Terma & Syarat Vendor MFD Store</a></span>
+                </label>
+                
+                <button onclick="doRegisterVendor()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="register-btn">HANTAR PERMOHONAN</button>
+                <p class="text-center mt-4 text-xs text-gray-500">✅ Permohonan akan disemak dalam masa 24-48 jam</p>
+            </div>
+        </section>
+
+        <!-- 2. VENDOR DASHBOARD (MAIN) -->
+        <section id="view-dashboard" class="hidden-section">
+            
+            <!-- Approval Notice -->
+            <div id="approval-notice" class="hidden-section glass-panel p-4 mb-4 bg-yellow-50 border-l-4 border-yellow-400">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-clock text-yellow-600 mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-yellow-800">Permohonan Dalam Semakan</h4>
+                        <p class="text-xs text-yellow-700">Akaun vendor anda sedang diproses. Anda akan menerima notifikasi email apabila diluluskan. Sementara itu, anda boleh lengkapkan profil bisnes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejected Notice -->
+            <div id="rejected-notice" class="hidden-section glass-panel p-4 mb-4 bg-red-50 border-l-4 border-red-400">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-red-800">Permohonan Ditolak</h4>
+                        <p id="reject-reason" class="text-xs text-red-700"></p>
+                        <button onclick="navTo('register')" class="mt-2 text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Cuba Daftar Semula</button>
+                    </div>
+                </div>            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="glass-panel p-4 stat-card cursor-default">
+                    <div class="text-2xl font-bold text-purple-600" id="stat-total-sales">RM 0.00</div>
+                    <div class="text-[10px] text-gray-600">📈 Jumlah Jualan</div>
+                </div>
+                <div class="glass-panel p-4 stat-card cursor-default">
+                    <div class="text-2xl font-bold text-green-600" id="stat-earnings">RM 0.00</div>
+                    <div class="text-[10px] text-gray-600">💰 Komisen Terkumpul</div>
+                </div>
+                <div class="glass-panel p-4 stat-card cursor-default">
+                    <div class="text-2xl font-bold text-blue-600" id="stat-pending-orders">0</div>
+                    <div class="text-[10px] text-gray-600">📦 Pesanan Pending</div>
+                </div>
+                <div class="glass-panel p-4 stat-card cursor-default">
+                    <div class="text-2xl font-bold text-pink-600" id="stat-products">0</div>
+                    <div class="text-[10px] text-gray-600">🛍️ Produk Aktif</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glass-panel p-4 mb-6">
+                <h3 class="font-bold text-purple-700 mb-3 text-sm">⚡ Tindakan Pantas</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <button onclick="navTo('products')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm">
+                        <i class="fas fa-plus-circle text-purple-600 mb-1"></i>
+                        <div class="text-[10px] font-bold">Tambah Produk</div>
+                    </button>
+                    <button onclick="navTo('orders')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm">
+                        <i class="fas fa-box-open text-blue-600 mb-1"></i>
+                        <div class="text-[10px] font-bold">Urus Pesanan</div>
+                    </button>
+                    <button onclick="navTo('earnings')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm">
+                        <i class="fas fa-wallet text-green-600 mb-1"></i>
+                        <div class="text-[10px] font-bold">Withdraw</div>
+                    </button>
+                    <button onclick="navTo('profile')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm">
+                        <i class="fas fa-cog text-gray-600 mb-1"></i>
+                        <div class="text-[10px] font-bold">Settings</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Orders Preview -->
+            <div class="glass-panel p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-purple-700 text-sm">🕐 Pesanan Terkini</h3>
+                    <button onclick="navTo('orders')" class="text-[10px] text-purple-600 hover:underline">Lihat Semua →</button>                </div>
+                <div id="recent-orders-list" class="space-y-2 max-h-60 overflow-y-auto">
+                    <div class="text-center text-gray-500 py-4 text-xs"><div class="loader mx-auto mb-2"></div>Memuatkan...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PRODUCT MANAGEMENT -->
+        <section id="view-products" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6">
+                <h2 class="text-xl font-bold glitter-text mb-4">➕ Tambah Produk Baharu</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-white/30 p-4 rounded-xl">
+                    <!-- Image URL Input (PostImages.org) -->
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-xs font-bold mb-1">🖼️ URL Gambar Produk</label>
+                        <input type="url" id="prod-img-url" placeholder="Paste link dari postimages.org (contoh: https://i.postimg.cc/xxxx/produk.jpg)" class="m-0">
+                        <div id="prod-img-preview" class="mt-2 hidden"><img class="w-20 h-20 object-cover rounded-lg border"></div>
+                        <p class="text-[10px] text-gray-500 mt-1">
+                            💡 Tips: Upload gambar di <a href="https://postimages.org/" target="_blank" class="text-purple-600 underline">postimages.org</a> → Copy <strong>"Direct link"</strong> → Paste di sini
+                        </p>
+                    </div>
+                    
+                    <input type="text" id="prod-name" placeholder="Nama Produk *" required maxlength="100">
+                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM) *" required min="0.01" step="0.01">
+                    <input type="text" id="prod-variation" placeholder="Variasi (Contoh: Merah, XL, Set A)" maxlength="50">
+                    <input type="number" id="prod-stock" placeholder="Stok Tersedia *" required min="0">
+                    <textarea id="prod-desc" placeholder="Deskripsi Produk" class="md:col-span-2 lg:col-span-3" maxlength="500" rows="2"></textarea>
+                    <input type="text" id="prod-category" placeholder="Kategori (Contoh: Elektronik, Fashion)" maxlength="30">
+                    <input type="text" id="prod-weight" placeholder="Berat (kg) - Untuk kalkulasi shipping" maxlength="10">
+                    
+                    <select id="prod-status" class="m-0">
+                        <option value="draft">💾 Simpan sebagai Draft</option>
+                        <option value="pending">📤 Hantar untuk Kelulusan</option>
+                    </select>
+                </div>
+                
+                <button onclick="addVendorProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg disabled:opacity-50" id="add-product-btn">
+                    <i class="fas fa-paper-plane mr-2"></i>HANTAR PRODUK
+                </button>
+            </div>
+
+            <!-- Product List -->
+            <div class="glass-panel p-4 md:p-6">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 class="font-bold text-purple-700">📋 Senarai Produk Saya</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="prod-search" placeholder="Cari produk..." class="w-32 md:w-40 text-xs py-1 m-0" onkeyup="renderVendorProducts()">
+                        <select id="prod-filter" class="w-28 text-xs py-1 m-0" onchange="renderVendorProducts()">
+                            <option value="all">Semua</option>                            <option value="approved">✅ Diluluskan</option>
+                            <option value="pending">⏳ Menunggu</option>
+                            <option value="draft">💾 Draft</option>
+                            <option value="rejected">❌ Ditolak</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>GAMBAR</th>
+                                <th>NAMA</th>
+                                <th>HARGA</th>
+                                <th>STOK</th>
+                                <th>STATUS</th>
+                                <th>TERJUAL</th>
+                                <th>PENDAPATAN</th>
+                                <th>TINDAKAN</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-product-list">
+                            <tr><td colspan="8" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Memuatkan produk...</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ORDER MANAGEMENT -->
+        <section id="view-orders" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-4">
+                <h2 class="text-xl font-bold glitter-text mb-3">📦 Urus Pesanan</h2>
+                <p class="text-xs text-gray-600 mb-4">Hanya paparkan pesanan yang mengandungi produk anda. Update status selepas anda pos barang.</p>
+                
+                <!-- Order Filters -->
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-2">
+                    <button onclick="filterVendorOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300">Semua</button>
+                    <button onclick="filterVendorOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
+                    <button onclick="filterVendorOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
+                    <button onclick="filterVendorOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
+                    <button onclick="filterVendorOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
+                    <button onclick="filterVendorOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 md:p-6">
+                <div class="table-container">
+                    <table class="custom-table">                        <thead>
+                            <tr>
+                                <th>ORDER ID</th>
+                                <th>CUSTOMER</th>
+                                <th>PRODUK ANDA</th>
+                                <th>QTY</th>
+                                <th>HARGA</th>
+                                <th>KOMISEN ANDA</th>
+                                <th>ALAMAT</th>
+                                <th>STATUS</th>
+                                <th>TRACKING</th>
+                                <th>TINDAKAN</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-order-list">
+                            <tr><td colspan="10" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Memuatkan pesanan...</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. EARNINGS & WITHDRAWAL -->
+        <section id="view-earnings" class="hidden-section">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                <!-- Balance Card -->
+                <div class="glass-panel p-5 lg:col-span-2">
+                    <h3 class="font-bold text-purple-700 mb-4">💰 Baki Komisen</h3>
+                    <div class="flex items-end gap-3 mb-4">
+                        <span class="text-4xl font-bold text-green-600" id="earnings-balance">RM 0.00</span>
+                        <span class="text-xs text-gray-500 mb-1">boleh withdraw</span>
+                    </div>
+                    
+                    <div class="bg-white/50 p-3 rounded-lg text-xs space-y-2">
+                        <div class="flex justify-between"><span>Komisen terkumpul:</span><strong id="earnings-total">RM 0.00</strong></div>
+                        <div class="flex justify-between"><span>Sudah withdraw:</span><strong id="earnings-withdrawn">RM 0.00</strong></div>
+                        <div class="flex justify-between"><span>Dalam proses:</span><strong id="earnings-pending">RM 0.00</strong></div>
+                        <hr class="border-gray-300">
+                        <div class="flex justify-between text-purple-700"><span><strong>Baki tersedia:</strong></span><strong id="earnings-available">RM 0.00</strong></div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs text-blue-800">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <strong>Polisi Withdrawal:</strong> Minimum RM50 • Diproses 1-3 hari bekerja • Ke akaun bank / TNG eWallet yang didaftarkan
+                    </div>
+                </div>
+                
+                <!-- Withdrawal Form -->
+                <div class="glass-panel p-5">
+                    <h3 class="font-bold text-purple-700 mb-3">📤 Request Withdrawal</h3>                    <label class="block text-xs font-bold mb-1">Jumlah (RM)</label>
+                    <input type="number" id="withdraw-amount" placeholder="Min. RM50" min="50" step="0.01">
+                    
+                    <label class="block text-xs font-bold mb-1 mt-3">Kaedah Penerimaan</label>
+                    <select id="withdraw-method">
+                        <option value="bank">Transfer Bank</option>
+                        <option value="tng">Touch 'n Go eWallet</option>
+                    </select>
+                    
+                    <label class="block text-xs font-bold mb-1 mt-3">No. Akaun / EWallet</label>
+                    <input type="text" id="withdraw-account" placeholder="Contoh: 1234567890 / 0123456789">
+                    
+                    <button onclick="requestWithdrawal()" class="btn-glitter w-full py-2 rounded-lg mt-4 text-sm disabled:opacity-50" id="withdraw-btn">
+                        HANTAR PERMOHONAN
+                    </button>
+                    <p class="text-[10px] text-gray-500 mt-2 text-center">*Pastikan maklumat akaun adalah betul</p>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="glass-panel p-4 md:p-6">
+                <h3 class="font-bold text-purple-700 mb-4">📜 Sejarah Transaksi</h3>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>TARIKH</th>
+                                <th>JENIS</th>
+                                <th>KETERANGAN</th>
+                                <th>JUMLAH</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list">
+                            <tr><td colspan="5" class="text-center py-6 text-gray-500 text-xs">Tiada transaksi</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PROFILE & SETTINGS -->
+        <section id="view-profile" class="hidden-section max-w-2xl mx-auto">
+            <div class="glass-panel p-6">
+                <h2 class="text-xl font-bold glitter-text mb-6">⚙️ Tetapan Profil Vendor</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Nama Bisnes</label>
+                        <input type="text" id="profile-business" disabled class="bg-gray-100">                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">No. Telefon (WhatsApp)</label>
+                        <input type="tel" id="profile-phone">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Email</label>
+                        <input type="email" id="profile-email" disabled class="bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Deskripsi Bisnes</label>
+                        <textarea id="profile-desc" rows="3" maxlength="200"></textarea>
+                    </div>
+                    
+                    <hr class="border-gray-300 my-4">
+                    
+                    <h4 class="font-bold text-sm text-purple-700 mb-2">💳 Maklumat Pembayaran (Untuk Withdrawal)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Nama Pemegang Akaun</label>
+                            <input type="text" id="profile-bank-name" placeholder="Nama seperti dalam bank">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Nama Bank / EWallet</label>
+                            <select id="profile-bank-type">
+                                <option value="">Pilih...</option>
+                                <option value="Maybank">Maybank</option>
+                                <option value="CIMB">CIMB</option>
+                                <option value="Public Bank">Public Bank</option>
+                                <option value="RHB">RHB</option>
+                                <option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option>
+                                <option value="GrabPay">GrabPay</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold mb-1">No. Akaun / EWallet</label>
+                            <input type="text" id="profile-bank-number" placeholder="Contoh: 1234567890">
+                        </div>
+                    </div>
+                    
+                    <button onclick="updateVendorProfile()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg">
+                        💾 SIMPAN PERUBAHAN
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Fairness Notice -->
+            <div class="glass-panel p-4 mt-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200">
+                <h4 class="font-bold text-purple-700 text-sm mb-2">🤝 Komitmen Keadilan MFD Store</h4>
+                <ul class="text-xs text-gray-700 space-y-1">                    <li>✅ Semua vendor dikenakan komisen <strong>10%</strong> yang sama — tiada "premium rate"</li>
+                    <li>✅ Produk diluluskan berdasarkan kualiti, bukan siapa vendor</li>
+                    <li>✅ Support dan resources disediakan sama rata untuk semua</li>
+                    <li>✅ Sistem komisen & withdrawal telus — anda boleh semak bila-bila masa</li>
+                    <li>✅ Aduan vendor diproses secara adil oleh admin neutral</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 7. LIVE CHAT (Vendor ↔ Customer) -->
+        <section id="view-chat" class="hidden-section">
+            <div class="glass-panel p-4 h-[80vh] flex flex-col">
+                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
+                    <i class="fas fa-headset"></i> Live Chat dengan Pelanggan
+                </h2>
+                
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Memuatkan perbualan...</p></div>
+                </div>
+                
+                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="closeVendorChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
+                            <div>
+                                <h3 id="chat-customer-name" class="font-bold text-sm text-gray-800">Nama Pelanggan</h3>
+                                <span class="text-[10px] text-green-500">● Online</span>
+                            </div>
+                        </div>
+                        <button onclick="copyCustomerInfo()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">📋 Info</button>
+                    </div>
+                    
+                    <div id="vendor-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50 flex-1 overflow-y-auto p-3">
+                        <!-- Messages will be inserted here -->
+                    </div>
+                    
+                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
+                        <textarea id="vendor-msg-input" rows="1" placeholder="Taip mesej..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendVendorMessage();}" maxlength="1000"></textarea>
+                        <button onclick="sendVendorMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Hantar"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1 text-center">Semua mesej direkod untuk tujuan keselamatan & penyelesaian pertikaian</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FIREBASE LOGIC - VENDOR SPECIFIC -->
+    <script type="module">
+        // ===== FIREBASE SETUP (SAME AS index.html) =====        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ===== GLOBAL STATE =====
+        let currentUser = null;
+        let vendorData = {};
+        let myProducts = [];
+        let myOrders = [];
+        let myTransactions = [];
+        let currentChatPartner = null;
+        let unsubscribeOrders = null;
+        let unsubscribeProducts = null;
+        let unsubscribeChat = null;
+
+        // ===== CONSTANTS - FAIRNESS POLICY =====
+        const COMMISSION_RATE = 0.10; // 10% - SAME FOR ALL VENDORS
+        const MIN_WITHDRAWAL = 50;
+        const PRODUCT_APPROVAL_REQUIRED = true;
+
+        // ===== UTILITY FUNCTIONS =====
+        window.playSound = (type) => {
+            try {
+                const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error') };
+                if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
+            } catch(e) {}
+        };
+
+        function showToast(msg, type='success', duration=3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'} mr-2"></i>${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(100%)'; setTimeout(()=>toast.remove(),300); }, duration);
+        }
+        function formatRM(amount) { return 'RM ' + parseFloat(amount||0).toFixed(2); }
+        function formatDate(ts) { if(!ts) return '-'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('ms-MY', {day:'2-digit',month:'short',year:'numeric'}); }
+
+        function isValidImageUrl(url) {
+            if(!url || !url.startsWith('https://')) return false;
+            const allowedExt = ['.jpg','.jpeg','.png','.webp','.gif'];
+            if(!allowedExt.some(ext => url.toLowerCase().endsWith(ext))) return false;
+            const allowedDomains = ['postimg.cc','i.postimg.cc','postimages.org'];
+            try { const domain = new URL(url).hostname; if(!allowedDomains.includes(domain)) return false; } catch(e){ return false; }
+            return url.length < 500;
+        }
+
+        // ===== NAVIGATION =====
+        window.navTo = (viewId) => {
+            playSound('click');
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
+            const target = document.getElementById(`view-${viewId}`);
+            if(target) target.classList.remove('hidden-section');
+            window.scrollTo(0,0);
+            
+            if(viewId === 'dashboard' && currentUser) loadVendorDashboard();
+            if(viewId === 'products' && currentUser) loadVendorProducts();
+            if(viewId === 'orders' && currentUser) loadVendorOrders();
+            if(viewId === 'earnings' && currentUser) loadVendorEarnings();
+            if(viewId === 'profile' && currentUser) loadVendorProfile();
+            if(viewId === 'chat' && currentUser) loadVendorChatList();
+        };
+
+        // ===== AUTH =====
+        window.doLogin = async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('login-btn');
+            if(!email || !pass) { showToast('Sila masukkan email & password', 'error'); return; }
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showToast('✅ Login berjaya!', 'success');
+            } catch(e) {
+                let msg = 'Login gagal';
+                if(e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') msg = 'Email atau password salah';
+                showToast(`❌ ${msg}`, 'error');
+            } finally { btn.disabled = false; btn.innerHTML = 'LOGIN'; }
+        };
+
+        window.doRegisterVendor = async () => {
+            const business = document.getElementById('reg-business').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const email = document.getElementById('reg-email').value.trim();            const pass = document.getElementById('reg-pass').value;
+            const agree = document.getElementById('reg-agree').checked;
+            const btn = document.getElementById('register-btn');
+            
+            if(!business || !phone || !email || !pass) { showToast('Sila lengkapkan semua field wajib', 'error'); return; }
+            if(!agree) { showToast('Sila bersetuju dengan Terma & Syarat', 'error'); return; }
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const uac = "VND-" + Math.random().toString(36).substr(2,8).toUpperCase();
+                
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    username: business,
+                    email: email,
+                    phone: phone,
+                    uac: uac,
+                    role: 'vendor',
+                    status: 'PENDING', // Requires admin approval
+                    vendorProfile: {
+                        businessName: business,
+                        description: document.getElementById('reg-desc').value.trim() || '',
+                        icNumber: document.getElementById('reg-ic').value.trim() || '',
+                        approvalStatus: 'pending',
+                        approvedAt: null,
+                        commissionRate: COMMISSION_RATE, // FAIR: same rate for all
+                        bankDetails: {}
+                    },
+                    createdAt: serverTimestamp(),
+                    logCache: serverTimestamp()
+                });
+                
+                showToast('✅ Permohonan dihantar! Sila semak email untuk update.', 'success');
+                navTo('login');
+            } catch(e) {
+                console.error(e);
+                let msg = 'Pendaftaran gagal';
+                if(e.code === 'auth/email-already-in-use') msg = 'Email sudah digunakan';
+                showToast(`❌ ${msg}`, 'error');
+            } finally { btn.disabled = false; btn.innerHTML = 'HANTAR PERMOHONAN'; }
+        };
+
+        window.logout = () => { signOut(auth); playSound('click'); showToast('✅ Logged out', 'success'); navTo('login'); };
+
+        // ===== AUTH STATE LISTENER =====
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if(user) {
+                document.getElementById('auth-nav').classList.add('hidden-section');
+                document.getElementById('vendor-nav').classList.remove('hidden-section');                
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if(snap.exists()) {
+                        vendorData = snap.data();
+                        
+                        // Security & Fairness Check
+                        if(vendorData.status === 'BLOCKED') { showToast('❌ Akaun diblokir', 'error'); signOut(auth); return; }
+                        
+                        // Show appropriate notice
+                        const approvalNotice = document.getElementById('approval-notice');
+                        const rejectedNotice = document.getElementById('rejected-notice');
+                        if(vendorData.vendorProfile?.approvalStatus === 'pending') {
+                            approvalNotice.classList.remove('hidden-section');
+                            rejectedNotice.classList.add('hidden-section');
+                        } else if(vendorData.vendorProfile?.approvalStatus === 'rejected') {
+                            approvalNotice.classList.add('hidden-section');
+                            rejectedNotice.classList.remove('hidden-section');
+                            document.getElementById('reject-reason').innerText = vendorData.vendorProfile.rejectionReason || 'Tiada sebab diberikan';
+                        } else {
+                            approvalNotice.classList.add('hidden-section');
+                            rejectedNotice.classList.add('hidden-section');
+                        }
+                        
+                        // Update nav
+                        document.getElementById('nav-vendor-name').innerText = vendorData.vendorProfile?.businessName || vendorData.username;
+                        document.getElementById('nav-commission').innerText = `Komisen: ${(COMMISSION_RATE*100).toFixed(0)}%`;
+                        
+                        navTo('dashboard');
+                    }
+                } catch(e) { console.error('Auth error:', e); navTo('login'); }
+            } else {
+                document.getElementById('auth-nav').classList.remove('hidden-section');
+                document.getElementById('vendor-nav').classList.add('hidden-section');
+                navTo('login');
+            }
+        });
+
+        // ===== DASHBOARD =====
+        async function loadVendorDashboard() {
+            if(!currentUser || vendorData.role !== 'vendor') return;
+            
+            // Load stats in parallel
+            try {
+                const [productsSnap, ordersSnap, transactionsSnap] = await Promise.all([
+                    getDocs(query(collection(db, "products"), where("vendorId", "==", currentUser.uid))),
+                    getDocs(query(collection(db, "orders"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(5))),
+                    getDocs(query(collection(db, "vendor_transactions"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(10))
+                ]);
+                                // Calculate stats
+                let totalSales = 0, totalEarned = 0, activeProducts = 0, pendingOrders = 0;
+                
+                productsSnap.forEach(d => {
+                    const p = d.data();
+                    if(p.status === 'approved') activeProducts++;
+                });
+                
+                ordersSnap.forEach(d => {
+                    const o = d.data();
+                    if(o.status === 'To Ship') pendingOrders++;
+                    // Only count completed orders for sales
+                    if(o.status === 'Completed') {
+                        const vendorItem = o.items?.find(i => i.vendorId === currentUser.uid);
+                        if(vendorItem) {
+                            totalSales += (vendorItem.priceSell || 0) * (vendorItem.qty || 1);
+                            totalEarned += ((vendorItem.priceSell || 0) * (1 - COMMISSION_RATE)) * (vendorItem.qty || 1);
+                        }
+                    }
+                });
+                
+                // Update UI
+                document.getElementById('stat-total-sales').innerText = formatRM(totalSales);
+                document.getElementById('stat-earnings').innerText = formatRM(totalEarned);
+                document.getElementById('stat-pending-orders').innerText = pendingOrders;
+                document.getElementById('stat-products').innerText = activeProducts;
+                
+                // Recent orders preview
+                const recentList = document.getElementById('recent-orders-list');
+                if(ordersSnap.empty) {
+                    recentList.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">Tiada pesanan terkini</p>';
+                } else {
+                    recentList.innerHTML = ordersSnap.docs.slice(0,3).map(d => {
+                        const o = d.data();
+                        const myItem = o.items?.find(i => i.vendorId === currentUser.uid);
+                        return `<div class="p-2 bg-white/50 rounded text-xs flex justify-between items-center">
+                            <div><strong class="text-purple-700">${myItem?.name || 'Produk'}</strong><br><span class="text-gray-500">${formatDate(o.createdAt)}</span></div>
+                            <span class="badge ${o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':'badge-pending'}">${o.status}</span>
+                        </div>`;
+                    }).join('');
+                }
+                
+            } catch(e) { console.error('Dashboard load error:', e); }
+        }
+
+        // ===== PRODUCTS =====
+        // Image preview for PostImages URL
+        document.getElementById('prod-img-url')?.addEventListener('input', function(e) {
+            const url = e.target.value.trim();
+            const preview = document.getElementById('prod-img-preview');            const img = preview.querySelector('img');
+            if(isValidImageUrl(url)) {
+                img.src = url;
+                img.onerror = () => { showToast('⚠️ Link gambar tidak boleh diakses', 'warning'); };
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+            }
+        });
+
+        window.addVendorProduct = async () => {
+            const name = document.getElementById('prod-name').value.trim();
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const imgUrl = document.getElementById('prod-img-url').value.trim();
+            const stock = parseInt(document.getElementById('prod-stock').value);
+            const status = document.getElementById('prod-status').value;
+            const btn = document.getElementById('add-product-btn');
+            
+            if(!name || !price || !imgUrl || !stock) { showToast('Sila lengkapkan field wajib', 'error'); return; }
+            if(!isValidImageUrl(imgUrl)) { showToast('URL gambar tidak sah. Guna postimages.org', 'error'); return; }
+            if(price <= 0 || stock < 0) { showToast('Harga & stok mesti valid', 'error'); return; }
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            
+            try {
+                const uniqueCode = "ITEM-" + Math.random().toString(36).substr(2,6).toUpperCase();
+                const finalStatus = (status === 'pending' && PRODUCT_APPROVAL_REQUIRED) ? 'pending' : 'draft';
+                
+                await addDoc(collection(db, "products"), {
+                    name,
+                    priceSell: price,
+                    imageUrl: imgUrl,
+                    stock,
+                    status: finalStatus,
+                    vendorId: currentUser.uid,
+                    vendorName: vendorData.vendorProfile?.businessName || vendorData.username,
+                    description: document.getElementById('prod-desc').value.trim() || '',
+                    variation: document.getElementById('prod-variation').value.trim() || '',
+                    category: document.getElementById('prod-category').value.trim() || '',
+                    weight: document.getElementById('prod-weight').value.trim() || '',
+                    uniqueCode,
+                    totalSold: 0,
+                    rating: 5.0,
+                    reviews: [],
+                    allowReviews: true,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    approvalNote: finalStatus === 'pending' ? 'Menunggu kelulusan admin' : ''
+                });
+                                showToast('✅ Produk berjaya dihantar!', 'success');
+                // Reset form
+                document.querySelectorAll('#view-products input:not([disabled]), #view-products textarea').forEach(i => i.value = '');
+                document.getElementById('prod-img-preview').classList.add('hidden');
+                navTo('products');
+                
+            } catch(e) {
+                console.error('Add product error:', e);
+                showToast('❌ Gagal: ' + (e.message || 'Unknown'), 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>HANTAR PRODUK';
+            }
+        };
+
+        async function loadVendorProducts() {
+            if(!currentUser) return;
+            if(unsubscribeProducts) unsubscribeProducts();
+            
+            unsubscribeProducts = onSnapshot(
+                query(collection(db, "products"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc")),
+                (snap) => {
+                    myProducts = [];
+                    snap.forEach(d => myProducts.push({id: d.id, ...d.data()}));
+                    renderVendorProducts();
+                }
+            );
+        }
+
+        window.renderVendorProducts = () => {
+            const tbody = document.getElementById('vendor-product-list');
+            const search = (document.getElementById('prod-search')?.value || '').toLowerCase();
+            const filter = document.getElementById('prod-filter')?.value || 'all';
+            
+            let filtered = myProducts.filter(p => {
+                const matchSearch = !search || p.name?.toLowerCase().includes(search) || p.category?.toLowerCase().includes(search);
+                const matchFilter = filter === 'all' || p.status === filter;
+                return matchSearch && matchFilter;
+            });
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-gray-500 text-xs">Tiada produk dijumpai</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(p => {
+                const sold = p.totalSold || 0;
+                const revenue = sold * (p.priceSell || 0) * (1 - COMMISSION_RATE);
+                const badgeClass = p.status === 'approved' ? 'badge-approved' : p.status === 'pending' ? 'badge-pending' : p.status === 'rejected' ? 'badge-rejected' : 'badge-draft';
+                
+                return `<tr>                    <td><img src="${p.imageUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover bg-gray-200" onerror="this.src='https://via.placeholder.com/40'"></td>
+                    <td class="font-bold text-xs max-w-[150px] truncate" title="${p.name}">${p.name}</td>
+                    <td class="font-bold text-purple-600">${formatRM(p.priceSell)}</td>
+                    <td class="text-center">${p.stock}</td>
+                    <td><span class="badge ${badgeClass}">${p.status}</span></td>
+                    <td class="text-center">${sold}</td>
+                    <td class="font-bold text-green-600">${formatRM(revenue)}</td>
+                    <td class="text-center space-x-1">
+                        ${p.status === 'draft' ? `<button onclick="editVendorProduct('${p.id}')" class="action-btn btn-edit">Edit</button>` : ''}
+                        <button onclick="deleteVendorProduct('${p.id}')" class="action-btn btn-delete">Padam</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.editVendorProduct = (id) => { showToast('Fitur edit akan disediakan dalam update seterusnya', 'warning'); };
+        
+        window.deleteVendorProduct = async (id) => {
+            if(!confirm('Padam produk ini? Tindakan tidak boleh dipulihkan.')) return;
+            try {
+                await updateDoc(doc(db, "products", id), { status: 'deleted', deletedAt: serverTimestamp() });
+                showToast('✅ Produk dipadam', 'success');
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        // ===== ORDERS =====
+        async function loadVendorOrders() {
+            if(!currentUser) return;
+            if(unsubscribeOrders) unsubscribeOrders();
+            
+            unsubscribeOrders = onSnapshot(
+                query(collection(db, "orders"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc")),
+                (snap) => {
+                    myOrders = [];
+                    snap.forEach(d => myOrders.push({id: d.id, ...d.data()}));
+                    filterVendorOrders('all');
+                }
+            );
+        }
+
+        window.filterVendorOrders = (status) => {
+            const tbody = document.getElementById('vendor-order-list');
+            const filtered = status === 'all' ? myOrders : myOrders.filter(o => o.status === status);
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-gray-500 text-xs">Tiada pesanan untuk status ini</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(o => {                const myItem = o.items?.find(i => i.vendorId === currentUser.uid);
+                if(!myItem) return '';
+                
+                const myEarning = (myItem.priceSell || 0) * (1 - COMMISSION_RATE) * (myItem.qty || 1);
+                const badgeClass = o.status === 'To Ship' ? 'badge-to-ship' : o.status === 'Completed' ? 'badge-completed' : o.status === 'Cancelled' ? 'badge-cancelled' : 'badge-to-pay';
+                
+                return `<tr>
+                    <td class="font-mono text-[10px]">${o.orderId || '-'}</td>
+                    <td class="text-xs">${o.username || 'Customer'}</td>
+                    <td class="text-xs max-w-[120px] truncate" title="${myItem.name}">${myItem.name}</td>
+                    <td class="text-center">${myItem.qty || 1}</td>
+                    <td class="font-bold">${formatRM(myItem.priceSell)}</td>
+                    <td class="font-bold text-green-600">${formatRM(myEarning)}</td>
+                    <td class="text-[10px] max-w-[100px] truncate" title="${o.address}">${o.address}</td>
+                    <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                    <td class="font-mono text-[10px]">${o.trackingNo || '-'}</td>
+                    <td class="text-center">
+                        ${o.status === 'To Ship' ? `<button onclick="updateOrderTracking('${o.id}')" class="action-btn btn-edit">Pos</button>` : 
+                          o.status === 'Completed' ? '<span class="text-green-600 text-[10px]">✓ Selesai</span>' : '-'}
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.updateOrderTracking = async (orderId) => {
+            const tracking = prompt("Masukkan No. Tracking (Contoh: JNE123456):");
+            if(!tracking) return;
+            try {
+                await updateDoc(doc(db, "orders", orderId), { 
+                    trackingNo: tracking, 
+                    deliveryStatus: 'Shipping',
+                    updatedAt: serverTimestamp() 
+                });
+                showToast('✅ Tracking dikemaskini! Pelanggan akan diberitahu.', 'success');
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        // ===== EARNINGS & WITHDRAWAL =====
+        async function loadVendorEarnings() {
+            if(!currentUser) return;
+            
+            try {
+                // Calculate from transactions
+                const txSnap = await getDocs(query(collection(db, "vendor_transactions"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc")));
+                myTransactions = [];
+                let totalEarned = 0, totalWithdrawn = 0, pendingWithdrawal = 0;
+                
+                txSnap.forEach(d => {
+                    const t = d.data();
+                    myTransactions.push({id: d.id, ...t});                    if(t.type === 'earning') totalEarned += t.amount;
+                    if(t.type === 'withdrawal') {
+                        if(t.status === 'paid') totalWithdrawn += t.amount;
+                        if(t.status === 'pending') pendingWithdrawal += t.amount;
+                    }
+                });
+                
+                const available = totalEarned - totalWithdrawn - pendingWithdrawal;
+                
+                document.getElementById('earnings-total').innerText = formatRM(totalEarned);
+                document.getElementById('earnings-withdrawn').innerText = formatRM(totalWithdrawn);
+                document.getElementById('earnings-pending').innerText = formatRM(pendingWithdrawal);
+                document.getElementById('earnings-balance').innerText = formatRM(available);
+                document.getElementById('earnings-available').innerText = formatRM(available);
+                
+                // Render transaction list
+                const tbody = document.getElementById('transaction-list');
+                if(myTransactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500 text-xs">Tiada transaksi</td></tr>`;
+                } else {
+                    tbody.innerHTML = myTransactions.slice(0,20).map(t => {
+                        const badge = t.type === 'earning' ? 'badge-approved' : t.status === 'paid' ? 'badge-completed' : t.status === 'pending' ? 'badge-pending' : 'badge-rejected';
+                        const label = t.type === 'earning' ? '💰 Komisen' : `📤 Withdrawal (${t.method})`;
+                        return `<tr>
+                            <td>${formatDate(t.createdAt)}</td>
+                            <td>${label}</td>
+                            <td class="text-[10px] truncate max-w-[150px]">${t.description || '-'}</td>
+                            <td class="font-bold ${t.type==='earning'?'text-green-600':'text-red-600'}">${t.type==='earning'?'+':'-'}${formatRM(t.amount)}</td>
+                            <td><span class="badge ${badge}">${t.status || 'completed'}</span></td>
+                        </tr>`;
+                    }).join('');
+                }
+                
+            } catch(e) { console.error('Earnings load error:', e); }
+        }
+
+        window.requestWithdrawal = async () => {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+            const account = document.getElementById('withdraw-account').value.trim();
+            const btn = document.getElementById('withdraw-btn');
+            
+            if(!amount || amount < MIN_WITHDRAWAL) { showToast(`Minimum withdrawal: RM${MIN_WITHDRAWAL}`, 'error'); return; }
+            if(!account) { showToast('Sila masukkan no. akaun / eWallet', 'error'); return; }
+            
+            // Check available balance first
+            const available = parseFloat(document.getElementById('earnings-available').innerText.replace('RM ',''));
+            if(amount > available) { showToast('Baki tidak mencukupi', 'error'); return; }
+            
+            if(!confirm(`Request withdrawal RM${amount.toFixed(2)} ke ${method} (${account})?\n\nDiproses dalam 1-3 hari bekerja.`)) return;            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            
+            try {
+                await addDoc(collection(db, "vendor_transactions"), {
+                    vendorId: currentUser.uid,
+                    type: 'withdrawal',
+                    amount,
+                    method,
+                    accountNumber: account,
+                    status: 'pending',
+                    description: `Withdrawal via ${method}`,
+                    requestedAt: serverTimestamp(),
+                    createdAt: serverTimestamp()
+                });
+                
+                showToast('✅ Permohonan withdrawal dihantar! Semak status di sejarah transaksi.', 'success');
+                document.getElementById('withdraw-amount').value = '';
+                document.getElementById('withdraw-account').value = '';
+                loadVendorEarnings(); // Refresh
+                
+            } catch(e) {
+                console.error('Withdrawal error:', e);
+                showToast('❌ Gagal: ' + (e.message || 'Unknown'), 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = 'HANTAR PERMOHONAN';
+            }
+        };
+
+        // ===== PROFILE =====
+        async function loadVendorProfile() {
+            if(!currentUser) return;
+            const vp = vendorData.vendorProfile || {};
+            document.getElementById('profile-business').value = vp.businessName || '';
+            document.getElementById('profile-phone').value = vendorData.phone || '';
+            document.getElementById('profile-email').value = vendorData.email || '';
+            document.getElementById('profile-desc').value = vp.description || '';
+            
+            const bd = vp.bankDetails || {};
+            document.getElementById('profile-bank-name').value = bd.accountName || '';
+            document.getElementById('profile-bank-type').value = bd.bankName || '';
+            document.getElementById('profile-bank-number').value = bd.accountNumber || '';
+        }
+
+        window.updateVendorProfile = async () => {
+            const phone = document.getElementById('profile-phone').value.trim();
+            const desc = document.getElementById('profile-desc').value.trim();
+            const bankName = document.getElementById('profile-bank-name').value.trim();
+            const bankType = document.getElementById('profile-bank-type').value;
+            const bankNumber = document.getElementById('profile-bank-number').value.trim();            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    phone,
+                    'vendorProfile.description': desc,
+                    'vendorProfile.bankDetails': {
+                        accountName: bankName,
+                        bankName: bankType,
+                        accountNumber: bankNumber,
+                        updatedAt: serverTimestamp()
+                    },
+                    logCache: serverTimestamp()
+                });
+                showToast('✅ Profil dikemaskini!', 'success');
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        // ===== CHAT =====
+        async function loadVendorChatList() {
+            if(!currentUser) return;
+            const listEl = document.getElementById('chat-list-view');
+            
+            // Get customers who ordered from this vendor
+            try {
+                const ordersSnap = await getDocs(query(collection(db, "orders"), where("vendorId", "==", currentUser.uid)));
+                const customerIds = [...new Set(ordersSnap.docs.map(d => d.data().userId).filter(Boolean))];
+                
+                if(customerIds.length === 0) {
+                    listEl.innerHTML = '<p class="text-center text-gray-500 mt-10 text-xs">Belum ada pelanggan untuk dihubungi</p>';
+                    return;
+                }
+                
+                listEl.innerHTML = '';
+                for(const cid of customerIds) {
+                    try {
+                        const userSnap = await getDoc(doc(db, "users", cid));
+                        if(userSnap.exists()) {
+                            const u = userSnap.data();
+                            listEl.innerHTML += `<div onclick="openVendorChat('${cid}', '${u.username || 'Customer'}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm">${(u.username || '?')[0]}</div>
+                                    <div><h4 class="font-bold text-sm">${u.username || 'Unknown'}</h4><p class="text-xs text-gray-500 truncate w-40">Tekan untuk chat</p></div>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>`;
+                        }
+                    } catch(e) {}
+                }
+            } catch(e) {
+                listEl.innerHTML = '<p class="text-center text-red-500 mt-10 text-xs">Gagal memuatkan senarai</p>';            }
+        }
+
+        window.openVendorChat = (customerId, customerName) => {
+            currentChatPartner = customerId;
+            document.getElementById('chat-list-view').classList.add('hidden-section');
+            document.getElementById('active-chat-view').classList.remove('hidden-section');
+            document.getElementById('chat-customer-name').innerText = customerName;
+            
+            const chatId = [currentUser.uid, customerId].sort().join('_');
+            const msgContainer = document.getElementById('vendor-chat-messages');
+            
+            if(unsubscribeChat) unsubscribeChat();
+            unsubscribeChat = onSnapshot(
+                query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"), limit(50)),
+                (snap) => {
+                    msgContainer.innerHTML = '';
+                    snap.forEach(d => {
+                        const m = d.data();
+                        const isMe = m.senderId === currentUser.uid;
+                        msgContainer.innerHTML += `
+                            <div class="message-bubble ${isMe ? 'msg-me' : 'msg-other'} mb-2">
+                                <p class="text-sm">${m.text || ''}</p>
+                                <div class="text-[9px] opacity-70 text-right">${m.timestamp ? new Date(m.timestamp.toDate?.()).toLocaleTimeString() : ''}</div>
+                            </div>`;
+                    });
+                    msgContainer.scrollTop = msgContainer.scrollHeight;
+                }
+            );
+        };
+
+        window.closeVendorChat = () => { 
+            if(unsubscribeChat) unsubscribeChat(); 
+            document.getElementById('active-chat-view').classList.add('hidden-section'); 
+            document.getElementById('chat-list-view').classList.remove('hidden-section'); 
+        };
+
+        window.sendVendorMessage = async () => {
+            const input = document.getElementById('vendor-msg-input');
+            const text = input?.value?.trim();
+            if(!text || !currentChatPartner) return;
+            
+            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
+            try {
+                await addDoc(collection(db, `chats/${chatId}/messages`), {
+                    senderId: currentUser.uid,
+                    text,
+                    type: 'text',
+                    timestamp: serverTimestamp(),
+                    read: false                });
+                await setDoc(doc(db, "chats", chatId), {
+                    participants: [currentUser.uid, currentChatPartner],
+                    lastMessage: text,
+                    lastTime: serverTimestamp()
+                }, {merge: true});
+                input.value = '';
+            } catch(e) { showToast('❌ Gagal hantar mesej', 'error'); }
+        };
+
+        window.copyCustomerInfo = () => {
+            if(currentChatPartner) {
+                navigator.clipboard.writeText(`Customer ID: ${currentChatPartner}`);
+                showToast('✅ ID pelanggan disalin', 'success', 1500);
+            }
+        };
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Preload sounds
+            document.querySelectorAll('audio').forEach(a => a.load());
+        });
+    </script>
+</body>
+</html>
