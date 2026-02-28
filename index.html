@@ -973,65 +973,75 @@
                 btn.innerHTML = 'LOGIN NOW';
             }
         };
-        // ==================== GOOGLE SIGN IN ====================
-window.doGoogleSignIn = async () => {
-  const provider = new GoogleAuthProvider();
+       // ==================== GOOGLE SIGN IN ====================
+window.doGoogleSignIn = async (e) => {
+  // Prevent default if called from event
+  if (e && e.preventDefault) e.preventDefault();
   
-  // Optional: force account selection
+  const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   
-  const btn = event?.target?.closest('button');
+  // Find button safely without relying on event
+  const btn = document.querySelector('button[onclick*="doGoogleSignIn"]');
   if (btn) {
     btn.disabled = true;
-    const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connecting...';
-    
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      // Check if user exists in Firestore
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (!userSnap.exists()) {
-        // Create new user doc for Google sign-in
-        const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-        await setDoc(userRef, {
-          username: user.displayName || `User_${uac.split('-')[1]}`,
-          email: user.email,
-          phone: '',
-          uac: uac,
-          role: 'customer',
-          status: 'ACTIVE',
-          address: '',
-          createdAt: serverTimestamp(),
-          logCache: serverTimestamp(),
-          provider: 'google',
-          photoURL: user.photoURL || ''
-        });
-        showToast('✅ Akaun Google berjaya didaftarkan!', 'success');
-      } else {
-        showToast('✅ Login dengan Google berjaya!', 'success');
-      }
-      // Auth listener will handle navigation
-      
-    } catch (e) {
-      console.error('Google error:', e);
-      let msg = 'Google login gagal';
-      if (e.code === 'auth/popup-closed-by-user') msg = 'Login dibatalkan';
-      else if (e.code === 'auth/popup-blocked') msg = 'Popup diblocker. Allow popup untuk site ini.';
-      else if (e.code === 'auth/operation-not-allowed') msg = 'Google Sign-In belum enabled di Firebase Console';
-      showToast(`❌ ${msg}`, 'error');
-    } finally {
-      // Reset button
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" class="w-5 h-5"> Continue with Google`;
-      }
-    }
   }
-};
+  
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    
+    // Check if user exists in Firestore
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      // Create new user doc for Google sign-in
+      const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+      await setDoc(userRef, {
+        username: user.displayName || `User_${uac.split('-')[1]}`,
+        email: user.email,
+        phone: '',
+        uac: uac,
+        role: 'customer',
+        status: 'ACTIVE',
+        address: '',
+        createdAt: serverTimestamp(),
+        logCache: serverTimestamp(),
+        provider: 'google',
+        photoURL: user.photoURL || ''
+      });
+      showToast('✅ Akaun Google berjaya didaftarkan!', 'success');
+    } else {
+      showToast('✅ Login dengan Google berjaya!', 'success');
+    }
+    
+  } catch (err) {
+    console.error('Google Sign-In Error:', err);
+    
+    // Show detailed error for debugging
+    let msg = 'Google login gagal';
+    if (err.code) {
+      if (err.code === 'auth/popup-closed-by-user') msg = 'Login dibatalkan oleh user';
+      else if (err.code === 'auth/popup-blocked') msg = 'Popup diblocker browser. Sila allow popup untuk site ini.';
+      else if (err.code === 'auth/operation-not-allowed') msg = 'Google Sign-In BELUM enabled di Firebase Console';
+      else if (err.code === 'auth/unauthorized-domain') msg = 'Domain tidak authorized. Tambah di Firebase Console → Authorized domains';
+      else if (err.code === 'auth/network-request-failed') msg = 'Sambungan internet bermasalah';
+      else msg = 'Error: ' + err.code + ' - ' + err.message;
+    }
+    showToast('❌ ' + msg, 'error');
+    
+  } finally {
+    // Reset button state
+    const buttons = document.querySelectorAll('button[onclick*="doGoogleSignIn"]');
+    buttons.forEach(b => {
+      b.disabled = false;
+      const isRegister = b.innerText.includes('Sign up');
+      b.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> ${isRegister ? 'Sign up with Google' : 'Continue with Google'}`;
+    });
+  }
+}; 
         window.logout = () => {
             signOut(auth);
             playSound('click');
