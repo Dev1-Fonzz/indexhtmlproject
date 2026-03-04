@@ -1858,79 +1858,235 @@ grid.innerHTML = filtered.map(p => `
             playSound('click');
         };
 
-        window.submitOrder = async () => {
-            if(!currentUser) {
-                showToast('❌ Sila login dahulu', 'error');
-                navTo('login');
-                return;
-            }
-            if(cart.length === 0) {
-                showToast('❌ Cart kosong', 'error');
-                return;
-            }
-            if(!userData?.address?.trim()) {
-                showToast('❌ Sila masukkan alamat di Dashboard dahulu', 'error');
-                navTo('dashboard');
-                return;            }
-            
-            const btn = document.getElementById('checkout-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-            
+// ==================== FIXED ORDER SUBMISSION ====================
+
+window.submitOrder = async () => {
+    console.log('🛒 Starting order submission...');
+    
+    // ===== VALIDATION 1: User Login =====
+    if (!currentUser) {
+        showToast('❌ Sila login dahulu', 'error');
+        navTo('login');
+        return;
+    }
+    
+    // ===== VALIDATION 2: Cart Not Empty =====
+    if (!cart || cart.length === 0) {
+        showToast('❌ Cart kosong', 'error');
+        return;
+    }
+    
+    // ===== VALIDATION 3: User Data Exists =====
+    if (!userData || !userData.uac) {
+        showToast('❌ Data pengguna tidak lengkap. Sila update profil.', 'error');
+        navTo('dashboard');
+        return;
+    }
+    
+    // ===== VALIDATION 4: Address Required =====
+    const address = userData.address?.trim();
+    if (!address) {
+        showToast('❌ Sila masukkan alamat penghantaran di Dashboard dahulu', 'error');
+        navTo('dashboard');
+        return;
+    }
+    
+    // ===== VALIDATION 5: Validate Cart Items =====
+    let hasInvalidItem = false;
+    cart.forEach((item, index) => {
+        if (!item.name || !item.priceSell || isNaN(item.priceSell)) {
+            console.error('Invalid cart item:', item);
+            hasInvalidItem = true;
+        }
+    });
+    
+    if (hasInvalidItem) {
+        showToast('❌ Terdapat item tidak sah dalam cart. Sila refresh dan cuba lagi.', 'error');
+        cart = [];
+        document.getElementById('cart-count').innerText = 0;
+        toggleCartModal();
+        return;
+    }
+        // ===== CALCULATE TOTAL (WITH VOUCHER FIX) =====
+    let subtotal = 0;
+    try {
+        subtotal = cart.reduce((sum, item) => {
+            const price = parseFloat(item.priceSell || item.price || 0);
+            const qty = parseInt(item.qty || 1);
+            return sum + (price * qty);
+        }, 0);
+    } catch (e) {
+        console.error('Error calculating subtotal:', e);
+        showToast('❌ Ralat mengira jumlah. Sila cuba lagi.', 'error');
+        return;
+    }
+    
+    // Voucher discount (FIX: Ensure it's a valid number)
+    let voucherDiscount = 0;
+    if (window.voucherDiscount) {
+        voucherDiscount = parseFloat(window.voucherDiscount) || 0;
+        voucherDiscount = Math.min(voucherDiscount, subtotal); // Cap at subtotal
+        voucherDiscount = Math.max(0, voucherDiscount); // Prevent negative
+    }
+    
+    const total = Math.max(0, subtotal - voucherDiscount);
+    
+    console.log('💰 Order totals:', { subtotal, voucherDiscount, total });
+    
+    // ===== PREPARE ORDER DATA =====
+    const tracking = "TRK-" + Date.now().toString().substr(-8);
+    const orderId = "ORD-" + Date.now().toString().substr(-6);
+    
+    // Build itemCounts properly
+    const itemCounts = {};
+    cart.forEach(item => {
+        const id = item.id || 'unknown';
+        itemCounts[id] = (itemCounts[id] || 0) + (parseInt(item.qty) || 1);
+    });
+    
+    // Build clean items array (remove any undefined/null values)
+    const cleanItems = cart.map(item => ({
+        id: item.id || 'unknown',
+        name: item.name || 'Unnamed Item',
+        price: parseFloat(item.price) || 0,
+        priceSell: parseFloat(item.priceSell) || 0,
+        qty: parseInt(item.qty) || 1,
+        imageUrl: item.imageUrl || '',
+        uniqueCode: item.uniqueCode || 'N/A',
+        variation: item.variation || '',
+        vendorId: item.vendorId || 'unknown',
+        vendorName: item.vendorName || 'Unknown Vendor'
+    }));    
+    // ===== BUILD ORDER OBJECT =====
+    const orderData = {
+        userId: currentUser.uid,
+        uac: userData.uac || 'UNKNOWN',
+        username: userData.username || 'Unknown User',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        items: cleanItems,
+        itemCounts: itemCounts,
+        subtotal: subtotal,
+        voucherCode: appliedVoucher?.code || null,
+        voucherDiscount: voucherDiscount,
+        total: total,
+        address: address,
+        trackingNo: tracking,
+        orderId: orderId,
+        paymentMethod: "Manual Transfer",
+        paymentStatus: "Not Verified",
+        status: "To Pay",
+        deliveryStatus: "Pending",
+        adminNote: "",
+        currentStatus: "Pending Payment - Menunggu pembayaran",
+        userRating: null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        category: "To Pay"
+    };
+    
+    // ===== DISABLE CHECKOUT BUTTON =====
+    const btn = document.getElementById('checkout-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+    }
+    
+    // ===== SUBMIT TO FIRESTORE =====
+    try {
+        console.log('📤 Submitting order to Firestore...', orderData);
+        
+        const orderRef = await addDoc(collection(db, "orders"), orderData);
+        
+        console.log('✅ Order created successfully:', orderRef.id);
+        
+        // ===== UPDATE PRODUCT SOLD COUNT =====
+        cart.forEach(async (item) => {
             try {
-                const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
-                const tracking = "TRK-" + Date.now().toString().substr(-8);
-                const orderId = "ORD-" + Date.now().toString().substr(-6);
-                const itemCounts = {};
-                cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
-                
-                await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, 
-                    uac: userData.uac, 
-                    username: userData.username, 
-                    items: cart, 
-                    itemCounts: itemCounts, 
-                    total: total, 
-                    address: userData.address,
-                    trackingNo: tracking, 
-                    orderId: orderId, 
-                    paymentMethod: "Manual Transfer", 
-                    paymentStatus: "Not Verified", 
-                    status: "To Pay", 
-                    deliveryStatus: "Pending",
-                    adminNote: "", 
-                    currentStatus: "Pending Payment - Menunggu pembayaran", 
-                    userRating: null, 
-                    createdAt: serverTimestamp(), 
-                    category: "To Pay",
-                    updatedAt: serverTimestamp()
-                });
-                
-                // Update product sold count (optional - can be done via Cloud Function)
-                cart.forEach(item => {
-                    updateDoc(doc(db, "products", item.id), {
-                        totalSold: (item.totalSold || 0) + 1
-                    }).catch(() => {}); // Silent fail
-                });
-                
-                cart = []; 
-                document.getElementById('cart-count').innerText = 0; 
-                toggleCartModal(); 
-                playSound('success');
-                showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
-                
-                setTimeout(() => { 
-                    if(currentUser) loadUserData();                     navTo('dashboard'); 
-                }, 1000);
-                
-            } catch(e) { 
-                console.error('Order error:', e);
-                showToast('❌ Ralat: ' + (e.message || 'Unknown error'), 'error'); 
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
+                if (item.id && item.id !== 'unknown') {
+                    await updateDoc(doc(db, "products", item.id), {
+                        totalSold: (parseInt(item.qty) || 1) + ((await getDoc(doc(db, "products", item.id))).data()?.totalSold || 0),                        updatedAt: serverTimestamp()
+                    });
+                }
+            } catch (e) {
+                console.error('Error updating product sold count:', e);
+                // Silent fail - don't block order
             }
-        };
+        });
+        
+        // ===== MARK VOUCHER AS USED =====
+        if (appliedVoucher && currentUser) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                const vouchers = userDoc.data()?.vouchers || [];
+                const updatedVouchers = vouchers.map(v => 
+                    v.code === appliedVoucher.code && !v.used 
+                        ? { ...v, used: true, usedAt: Date.now() } 
+                        : v
+                );
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    vouchers: updatedVouchers,
+                    logCache: serverTimestamp()
+                });
+            } catch (e) {
+                console.error('Error marking voucher as used:', e);
+                // Silent fail - don't block order
+            }
+        }
+        
+        // ===== SUCCESS =====
+        playSound('success');
+        showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
+        
+        // Clear cart
+        cart = [];
+        document.getElementById('cart-count').innerText = 0;
+        appliedVoucher = null;
+        window.voucherDiscount = 0;
+        
+        // Reset voucher display
+        const voucherDisplay = document.getElementById('applied-voucher-display');
+        if (voucherDisplay) voucherDisplay.classList.add('hidden');
+        
+        // Close modal
+        toggleCartModal();
+        
+        // Redirect to dashboard after delay
+        setTimeout(() => {
+            if (currentUser) loadUserData();
+            navTo('dashboard');        }, 1000);
+        
+    } catch (e) {
+        console.error('❌ Order submission error:', e);
+        
+        // Detailed error messages
+        let errorMsg = 'Ralat tidak diketahui';
+        
+        if (e.code === 'permission-denied') {
+            errorMsg = '❌ Access denied. Sila hubungi admin.';
+        } else if (e.code === 'unavailable') {
+            errorMsg = '❌ Sambungan Firebase terputus. Sila cuba lagi.';
+        } else if (e.code === 'invalid-argument') {
+            errorMsg = '❌ Data tidak sah. Sila refresh dan cuba lagi.';
+        } else if (e.message?.includes('NaN')) {
+            errorMsg = '❌ Harga item tidak sah. Sila kosongkan cart dan cuba lagi.';
+        } else if (e.message?.includes('undefined')) {
+            errorMsg = '❌ Data pengguna tidak lengkap. Sila update profil.';
+        } else {
+            errorMsg = `❌ Ralat: ${e.message || 'Unknown error'}`;
+        }
+        
+        showToast(errorMsg, 'error', 6000);
+        
+        // Re-enable button
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
+        }
+    }
+};
+
+// ==================== END FIXED ORDER SUBMISSION ====================
 
         // ==================== USER DASHBOARD ====================
         
@@ -3585,6 +3741,37 @@ async function checkNewUserVoucher() {
             if(qr) { qr.classList.add('blur-md'); }
             if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; }
         });
+        // ==================== GLOBAL ERROR HANDLER ====================
+
+// Catch unhandled promise rejections
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled Promise Rejection:', event.reason);
+    
+    // Show user-friendly error
+    if (event.reason?.code === 'permission-denied') {
+        showToast('❌ Access denied. Sila login semula.', 'error', 5000);
+    } else if (event.reason?.code === 'unavailable') {
+        showToast('❌ Sambungan terputus. Sila refresh halaman.', 'error', 5000);
+    } else {
+        showToast('⚠️ Ralat sistem. Sila cuba lagi.', 'warning', 4000);
+    }
+    
+    event.preventDefault();
+});
+
+// Catch JavaScript errors
+window.addEventListener('error', (event) => {
+    console.error('Global Error:', event.error);
+    
+    // Don't show for every small error (avoid spam)
+    if (event.error?.message?.includes('Firebase') ||
+        event.error?.message?.includes('fetch') ||
+        event.error?.message?.includes('network')) {
+        showToast('⚠️ Ralat sambungan. Sila check internet anda.', 'warning', 4000);
+    }
+});
+// ==================== END GLOBAL ERROR HANDLER ===================
+
     </script>
     <!-- PRODUCT DETAIL MODAL -->
 <div id="product-detail-modal" class="modal-overlay hidden-section">
