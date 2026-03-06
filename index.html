@@ -175,6 +175,21 @@
             .glass-panel { box-shadow: none; border: 1px solid #ccc; }
             .btn-glitter, .action-btn { display: none; }
         }
+        /* ===== LOGO UTAMA KEDAI ===== */
+.nav-logo {
+    max-height: 50px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+.nav-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 8px rgba(102,126,234,0.3));
+}
+@media (max-width: 768px) {
+    .nav-logo { max-height: 40px; }
+}
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -190,8 +205,13 @@
 
     <!-- NAVBAR -->
     <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
-        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
-            <i class="fas fa-gem"></i> MFD STORE
+        <!-- CARA BARU - IMAGE LOGO -->
+<a href="https://mfdstore.vercel.app" class="flex items-center gap-2 cursor-pointer group" onclick="playSound('click'); navTo('home'); return false;">
+    <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
+         alt="MFD Store Logo" 
+         class="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
+         onerror="this.src='https://via.placeholder.com/150x50?text=MFD+STORE'; this.classList.add('bg-white/50');">
+</a>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
             <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
@@ -704,8 +724,13 @@
                 <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
             </div>
             
-            <!-- PAYMENT SECTION WITH QR CODE -->
-            <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border border-purple-100">
+           <!-- LOGO KECIL DI CHECKOUT MODAL -->
+<div class="text-center mb-4">
+    <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
+         alt="MFD Store" 
+         class="h-8 mx-auto object-contain opacity-80"
+         onerror="this.style.display='none'">
+</div> 
                 <p class="font-bold text-purple-700 mb-3 flex items-center gap-2">
                     <i class="fas fa-credit-card"></i> Payment Method
                 </p>
