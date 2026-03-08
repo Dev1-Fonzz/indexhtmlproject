@@ -1,9 +1,80 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+    <!-- 🔒 INCOGNITO/PRIVATE MODE BLOCKER - PASTE INI PALING ATAS DALAM <head> -->
+<script>
+    (function() {
+        // Fungsi untuk memblokir akses dan paparkan mesej
+        function blockAccess() {
+            document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Akses Ditolak</title><style>body{font-family:"Poppins",Arial,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;text-align:center}h1{color:#ff6b6b;font-size:2rem;margin-bottom:1rem;text-shadow:0 2px 10px rgba(255,107,107,0.3)}p{max-width:500px;line-height:1.6;color:#ccc}.btn{display:inline-block;margin-top:25px;padding:12px 35px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-decoration:none;border-radius:25px;font-weight:600;transition:all 0.3s;box-shadow:0 4px 15px rgba(118,75,162,0.4)}.btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(118,75,162,0.6)}.icon{font-size:3rem;margin-bottom:1rem}</style></head><body><div><div class="icon">🔐</div><h1>Access Denied</h1><p>Please open using <strong style="color:#fff"> Regular tabs (Normal Mode)</strong>.</p><p style="font-size:0.85rem;color:#888">This mode cannot be used.</p><a href="javascript:location.reload()" class="btn">Please use regular tabs</a></div></body></html>');
+            document.close();
+            throw new Error('Blocked: Incognito mode detected');
+        }
+        
+        // Fungsi utama untuk mengesan Incognito
+        async function checkIncognito() {
+            try {
+                // Kaedah 1: Storage Quota Estimation (Paling berkesan untuk Chrome/Edge/Firefox)
+                // Incognito biasanya ada quota sangat kecil (< 2GB), normal mode ada 60GB+
+                if (navigator.storage && navigator.storage.estimate) {
+                    const estimate = await navigator.storage.estimate();
+                    const quota = estimate.quota;
+                    
+                    // Jika quota kurang dari 2GB (2147483648 bytes), anggap sebagai Incognito
+                    if (quota && quota < 2147483648) {
+                        console.log('Incognito detected via storage quota:', quota);
+                        blockAccess();
+                        return;
+                    }
+                }
+                
+                // Kaedah 2: Safari Private Browsing Detection
+                // Safari akan throw error bila try set localStorage dalam private mode
+                if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') === -1) {
+                    try {
+                        localStorage.setItem('test_incognito', 'test');
+                        localStorage.removeItem('test_incognito');
+                    } catch (e) {
+                        console.log('Incognito detected via Safari localStorage');
+                        blockAccess();
+                        return;
+                    }
+                }
+                
+                // Kaedah 3: Firefox Private Browsing (IndexedDB)
+                if (navigator.userAgent.indexOf('Firefox') > -1) {
+                    try {
+                        const db = await indexedDB.open('test_incognito_db', 1);
+                        db.onupgradeneeded = function(e) { e.target.transaction.abort(); };
+                        db.onerror = function() { blockAccess(); };
+                    } catch (e) {
+                        blockAccess();
+                        return;
+                    }
+                }
+                
+            } catch (e) {
+                // Jika ada error semasa check, kita biarkan user masuk (fail-safe)
+                // Supaya user yang browser lama/aneh masih boleh akses
+                console.log('Incognito check completed with error:', e);
+            }
+        }
+        
+        // Jalankan semakan serta-merta
+        checkIncognito();
+    })();
+</script>
+<!-- 🔒 END INCOGNITO BLOCKER -->
+
     <meta name="google-site-verification" content="v7koD54-JpANjYbZKCN46QWnVK7Q3a7sSdQnCcAVczo" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <!-- ═══════════════════════════════════════ -->
+    <!-- GOOGLE ADSENSE - TAMBAH CODE INI SAHAJA -->
+    <!-- ═══════════════════════════════════════ -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3180819938764995"
+            crossorigin="anonymous"></script>
+    <!-- ═══════════════════════════════════════ -->
     <title>MFD Store Own Business</title>
     
     <!-- Libraries -->
@@ -190,6 +261,425 @@
 @media (max-width: 768px) {
     .nav-logo { max-height: 40px; }
 }
+/* ===== CHAT SYSTEM SIMPLE ===== */
+.chat-bubble { position: relative; max-width: 85%; padding: 10px 14px; border-radius: 16px; margin: 4px 0; animation: fadeIn 0.2s; word-wrap: break-word; }
+.chat-bubble.me { background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+.chat-bubble.other { background: white; color: #333; margin-right: auto; border-bottom-left-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.chat-actions { position: absolute; top: -22px; right: 8px; display: none; gap: 4px; background: white; padding: 3px 6px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 10px; }
+.chat-bubble:hover .chat-actions { display: flex; }
+.chat-action-btn { background: none; border: none; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.chat-action-btn:hover { background: #f0f0f0; }
+.chat-action-btn.danger:hover { background: #fed7d7; color: #c53030; }
+.msg-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
+.msg-status { font-size: 9px; display: flex; align-items: center; gap: 3px; margin-top: 3px; }
+.msg-status.read { color: #68d391; }
+.msg-status.unread { color: #f6ad55; }
+.msg-status.sent { color: #a0aec0; }
+.pinned { position: absolute; top: -8px; left: 10px; background: #f6d365; color: #744210; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
+.voice-msg { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px; min-width: 150px; }
+.voice-wave { display: flex; align-items: center; gap: 2px; height: 16px; }
+.voice-wave span { width: 2px; background: currentColor; border-radius: 2px; animation: wave 0.4s infinite alternate; }
+.voice-wave span:nth-child(2) { animation-delay: 0.1s; height: 10px; }
+.voice-wave span:nth-child(3) { animation-delay: 0.2s; height: 14px; }
+.voice-wave span:nth-child(4) { animation-delay: 0.3s; height: 8px; }
+@keyframes wave { from { height: 3px; } to { height: 16px; } }
+.chat-toolbar { display: flex; gap: 6px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.chat-tool-btn { padding: 6px 10px; background: #edf2f7; border: none; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.chat-tool-btn:hover { background: #cbd5e0; }
+.chat-tool-btn.active { background: #667eea; color: white; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status-dot.online { background: #48bb78; }
+.status-dot.busy { background: #ed8936; }
+.status-dot.offline { background: #a0aec0; }
+.chat-id { font-family: monospace; font-size: 9px; background: #edf2f7; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+.chat-id.copied { background: #9ae6b4; }
+.notify-badge { position: absolute; top: -4px; right: -4px; background: #f56565; color: white; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+.recording-ui { display: none; align-items: center; justify-content: space-between; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 8px; margin-bottom: 6px; }
+.recording-ui.active { display: flex; }
+.recording-ui .timer { font-weight: bold; color: #c53030; }
+.edit-input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; margin-top: 4px; background: white; }
+.admin-controls { display: flex; gap: 4px; padding: 6px; background: rgba(102,126,234,0.1); border-radius: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.admin-status-btn { padding: 4px 8px; border: none; border-radius: 12px; font-size: 10px; cursor: pointer; background: #edf2f7; }
+.admin-status-btn.active { background: #667eea; color: white; }
+.fadeIn { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+/* ===== WHATSAPP CHAT BUTTON ===== */
+.whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #25D366;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.4);
+    margin-left: 8px;
+}
+.whatsapp-btn:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+}
+.whatsapp-btn img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+.whatsapp-btn.small img {
+    width: 14px;
+    height: 14px;
+}
+.whatsapp-btn.small {
+    padding: 4px 8px;
+    font-size: 10px;
+    gap: 4px;
+}
+@media (max-width: 768px) {
+    .whatsapp-btn { padding: 5px 10px; font-size: 10px; }
+    .whatsapp-btn img { width: 16px; height: 16px; }
+}
+/* ===== ADS WIDGET PREMIUM - LARGE & READABLE ===== */
+.ads-widget {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 16px 0;
+    height: 140px; /* ✅ BESAR - boleh baca teks dalam gambar */
+    box-shadow: 
+        0 8px 32px rgba(102, 126, 234, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.ads-track {
+    display: flex;
+    animation: scrollLeft 25s linear infinite;
+    width: max-content;
+    gap: 20px;
+    padding: 10px 15px;
+    align-items: center;
+}
+
+.ads-widget:hover .ads-track {
+    animation-play-state: paused;
+}
+
+.ads-slide {
+    flex: 0 0 auto;
+    height: 120px; /* ✅ Gambar besar */
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    min-width: 200px; /* ✅ Lebar minimum supaya gambar tak nipis */
+}
+
+.ads-slide img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /* ✅ Gambar penuh, tak distort */
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+/* Premium hover effect */.ads-slide:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(102, 126, 234, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.5);
+    z-index: 10;
+}
+
+.ads-slide:hover img {
+    transform: scale(1.08);
+}
+
+/* Shine effect on hover */
+.ads-slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        110deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 45%, 
+        transparent 55%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+.ads-slide:hover::before {
+    transform: translateX(100%);
+}
+
+/* Glow pulse animation for attention */
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    50% { box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25); }
+}
+
+.ads-slide {
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+.ads-slide:hover {
+    animation: none; /* Stop pulse when hovering */
+}
+
+/* Infinite scroll animation */
+@keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }}
+
+/* Smooth fade edges */
+.ads-widget::before,
+.ads-widget::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 60px; /* ✅ Lebih lebar untuk fade smooth */
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.ads-widget::before {
+    left: 0;
+    background: linear-gradient(to right, 
+        rgba(255,255,255,0.95) 0%, 
+        rgba(255,255,255,0.6) 40%, 
+        transparent 100%);
+}
+
+.ads-widget::after {
+    right: 0;
+    background: linear-gradient(to left, 
+        rgba(255,255,255,0.95) 0%, 
+        rgba(255,255,255,0.6) 40%, 
+        transparent 100%);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .ads-widget {
+        background: linear-gradient(135deg, rgba(30,30,40,0.4), rgba(20,20,30,0.2));
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+    .ads-widget::before,
+    .ads-widget::after {
+        background: linear-gradient(to right, 
+            rgba(18,18,24,0.95) 0%, 
+            rgba(18,18,24,0.6) 40%, 
+            transparent 100%);
+    }
+    .ads-widget::after {
+        background: linear-gradient(to left, 
+            rgba(18,18,24,0.95) 0%, 
+            rgba(18,18,24,0.6) 40%, 
+            transparent 100%);
+    }
+}
+/* ✅ MOBILE RESPONSIVE - Masih besar tapi fit screen */
+@media (max-width: 768px) {
+    .ads-widget { 
+        height: 110px; 
+        margin: 12px 0; 
+        border-radius: 14px;
+    }
+    .ads-slide { 
+        height: 90px; 
+        min-width: 160px;
+        border-radius: 10px;
+    }
+    .ads-track { 
+        gap: 15px; 
+        padding: 8px 12px;
+    }
+    .ads-widget::before,
+    .ads-widget::after { 
+        width: 40px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .ads-widget { 
+        height: 95px; 
+    }
+    .ads-slide { 
+        height: 75px; 
+        min-width: 140px;
+    }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .ads-track { animation: none !important; }
+    .ads-slide { 
+        transition: none !important; 
+        animation: none !important;
+    }
+    .ads-slide::before { display: none; }
+}
+
+/* Print friendly - hide ads */
+@media print {
+    .ads-widget { display: none !important; }
+}
+/* ===== ADS 320x50 - HOMEPAGE STYLING ===== */
+.ads-container-320x50 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.ads-container-320x50 .adsbygoogle {
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.ads-label-mini {
+    font-size: 7px;
+    color: #94a3b8;
+    text-align: center;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+/* Mobile: full width container */
+@media (max-width: 400px) {
+    .ads-container-320x50 {
+        padding: 8px 0;
+    }
+}
+
+/* Hide empty ads */
+.adsbygoogle:empty {
+    display: none !important;
+}
+/* ===== 🌟 PRODUCT DETAIL MODAL - INTELLECTUAL DESIGN ===== */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 200; display: flex; align-items: center; justify-content: center;
+    padding: 1rem; animation: fadeIn 0.3s ease;
+}
+.modal-content {
+    background: var(--glass-bg); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+    border-radius: 20px; box-shadow: 0 20px 60px rgba(102,126,234,0.4);
+    max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto;
+    position: relative; animation: slideUp 0.4s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.modal-close {
+    position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px;
+    border-radius: 50%; background: rgba(255,255,255,0.8); border: none;
+    font-size: 1.25rem; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all 0.2s; z-index: 10;
+}
+.modal-close:hover { background: #fed7d7; color: #c53030; transform: rotate(90deg); }
+
+.product-detail-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; }
+@media (min-width: 768px) { .product-detail-grid { grid-template-columns: 1fr 1.2fr; padding: 2rem; } }
+
+.product-main-image {
+    width: 100%; aspect-ratio: 1/1; border-radius: 16px; object-fit: cover;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.3); transition: transform 0.3s ease;
+}
+.product-main-image:hover { transform: scale(1.02); }
+
+.product-title { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; line-height: 1.3; }
+.product-variation {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+    padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500;
+    display: inline-block; margin-bottom: 1rem;
+}
+.product-pricing { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1rem; }
+.product-price-sell { font-size: 1.75rem; font-weight: 800; color: #764ba2; }
+.product-price-cost { font-size: 1rem; color: #a0aec0; text-decoration: line-through; }
+
+.product-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin: 1rem 0; }
+.meta-item { background: rgba(255,255,255,0.6); padding: 0.75rem; border-radius: 10px; font-size: 0.75rem; }
+.meta-label { color: #718096; font-weight: 500; margin-bottom: 0.25rem; }
+.meta-value { color: var(--text-dark); font-weight: 600; word-break: break-word; }
+
+.status-badge {
+    padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700;    text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.35rem;
+}
+.status-public { background: #c6f6d5; color: #22543d; }
+.status-private { background: #e9d8fd; color: #553c9a; }
+.status-outstock { background: #cbd5e0; color: #4a5568; }
+
+.rating-stars { color: #f6ad55; font-size: 1rem; letter-spacing: 2px; }
+.rating-count { font-size: 0.75rem; color: #718096; margin-left: 0.5rem; }
+
+/* ✅ DESKRIPSI UNLIMITED - Tiada max-height, boleh scroll */
+.product-description {
+    background: rgba(255,255,255,0.6); padding: 1rem; border-radius: 12px;
+    font-size: 0.875rem; line-height: 1.7; color: #4a5568; margin: 1rem 0;
+    max-height: none; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;
+}
+.product-description::-webkit-scrollbar { width: 4px; }
+.product-description::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 2px; }
+.product-description::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 2px; }
+
+.reviews-section { margin-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1.5rem; }
+.reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.review-item { background: rgba(255,255,255,0.5); padding: 0.875rem; border-radius: 10px; margin-bottom: 0.75rem; }
+.review-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+.review-username { font-weight: 600; color: var(--text-dark); font-size: 0.875rem; }
+.review-rating { color: #f6ad55; font-size: 0.875rem; }
+.review-comment { font-size: 0.8125rem; color: #4a5568; line-height: 1.5; }
+.review-date { font-size: 0.6875rem; color: #a0aec0; margin-top: 0.35rem; }
+
+.product-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.btn-add-cart {
+    flex: 1; min-width: 150px; padding: 0.875rem 1.5rem; border-radius: 12px;
+    font-weight: 700; font-size: 0.875rem; display: flex; align-items: center;
+    justify-content: center; gap: 0.5rem; transition: all 0.3s;
+}
+.btn-add-cart:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+.btn-buy-now {
+    padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; font-size: 0.875rem;
+    background: white; color: #764ba2; border: 2px solid #764ba2; transition: all 0.3s;
+}
+.btn-buy-now:hover { background: #764ba2; color: white; }
+
+.unique-code {
+    font-family: monospace; background: rgba(157,80,187,0.1); padding: 0.35rem 0.75rem;
+    border-radius: 6px; font-size: 0.75rem; color: #6b46c1;
+    display: inline-flex; align-items: center; gap: 0.35rem;
+}
+.tag-pill {
+    display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 20px;
+    font-size: 0.7rem; font-weight: 600; color: #744210; margin-right: 0.5rem;}
+
+@media (max-width: 640px) {
+    .product-title { font-size: 1.25rem; }
+    .product-price-sell { font-size: 1.5rem; }
+    .product-meta-grid { grid-template-columns: 1fr; }
+    .product-actions { flex-direction: column; }
+    .btn-add-cart, .btn-buy-now { width: 100%; }
+}
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -255,6 +745,26 @@
                 <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
                 <p class="text-white/90 font-semibold text-sm md:text-base">Exclusive deals updated in real-time!</p>
             </div>
+    <!-- 🎨 ADS WIDGET PREMIUM - AUTO SCROLL -->
+<div id="ads-widget-container" class="ads-widget glass-panel" role="region" aria-label="Promosi Iklan"></div>
+<!-- END ADS WIDGET -->
+<!-- ═══════════════════════════════════════ -->
+<!-- GOOGLE ADSENSE - MINI BANNER 320x50    -->
+<!-- Location: Homepage Only                 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ads-container-320x50">
+    <div class="ads-label-mini">Advertisement</div>
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:320px;height:50px"
+         data-ad-client="ca-pub-3180819938764995"
+         data-ad-slot="4727343649"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+<!-- ═══════════════════════════════════════ -->
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                 <div class="col-span-full text-center py-20">
                     <div class="loader mx-auto mb-4"></div>
@@ -341,7 +851,13 @@
                 <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">                        <span>My Orders</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
+        <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
+        <!-- WHATSAPP LIVE AGENT BUTTON -->
+<a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+   class="whatsapp-btn small" title="Chat via WhatsApp">
+    <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+    <span class="hidden sm:inline">Chat Now</span>
+</a>
                     </h3>
                     <div id="dashboard-message"></div>
                     
@@ -389,51 +905,119 @@
         </section>
 
         <!-- 4. LIVE CHAT SYSTEM -->
-        <section id="view-chat-list" class="hidden-section">            <div class="glass-panel p-4 h-[80vh] flex flex-col">
-        <h2 class="text-xl font-bold glitter-text mb-4 flex items-center justify-between gap-2">
-    <span class="flex items-center gap-2">
-        <i class="fas fa-headset"></i> Contact MFD Seller
-    </span>
-    <button onclick="loadChatList()" class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg transition flex items-center gap-1" title="Refresh chat list">
-        <i class="fas fa-sync-alt"></i> Refresh
-    </button>
-</h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
-                </div>
-                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+        <!-- LIVE CHAT SYSTEM - SIMPLE & WORKING -->
+<section id="view-chat-list" class="hidden-section">
+    <div class="glass-panel p-4 h-[80vh] flex flex-col">
+        <!-- Header -->
+        <h2 class="text-xl font-bold glitter-text mb-4 flex items-center justify-between">
+            <span><i class="fas fa-headset mr-2"></i>Customer Service Live Agent</span>
+            <button onclick="refreshChatList()" class="text-xs bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </h2>
+        <a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+   class="whatsapp-btn small" title="Chat via WhatsApp">
+    <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+    Chat Now
+</a>
+
+        <!-- Chat List View -->
+        <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+            <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></div>
+        </div>
+
+        <!-- Active Chat View (Hidden by default) -->
+        <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between border-b pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                    <button onclick="closeActiveChat()" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
+                    <div>
+                        <h3 id="chat-partner-name" class="font-bold text-sm">Customer</h3>
                         <div class="flex items-center gap-2">
-                            <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
-                            <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
-                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition"><i class="fas fa-ban"></i></button>
+                            <span id="chat-status" class="text-[10px] flex items-center gap-1"><span class="status-dot online"></span> Online</span>
+                            <span id="chat-id-badge" class="chat-id" onclick="copyChatID()" title="Click to copy">ID: <span id="chat-id-text">...</span></span>
                         </div>
                     </div>
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
-                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Attach Image"><i class="fas fa-image text-gray-600"></i></button>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects Enabled • All Data Encrypted • Copyright reserved since 2025</div>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="copyChatID()" class="text-[10px] bg-gray-200 px-2 py-1 rounded"><i class="fas fa-copy"></i> Copy ID</button>
+                    <button id="admin-block-btn" onclick="blockContact()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded hidden"><i class="fas fa-ban"></i> Block</button>
                 </div>
             </div>
-        </section>
 
+            <!-- Admin Controls (Only for admin) -->
+            <div id="admin-chat-controls" class="admin-controls hidden">
+                <span class="text-[10px] font-bold mr-2">Status:</span>
+                <button class="admin-status-btn active" onclick="setAdminStatus('online',this)">🟢 Online</button>
+                <button class="admin-status-btn" onclick="setAdminStatus('busy',this)">🟡 Busy</button>
+                <button class="admin-status-btn" onclick="setAdminStatus('offline',this)">⚪ Offline</button>
+                <button onclick="deleteAllMessages()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded ml-2"><i class="fas fa-trash"></i> Delete All</button>
+                <button onclick="adminSecureAction()" class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 rounded"><i class="fas fa-lock"></i> Secure</button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-2 space-y-1 bg-white/30 rounded-xl mb-2"></div>
+
+            <!-- Context Menu for Messages -->
+            <div id="msg-context" class="fixed bg-white rounded-lg shadow-lg p-1 z-50 hidden" style="min-width:160px;font-size:11px;">
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('reply')"><i class="fas fa-reply mr-2"></i>Reply</div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('edit')"><i class="fas fa-edit mr-2"></i>Edit</div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('pin')"><i class="fas fa-thumbtack mr-2"></i>Pin</div>
+                <div class="border-t my-1"></div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('delete-me')"><i class="fas fa-user-minus mr-2"></i>Delete for Me</div>
+                <div class="p-2 hover:bg-red-50 text-red-600 cursor-pointer" onclick="msgAction('delete-all')"><i class="fas fa-trash-alt mr-2"></i>Delete for Everyone</div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-white/50 p-2 rounded-xl">
+                <!-- Toolbar -->
+                <div class="chat-toolbar">
+                    <button class="chat-tool-btn" onclick="document.getElementById('chat-file').click()"><i class="fas fa-image"></i> Foto</button>
+                    <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
+                    <button class="chat-tool-btn" id="voice-btn" onclick="toggleVoice()"><i class="fas fa-microphone"></i> Suara</button>
+                    <button class="chat-tool-btn" onclick="sendLocation()"><i class="fas fa-map-marker-alt"></i> Lokasi</button>
+                    <button class="chat-tool-btn" onclick="sendOrderInfo()"><i class="fas fa-box"></i> Order</button>
+                    <button class="chat-tool-btn" onclick="sendAccountInfo()"><i class="fas fa-user"></i> Akaun</button>
+                </div>
+
+                <!-- Voice Recording UI -->
+                <div id="voice-ui" class="recording-ui">
+                    <div><span class="timer" id="voice-time">00:00</span> <span class="text-xs text-gray-500">Recording...</span></div>
+                    <div class="flex gap-2">
+                        <button onclick="cancelVoice()" class="px-3 py-1 text-xs bg-gray-200 rounded">Cancel</button>
+                        <button onclick="sendVoice()" class="px-3 py-1 text-xs bg-red-500 text-white rounded">Send</button>
+                    </div>
+                </div>
+
+                <!-- Text Input -->
+                <div class="flex gap-2">
+                    <textarea id="msg-input" rows="1" placeholder="Type message..." class="flex-1 resize-none text-sm py-2 m-0" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText()}"></textarea>
+                    <button onclick="sendText()" class="px-4 py-2 btn-glitter rounded-lg"><i class="fas fa-paper-plane"></i></button>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-[9px] text-gray-400 mt-2 flex justify-between">
+                    <span>🔐 Auto-sync • 1s update</span>
+                    <span id="last-update">Updated: --:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
         <!-- 5. ADMIN DASHBOARD - PRODUCTION READY -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl md:text-3xl font-bold">ADMIN MANAGEMENT CENTER v2.0</h2>
+                        <!-- WHATSAPP LIVE AGENT BUTTON (ADMIN) -->
+<div class="flex items-center gap-2 mt-2">
+    <a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+       class="whatsapp-btn small" title="Chat via WhatsApp">
+        <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+        <span>Chat Now</span>
+    </a>
+    <span class="text-[10px] text-white/70">• Live Agent Support</span>
+</div>
                         <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat - Production Ready</p>
                     </div>
                     <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
@@ -613,7 +1197,7 @@
                     <input type="number" id="prod-price-cost" placeholder="Harga Kos (RM) - Optional" min="0" step="0.01">
                     <input type="number" id="prod-price-sell" placeholder="Harga Jualan (RM) *" required min="0.01" step="0.01">
                     <input type="text" id="prod-variation" placeholder="Variasi (Size/Color/Type)" maxlength="50">
-                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2 lg:col-span-3" maxlength="500"></textarea>
+                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2 lg:col-span-3" maxlength="10000"></textarea>
                     <input type="text" id="prod-country" placeholder="Negara Asal" maxlength="50">
                     <input type="url" id="prod-link" placeholder="Pautan Optional (Website/Video)" maxlength="200">
                     <input type="text" id="prod-label" placeholder="Label Item (e.g. Best Seller)" maxlength="30">
@@ -767,15 +1351,71 @@
     </div>
 
     <!-- MODAL FOR REVIEWS -->
-    <div id="modal-reviews" class="modal-overlay hidden-section">
-        <div class="modal-content glass-panel">
-            <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-purple-700">⭐ Buyer Reviews</h4>
-                <button onclick="closeReviewsModal()" class="text-xl text-gray-500 hover:text-red-500" aria-label="Close">&times;</button>
+    <!-- ✅ MODAL DETAIL PRODUK - CANTIK + UNLIMITED DESC -->
+<div id="modal-product-detail" class="modal-overlay hidden-section" onclick="if(event.target===this) closeProductDetail()">
+    <div class="modal-content glass-panel">
+        <button onclick="closeProductDetail()" class="modal-close" aria-label="Close">&times;</button>
+        
+        <div class="product-detail-grid">
+            <!-- Gambar Produk -->
+            <div>
+                <img id="detail-image" src="" alt="Product" class="product-main-image" onerror="this.src='https://via.placeholder.com/400?text=No+Image'">
+                <div id="detail-tags" class="mt-3 flex flex-wrap gap-2"></div>
             </div>
-            <div id="reviews-content" class="space-y-3 max-h-60 overflow-y-auto"></div>
+            
+            <!-- Info Produk -->
+            <div>
+                <h2 id="detail-title" class="product-title"></h2>
+                <div id="detail-variation" class="product-variation hidden"></div>
+                
+                <div class="product-pricing">
+                    <span id="detail-price-sell" class="product-price-sell"></span>
+                    <span id="detail-price-cost" class="product-price-cost hidden"></span>
+                </div>
+                
+                <div class="rating-stars" id="detail-rating">★★★★★</div>
+                <span class="rating-count" id="detail-review-count">(0 reviews)</span>
+                
+                <div class="product-meta-grid mt-4">
+                    <div class="meta-item"><div class="meta-label">🔑 Kod Unik</div><div id="detail-code" class="meta-value unique-code"></div></div>
+                    <div class="meta-item"><div class="meta-label">🌍 Negara</div><div id="detail-country" class="meta-value"></div></div>
+                    <div class="meta-item"><div class="meta-label">🛒 Terjual</div><div id="detail-sold" class="meta-value"></div></div>
+                    <div class="meta-item"><div class="meta-label">📦 Status</div><div id="detail-status" class="meta-value"><span class="status-badge"></span></div></div>
+                </div>
+                
+                <!-- ✅ DESKRIPSI UNLIMITED -->
+                <div class="mt-4">
+                    <h4 class="font-bold text-sm text-gray-700 mb-2">📝 Deskripsi Penuh</h4>
+                    <div id="detail-description" class="product-description"></div>
+                </div>
+                
+                <!-- Pautan Optional -->
+                <a id="detail-link" href="#" target="_blank" class="hidden text-sm text-blue-600 hover:underline mt-2 inline-flex items-center gap-1">
+                    🔗 Lihat pautan <i class="fas fa-external-link-alt text-xs"></i>
+                </a>
+                
+                <!-- Action Buttons -->
+                <div class="product-actions">
+                    <button id="btn-add-to-cart" class="btn-add-cart btn-glitter" onclick="addToCartFromDetail()">
+                        <i class="fas fa-shopping-cart"></i> Tambah ke Cart
+                    </button>
+                    <button class="btn-buy-now" onclick="buyNowFromDetail()">
+                        <i class="fas fa-bolt"></i> Beli Sekarang
+                    </button>
+                </div>
+                
+                <!-- Reviews Section -->
+                <div class="reviews-section" id="detail-reviews-section">
+                    <div class="reviews-header">
+                        <h4 class="font-bold text-purple-700">⭐ Ulasan Pembeli</h4>
+                        <span id="detail-review-total" class="text-xs text-gray-500"></span>
+                    </div>
+                    <div id="detail-reviews-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
     <!-- FIREBASE LOGIC - PRODUCTION READY -->
     <script type="module">
@@ -1112,109 +1752,322 @@ window.doGoogleSignIn = async (e) => {
         }
 
         window.renderCatalog = () => {
-            const search = (document.getElementById('search-bar')?.value || '').toLowerCase().trim();
-            const sort = document.getElementById('filter-sort')?.value || 'default';
-            const grid = document.getElementById('product-grid');
-            
-            let filtered = allProducts.filter(p => {
-                const matchSearch = !search || p.name?.toLowerCase().includes(search) || p.description?.toLowerCase().includes(search);
-                return p.status === 'Public' && matchSearch;
-            });
-            
-            if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
-            if(sort === 'event') filtered = filtered.filter(p => p.event);
-            
-            if(filtered.length === 0) { 
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; 
-                return; 
-            }
-            
-            grid.innerHTML = filtered.map(p => {
-    // 🔢 Kira revenue: (harga jualan - harga kos) × total sold
-    const revenue = ((p.priceSell || 0) - (p.price || 0)) * (p.totalSold || 0);
+    const search = (document.getElementById('search-bar')?.value || '').toLowerCase().trim();
+    const sort = document.getElementById('filter-sort')?.value || 'default';
+    const grid = document.getElementById('product-grid');
     
-    return `
-    <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition relative">
+    // Filter produk
+    let filtered = allProducts.filter(p => {
+        const matchSearch = !search || p.name?.toLowerCase().includes(search) || p.description?.toLowerCase().includes(search);
+        return p.status === 'Public' && matchSearch;
+    });
+    
+    // Sorting
+    if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
+    if(sort === 'event') filtered = filtered.filter(p => p.event);
+    
+    // Empty state
+    if(filtered.length === 0) { 
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; 
+        return; 
+    }
+    
+    // ✅ RENDER PRODUK DENGAN SEMUA FITUR
+    grid.innerHTML = filtered.map(p => {
+        // 🔢 AUTO-CALCULATE RATING dari reviews pembeli
+        const reviews = p.reviews || [];
+        const avgRating = reviews.length > 0 
+            ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length)
+            : (p.rating || 5.0);
+        const starDisplay = '★'.repeat(Math.floor(avgRating)) + '☆'.repeat(5 - Math.floor(avgRating));
         
-        <!-- 🖼️ GAMBAR PRODUK -->
-        <div class="relative">
-            <img src="${p.imageUrl || 'https://via.placeholder.com/150?text=No+Image'}" 
-                 class="w-full h-40 object-cover rounded-lg mb-2 bg-gray-200" 
-                 onerror="this.src='https://via.placeholder.com/150?text=Error'"
-                 loading="lazy"
-                 alt="${p.name || 'Product'}">
-            
-            <!-- 🏷️ STATUS BADGE (Public/Private/Out of Stock) -->
-            <span class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold ${
-                p.status === 'Public' ? 'bg-green-100 text-green-700' : 
-                p.status === 'Private' ? 'bg-purple-100 text-purple-700' : 
-                'bg-gray-200 text-gray-600'
-            }">
-                ${p.status || 'Public'}
-            </span>
+        // 🔹 VARIASI: Split by comma untuk display
+        const variations = p.variation ? p.variation.split(',').map(v => v.trim()).filter(v => v) : [];
+        
+        // 🔗 Pautan optional check
+        const hasLink = p.link && p.link.trim() !== '';
+        
+        // 📦 Status badge class
+        const statusClass = p.status === 'Public' ? 'bg-green-100 text-green-700' : 
+                           p.status === 'Private' ? 'bg-purple-100 text-purple-700' : 
+                           'bg-gray-200 text-gray-600';
+        
+        // ⚡ Out of stock check for buttons
+        const isDisabled = p.status === 'Out of Stock';
+        
+        return `
+<div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition relative cursor-pointer group"
+     onclick="openProductDetail('${p.id}')" role="button" tabindex="0"
+     onkeypress="if(event.key==='Enter') openProductDetail('${p.id}')">
+    
+    <!-- 📦 STATUS BADGE -->    <span class="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-bold z-10 ${statusClass}">
+        ${p.status || 'Public'}
+    </span>
+    
+    <!-- 🖼️ GAMBAR PRODUK (dari browser upload) -->
+    <div class="relative overflow-hidden rounded-lg mb-2 bg-gray-100">
+        <img src="${p.imageUrl || 'https://via.placeholder.com/150?text=No+Image'}" 
+             class="w-full h-40 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" 
+             onerror="this.src='https://via.placeholder.com/150?text=Error'; this.parentElement.classList.add('bg-gray-200')"
+             loading="lazy" 
+             alt="${p.name || 'Product'}"
+             title="${p.name || 'Product'}">
+        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg pointer-events-none"></div>
+    </div>
+
+    <!-- 📛 NAMA ITEM -->
+    <h3 class="font-bold text-sm text-gray-800 leading-tight mb-1 line-clamp-2" title="${p.name || ''}">
+        ${p.name || 'Unnamed Item'}
+    </h3>
+    
+    <!-- 🏷️ LABEL & EVENT TAGS -->
+    <div class="flex flex-wrap gap-1 mb-2">
+        ${p.label ? `<span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">#${p.label}</span>` : ''}
+        ${p.event ? `<span class="text-[9px] bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded font-medium">#${p.event}</span>` : ''}
+    </div>
+
+    <!-- 💰 HARGA: Kos (optional) + Jualan -->
+    <div class="text-xs space-y-0.5 mb-2">
+        ${p.price && p.price > 0 ? `<div class="text-gray-400 line-through text-[10px]">Kos: ${formatRM(p.price)}</div>` : ''}
+        ${p.priceSell && p.priceSell > 0 ? `<div class="text-purple-600 font-extrabold text-base">Jualan: ${formatRM(p.priceSell)}</div>` : ''}
+        ${(!p.price && !p.priceSell) ? `<div class="text-gray-500 text-[10px]">Hubungi untuk harga</div>` : ''}
+    </div>
+
+    <!-- 🔹 VARIASI (comma separated) -->
+    ${variations.length > 0 ? `
+    <div class="text-[10px] text-gray-500 mb-2 bg-white/50 px-2 py-1 rounded">
+        🔹 ${variations.join(', ')}
+    </div>` : ''}
+
+    <!-- 🌍 NEGARA ASAL + 🔑 KOD UNIK -->
+    <div class="grid grid-cols-2 gap-1 text-[10px] text-gray-600 mb-2">
+        <div class="flex items-center gap-1">🌍 ${p.country || '-'}</div>
+        <div class="font-mono text-[9px] bg-purple-50 px-1.5 py-0.5 rounded truncate" title="${p.uniqueCode || ''}">
+            🔑 ${p.uniqueCode ? p.uniqueCode.substring(0, 10) + (p.uniqueCode.length > 10 ? '...' : '') : '-'}
         </div>
+    </div>
 
-        <!-- 📛 NAMA ITEM + LABEL + EVENT -->
-        <h3 class="font-bold text-sm text-gray-800 leading-tight mb-1">
-            ${p.name || 'Unnamed'}
-        </h3>
-        <div class="flex flex-wrap gap-1 mb-1">
-            ${p.label ? `<span class="text-[9px] bg-blue-100 text-blue-700 px-1 rounded">#${p.label}</span>` : ''}
-            ${p.event ? `<span class="text-[9px] bg-pink-100 text-pink-700 px-1 rounded">#${p.event}</span>` : ''}
+    <!-- ⭐ RATING (auto dari reviews) + 🛒 TOTAL SOLD -->
+    <div class="flex items-center justify-between bg-white/60 px-2 py-1.5 rounded mb-2">
+        <div class="flex items-center gap-1" title="Rating berdasarkan ulasan pembeli">            <span class="text-yellow-500 text-[10px]">${starDisplay}</span>
+            <span class="font-bold text-[10px] text-gray-700">${avgRating.toFixed(1)}</span>
+            <span class="text-[9px] text-gray-400">(${reviews.length})</span>
         </div>
+        <div class="text-[10px] text-gray-600">🛒 <strong>${p.totalSold || 0}</strong> sold</div>
+    </div>
 
-        <!-- 💰 HARGA: Cost + Selling + Revenue -->
-        <div class="text-xs space-y-0.5 mb-2">
-            ${p.price ? `<div class="text-gray-400 line-through">Kos: ${formatRM(p.price)}</div>` : ''}
-            <div class="text-purple-600 font-bold">Jualan: ${formatRM(p.priceSell || p.price)}</div>
-            ${revenue > 0 ? `<div class="text-green-600 text-[10px]">💰 Revenue: ${formatRM(revenue)}</div>` : ''}
+    <!-- 💬 BUYER REVIEWS PREVIEW (show latest 1) -->
+    ${reviews.length > 0 ? `
+    <div class="text-[10px] bg-purple-50 px-2 py-1.5 rounded mb-2 border-l-2 border-purple-300">
+        <div class="flex items-center gap-1 mb-1">
+            <span class="font-bold text-purple-700">${reviews[0].username || 'Pembeli'}</span>
+            <span class="text-yellow-500">${'★'.repeat(reviews[0].rating || 5)}</span>
         </div>
+        <p class="text-gray-600 line-clamp-1">"${reviews[0].comment || ''}"</p>
+        ${reviews.length > 1 ? `<span class="text-[9px] text-gray-400">+${reviews.length - 1} ulasan lagi</span>` : ''}
+    </div>` : ''}
 
-        <!-- 🎯 VARIASI (jika ada) -->
-        ${p.variation ? `<div class="text-[10px] text-gray-500 mb-1">🔹 ${p.variation}</div>` : ''}
+    <!-- 🔗 PAUTAN OPSYENAL -->
+    ${hasLink ? `
+    <a href="${p.link}" target="_blank" rel="noopener" 
+       class="text-[10px] text-blue-600 hover:underline flex items-center gap-1 mb-2"
+       onclick="event.stopPropagation()"
+       title="Buka pautan: ${p.link}">
+        🔗 Lihat pautan <i class="fas fa-external-link-alt text-[8px]"></i>
+    </a>` : ''}
 
-        <!-- 📝 DESKRIPSI (expandable) -->
-        <p class="text-[10px] text-gray-500 line-clamp-2 mb-2 cursor-pointer hover:line-clamp-none transition" 
-           title="${p.description || ''}">
-            ${p.description || 'Tiada deskripsi'}
-        </p>
-
-        <!-- 📊 STATS: Sold + Rating + Country + Unique Code -->
-        <div class="grid grid-cols-2 gap-1 text-[10px] text-gray-600 mb-2 bg-white/40 p-2 rounded">
-            <div>🛒 Sold: <strong>${p.totalSold || 0}</strong></div>
-            <div>⭐ Rating: <strong>${(p.rating || 0).toFixed(1)}</strong></div>
-            <div>🌍 ${p.country || '-'}</div>
-            <div class="font-mono">🔑 ${p.uniqueCode || '-'}</div>
+    <!-- ✅ ACTION BUTTONS: Quantity + Add Cart + Buy Now -->
+    <div class="mt-auto space-y-2">
+        <!-- Quantity Selector (mini) -->
+        <div class="flex items-center justify-center gap-2">
+            <span class="text-[10px] text-gray-500">Qty:</span>
+            <button onclick="event.stopPropagation(); updateCatalogQty('${p.id}', -1)" 
+                    class="w-6 h-6 rounded bg-gray-200 hover:bg-gray-300 text-xs font-bold disabled:opacity-50"
+                    ${isDisabled ? 'disabled' : ''}>−</button>
+            <span id="qty-${p.id}" class="text-xs font-bold w-6 text-center">1</span>
+            <button onclick="event.stopPropagation(); updateCatalogQty('${p.id}', 1)" 
+                    class="w-6 h-6 rounded bg-gray-200 hover:bg-gray-300 text-xs font-bold disabled:opacity-50"
+                    ${isDisabled ? 'disabled' : ''}>+</button>
         </div>
+        
+        <!-- Buttons Row -->
+        <div class="flex gap-1">
+            <button onclick="event.stopPropagation(); addToCartWithQty('${p.id}')" 
+                    class="btn-glitter flex-1 py-1.5 rounded-lg text-[10px] font-bold shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                    ${isDisabled ? 'disabled title="Stok habis"' : ''}>
+                ${isDisabled ? '❌ Stok Habis' : '🛒 Add Cart'}
+            </button>
+            <button onclick="event.stopPropagation(); buyNowWithQty('${p.id}')" 
+                    class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-white border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"                    ${isDisabled ? 'disabled' : ''}>
+                ⚡ Buy
+            </button>
+        </div>
+    </div>
+</div>`;
+    }).join('');
+};
 
-        <!-- 🔗 PAUTAN OPTIONAL -->
-        ${p.link ? `
-        <a href="${p.link}" target="_blank" class="text-[10px] text-blue-500 hover:underline mb-2 block truncate">
-            🔗 Lihat pautan
-        </a>` : ''}
+// 🔢 FUNGSI QUANTITY UNTUK KATALOG (per produk)
+window.catalogQuantities = {};
 
-        <!-- 💬 BUYER REVIEWS (click to view) -->
-        ${p.allowReviews && p.reviews?.length > 0 ? `
-        <button onclick="showProductReviews('${p.id}')" 
-                class="text-[10px] text-purple-600 hover:underline mb-2 flex items-center gap-1">
-            💬 ${p.reviews.length} Reviews <i class="fas fa-chevron-right text-[8px]"></i>
-        </button>` : ''}
+window.updateCatalogQty = (productId, change) => {
+    if(!window.catalogQuantities[productId]) window.catalogQuantities[productId] = 1;
+    
+    let newQty = window.catalogQuantities[productId] + change;
+    if(newQty < 1) newQty = 1;
+    if(newQty > 99) newQty = 99;
+    
+    window.catalogQuantities[productId] = newQty;
+    
+    // Update display
+    const qtyEl = document.getElementById(`qty-${productId}`);
+    if(qtyEl) qtyEl.textContent = newQty;
+};
 
-        <!-- 🛒 ADD TO CART BUTTON (only if Public & In Stock) -->
-        ${p.status === 'Public' ? `
-        <button onclick="addToCart('${p.id}')" 
-                class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-auto shadow disabled:opacity-50"
-                ${p.status === 'Out of Stock' ? 'disabled' : ''}>
-            ${p.totalSold < 1 ? '🔥 New!' : '🛒 Add to Cart'}
-        </button>` : 
-        `<button disabled class="w-full py-1.5 rounded-lg text-xs mt-auto bg-gray-200 text-gray-400 cursor-not-allowed">
-            ${p.status === 'Out of Stock' ? '❌ Out of Stock' : '🔒 Private'}
-        </button>`}
+// 🛒 ADD TO CART DENGAN QUANTITY
+window.addToCartWithQty = (productId) => {
+    const product = allProducts.find(p => p.id === productId);
+    const qty = window.catalogQuantities[productId] || 1;
+    
+    if(product) {
+        // Add multiple items based on quantity
+        for(let i = 0; i < qty; i++) {
+            cart.push({...product});
+        }
+        document.getElementById('cart-count').innerText = cart.length;
+        playSound('success');
+        showToast(`✅ ${qty}x "${product.name}" ditambah ke cart!`, 'success', 2000);
+        
+        // Reset quantity
+        window.catalogQuantities[productId] = 1;
+        const qtyEl = document.getElementById(`qty-${productId}`);
+        if(qtyEl) qtyEl.textContent = '1';
+    }
+};
 
-    </div>`;
-}).join('');
-        };
+// ⚡ BUY NOW DENGAN QUANTITY
+window.buyNowWithQty = (productId) => {
+    const product = allProducts.find(p => p.id === productId);    const qty = window.catalogQuantities[productId] || 1;
+    
+    if(product) {
+        for(let i = 0; i < qty; i++) {
+            cart.push({...product});
+        }
+        playSound('success');
+        showToast(`🛒 ${qty}x "${product.name}" sedia untuk checkout!`, 'success', 1500);
+        
+        // Reset quantity
+        window.catalogQuantities[productId] = 1;
+        const qtyEl = document.getElementById(`qty-${productId}`);
+        if(qtyEl) qtyEl.textContent = '1';
+        
+        // Open cart modal
+        setTimeout(() => toggleCartModal(), 300);
+    }
+};
+// ✅ FUNGSI BUKA MODAL DETAIL PRODUK
+window.openProductDetail = (productId) => {
+    playSound('click');
+    const product = allProducts.find(p => p.id === productId);
+    if(!product) return showToast('❌ Produk tidak dijumpai', 'error');
+    
+    // Populate data
+    document.getElementById('detail-image').src = product.imageUrl || 'https://via.placeholder.com/400?text=No+Image';
+    document.getElementById('detail-title').textContent = product.name || 'Unnamed';
+    document.getElementById('detail-price-sell').textContent = formatRM(product.priceSell || product.price);
+    
+    // Price cost (jika ada)
+    const costEl = document.getElementById('detail-price-cost');
+    if(product.price && product.price > 0) {
+        costEl.textContent = formatRM(product.price);
+        costEl.classList.remove('hidden');
+    } else { costEl.classList.add('hidden'); }
+    
+    // Variation
+    const varEl = document.getElementById('detail-variation');
+    if(product.variation) { varEl.textContent = product.variation; varEl.classList.remove('hidden'); }
+    else { varEl.classList.add('hidden'); }
+    
+    // Rating stars
+    const rating = product.rating || 5;
+    document.getElementById('detail-rating').innerHTML = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5-Math.floor(rating));
+    document.getElementById('detail-review-count').textContent = `(${product.reviews?.length || 0} reviews)`;
+    
+    // Meta grid
+    document.getElementById('detail-code').textContent = product.uniqueCode || '-';
+    document.getElementById('detail-country').textContent = product.country || '-';
+    document.getElementById('detail-sold').textContent = product.totalSold || 0;
+    
+    // Status badge
+    const statusEl = document.getElementById('detail-status').querySelector('.status-badge');
+    statusEl.textContent = product.status || 'Public';
+    statusEl.className = `status-badge ${product.status === 'Public' ? 'status-public' : product.status === 'Private' ? 'status-private' : 'status-outstock'}`;
+    
+    // ✅ DESKRIPSI UNLIMITED - pre-wrap untuk format paragraph
+    const descEl = document.getElementById('detail-description');
+    descEl.textContent = product.description || 'Tiada deskripsi untuk produk ini.';
+    
+    // Link
+    const linkEl = document.getElementById('detail-link');
+    if(product.link) { linkEl.href = product.link; linkEl.classList.remove('hidden'); }
+    else { linkEl.classList.add('hidden'); }
+    
+    // Tags/Labels
+    const tagsContainer = document.getElementById('detail-tags');
+    tagsContainer.innerHTML = '';    if(product.label) tagsContainer.innerHTML += `<span class="tag-pill">🏷️ ${product.label}</span>`;
+    if(product.event) tagsContainer.innerHTML += `<span class="tag-pill">🎉 ${product.event}</span>`;
+    
+    // Reviews
+    const reviewsList = document.getElementById('detail-reviews-list');
+    const reviewsTotal = document.getElementById('detail-review-total');
+    if(product.reviews?.length > 0) {
+        reviewsTotal.textContent = `${product.reviews.length} ulasan`;
+        reviewsList.innerHTML = product.reviews.slice(0, 5).map(r => `
+            <div class="review-item">
+                <div class="review-header">
+                    <span class="review-username">${r.username || 'Anonymous'}</span>
+                    <span class="review-rating">${'★'.repeat(r.rating || 5)}</span>
+                </div>
+                <p class="review-comment">${r.comment || ''}</p>
+                <span class="review-date">${r.date ? formatDate(r.date) : ''}</span>
+            </div>
+        `).join('');
+        if(product.reviews.length > 5) {
+            reviewsList.innerHTML += `<p class="text-[10px] text-gray-400 text-center mt-2">+${product.reviews.length - 5} lagi ulasan...</p>`;
+        }
+        document.getElementById('detail-reviews-section').classList.remove('hidden');
+    } else {
+        reviewsList.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">Belum ada ulasan. Jadilah yang pertama!</p>';
+        document.getElementById('detail-reviews-section').classList.add('hidden');
+    }
+    
+    // Store current product ID for cart functions
+    window.currentDetailProduct = productId;
+    
+    // Show modal
+    document.getElementById('modal-product-detail').classList.remove('hidden-section');
+    document.body.style.overflow = 'hidden';
+};
 
+window.closeProductDetail = () => {
+    document.getElementById('modal-product-detail').classList.add('hidden-section');
+    document.body.style.overflow = '';
+    window.currentDetailProduct = null;
+};
+
+window.addToCartFromDetail = () => {
+    if(window.currentDetailProduct) {
+        addToCart(window.currentDetailProduct);
+        closeProductDetail();
+    }
+};
+
+window.buyNowFromDetail = () => {
+    if(window.currentDetailProduct) {        addToCart(window.currentDetailProduct);
+        closeProductDetail();
+        setTimeout(() => toggleCartModal(), 300);
+    }
+};
         window.addToCart = (id) => { 
             const product = allProducts.find(x => x.id === id);
             if(product) {
@@ -2076,714 +2929,349 @@ if (avatarEl && userData.photoURL) {
         // ─────────────────────────────────────────────────────────────
         // CORE: Load Chat List (Admin & Customer)
         // ─────────────────────────────────────────────────────────────
-        async function loadChatList() {
-            if(!currentUser) return navTo('login');
-            
-            const listEl = userData.role === 'admin' 
-                ? document.getElementById('admin-chat-list') 
-                : document.getElementById('chat-list-view');
-            if(!listEl) return;
-            
-            // Cleanup previous listeners
-            cleanupChatListeners();
-            
-            if(userData.role === 'admin') {
-                await loadAdminChatList(listEl);
-            } else {
-                await loadCustomerChatList(listEl);
-            }
-            
-            // Start auto-refresh for active chat sessions
-            startAutoRefresh();
-        }
-        
-        // Load chats for ADMIN view
-        async function loadAdminChatList(listEl) {            listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>';
-            
-            try {
-                // Query: chats where admin is participant
-                const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                const snap = await getDocs(q);
-                
-                console.log(`📊 Admin chats found: ${snap.size}`);
-                
-                if(snap.empty) {
-                    listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif. Tunggu customer mesej...</p>";
-                    setupRealtimeListener(listEl, true);
-                    return;
-                }
-                
-                listEl.innerHTML = "";
-                
-                // Process each chat document
-                for(const docSnap of snap.docs) {
-                    const chatData = docSnap.data();
-                    const partnerId = chatData.participants?.find(id => id !== currentUser.uid);
-                    
-                    if(!partnerId) continue;
-                    
-                    try {
-                        // Fetch partner profile
-                        const partnerSnap = await getDoc(doc(db, "users", partnerId));
-                        const partner = partnerSnap.exists() ? partnerSnap.data() : { username: 'Unknown' };
-                        
-                        // Format display data
-                        const lastMsg = chatData.lastMessage || 'No messages';
-                        const lastTime = chatData.lastTime?.toDate?.()?.toLocaleTimeString('ms-MY', {hour:'2-digit', minute:'2-digit'}) || '';
-                        
-                        // Render chat item
-                        listEl.innerHTML += createChatItemHTML(partnerId, partner.username, lastMsg, lastTime);
-                        
-                    } catch(err) {
-                        console.warn('⚠️ Failed to load partner', partnerId, err);
-                        // Fallback render
-                        listEl.innerHTML += createChatItemHTML(partnerId, 'Unknown', chatData.lastMessage || '-', '');
-                    }
-                }
-                
-                if(listEl.innerHTML === "") {
-                    listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif.</p>";
-                }
-                
-                // Setup real-time updates
-                setupRealtimeListener(listEl, true);
-                            } catch(e) {
-                console.error('❌ Admin chat load error:', e);
-                listEl.innerHTML = createErrorUI('Gagal load chat', e.message, loadChatList);
-            }
-        }
-        
-        // Load chat for CUSTOMER view (connect to admin)
-        async function loadCustomerChatList(listEl) {
-            listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Connecting to support...</p></div>';
-            
-            try {
-                // Find active admin
-                const adminQ = query(collection(db, "users"), where("role", "==", "admin"), where("status", "==", "ACTIVE"), limit(1));
-                const adminSnap = await getDocs(adminQ);
-                
-                if(adminSnap.empty) {
-                    listEl.innerHTML = "<p class='text-center text-orange-500 mt-10 text-sm'>⚠️ Tiada Admin online.</p>";
-                    return;
-                }
-                
-                const adminDoc = adminSnap.docs[0];
-                const admin = adminDoc.data();
-                const adminId = adminDoc.id;
-                
-                // Render single admin chat card
-                listEl.innerHTML = `
-                <div onclick="openChat('${adminId}', '${admin.username || 'Support'}')" 
-                     class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow-lg transition group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                            <i class="fas fa-headset text-lg"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-800">MFD Support</h4>
-                            <p class="text-xs text-green-600 flex items-center gap-1">
-                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online - Ready to help
-                            </p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-purple-400 group-hover:translate-x-1 transition"></i>
-                </div>
-                <div class="text-center mt-4 text-[10px] text-gray-400">
-                    <i class="fas fa-shield-alt mr-1"></i> Auto-update setiap 5 saat • Data dienkripsi
-                </div>`;
-                
-            } catch(e) {
-                console.error('Customer chat error:', e);
-                listEl.innerHTML = createErrorUI('Gagal connect ke support', e.message, loadChatList);
-            }
-        }        
-        // Helper: Create chat item HTML
-        function createChatItemHTML(partnerId, username, lastMsg, lastTime) {
-            const initial = (username || '?').charAt(0).toUpperCase();
-            return `
-            <div onclick="openChat('${partnerId}', '${username}')" 
-                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-purple-400 hover:shadow-md">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                        ${initial}
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-sm text-gray-800 truncate">${username}</h4>
-                        <p class="text-xs text-gray-500 truncate w-40">${lastMsg}</p>
-                    </div>
-                </div>
-                <span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${lastTime}</span>
-            </div>`;
-        }
-        
-        // Helper: Create error UI with retry
-        function createErrorUI(title, details, retryFn) {
-            return `
-            <div class='text-center text-red-500 mt-10 text-xs p-4 bg-red-50 rounded-lg'>
-                <p class='font-bold mb-2'>❌ ${title}</p>
-                <p class='text-[10px] text-gray-400 mb-3'>${details || 'Unknown error'}</p>
-                <button onclick="${retryFn.name}()" class='px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600'>🔄 Cuba Lagi</button>
-            </div>`;
-        }
-        
-        // Setup real-time listener for chat updates
-        function setupRealtimeListener(listEl, isInitial = true) {
-            if(!currentUser) return;
-            
+        // ==================== CHAT SYSTEM - SIMPLE & WORKING ====================
+
+// Global variables
+let chatPartner = null;
+let chatId = null;
+let msgListener = null;
+let autoUpdate = null;
+let voiceRecorder = null;
+let voiceTimer = null;
+let voiceStart = null;
+let selectedMsg = null;
+let adminStatus = 'online';
+
+// Config
+const CFG = { AUTO_MS: 1000, MAX_VOICE: 60, ADMIN_PASS: 'admin123' }; // ⚠️ UBAH PASSWORD INI!
+
+// ==================== LOAD CHAT LIST ====================
+async function refreshChatList() {
+    if(!currentUser) return navTo('login');
+    const list = document.getElementById('chat-list-view');
+    list.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></div>';
+    
+    try {
+        if(userData.role === 'admin') {
             const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-            
-            chatMsgListener = onSnapshot(q, (snap) => {
-                // Only re-render if not initial load to prevent flicker
-                if(!isInitial && document.visibilityState === 'visible') {
-                    // Debounce re-render to avoid excessive updates
-                    debounce(() => loadChatList(), 300)();
-                }
-            }, (err) => console.warn('⚠️ Chat listener error:', err));
-        }
-        
-        // ─────────────────────────────────────────────────────────────
-        // AUTO-REFRESH SYSTEM (5-second interval)
-        // ─────────────────────────────────────────────────────────────
-        function startAutoRefresh() {
-            if(chatRefreshTimer) clearInterval(chatRefreshTimer);            
-            chatRefreshTimer = setInterval(() => {
-                // Only refresh if page is visible and chat is active
-                if(document.visibilityState === 'visible') {
-                    const chatActive = userData.role === 'admin' 
-                        ? !document.getElementById('admin-chat-list')?.classList.contains('hidden-section')
-                        : !document.getElementById('chat-list-view')?.classList.contains('hidden-section');
-                    
-                    if(chatActive) {
-                        // Use debounced load to prevent rapid re-renders
-                        debounce(() => loadChatList(), 500)();
-                    }
-                }
-            }, CHAT.AUTO_REFRESH_MS);
-            
-            console.log(`🔄 Auto-refresh started: ${CHAT.AUTO_REFRESH_MS}ms`);
-        }
-        
-        function stopAutoRefresh() {
-            if(chatRefreshTimer) {
-                clearInterval(chatRefreshTimer);
-                chatRefreshTimer = null;
-                console.log('🛑 Auto-refresh stopped');
+            const snap = await getDocs(q);
+            if(snap.empty) { list.innerHTML = '<p class="text-center text-gray-500 mt-10">✨ Tiada perbualan</p>'; return; }
+            list.innerHTML = '';
+            for(const d of snap.docs) {
+                const data = d.data();
+                const partnerId = data.participants.find(id => id !== currentUser.uid);
+                if(!partnerId) continue;
+                const pSnap = await getDoc(doc(db, "users", partnerId));
+                const p = pSnap.exists() ? pSnap.data() : {username: 'Unknown'};
+                list.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-400"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">${(p.username||'?')[0].toUpperCase()}</div><div><div class="font-bold text-sm">${p.username}</div><div class="text-xs text-gray-500 truncate w-40">${data.lastMessage || 'No messages'}</div></div></div><span class="text-[10px] text-gray-400">${data.lastTime?.toDate?.()?.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'})||''}</span></div>`;
             }
-        }
-        
-        // Debounce utility to limit function calls
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-        
-        // Cleanup all chat listeners
-        function cleanupChatListeners() {
-            stopAutoRefresh();
-            if(chatMsgListener) {
-                try { chatMsgListener(); } catch(e) {}
-                chatMsgListener = null;
-            }
-        }
-        
-        // ─────────────────────────────────────────────────────────────
-        // MESSAGE TYPE HANDLERS (Modular & Extensible)        // ─────────────────────────────────────────────────────────────
-        
-        // Render message based on type - single source of truth
-        function renderMessage(msg, isMe) {
-            const handlers = {
-                [CHAT.MSG_TYPES.TEXT]: renderTextMessage,
-                [CHAT.MSG_TYPES.IMAGE]: renderImageMessage,
-                [CHAT.MSG_TYPES.LOCATION]: renderLocationMessage,
-                [CHAT.MSG_TYPES.ORDER]: renderOrderMessage,
-                [CHAT.MSG_TYPES.ACCOUNT]: renderAccountMessage,
-                [CHAT.MSG_TYPES.SYSTEM]: renderSystemMessage
-            };
-            
-            const handler = handlers[msg.type] || renderTextMessage;
-            return handler(msg, isMe);
-        }
-        
-        // Handler: TEXT message
-        function renderTextMessage(msg, isMe) {
-            const text = escapeHtml(msg.payload?.text || msg.text || '');
-            return `<p class="text-sm break-words whitespace-pre-wrap">${text}</p>`;
-        }
-        
-        // Handler: IMAGE message (auto-convert to code + clickable)
-        function renderImageMessage(msg, isMe) {
-            const { url, code, caption, originalName } = msg.payload || msg;
-            const imgUrl = escapeHtml(url || '');
-            const displayCode = code ? `<span class="text-[10px] font-mono bg-gray-200 px-1 rounded ml-1">${code}</span>` : '';
-            
-            return `
-            <div class="image-container">
-                <img src="${imgUrl}" 
-                     class="msg-img rounded-lg cursor-zoom-in hover:opacity-90 transition" 
-                     alt="${escapeHtml(caption || originalName || 'Image')}"
-                     onclick="window.open('${imgUrl}', '_blank')"
-                     loading="lazy"
-                     onerror="this.closest('.image-container').innerHTML='<p class=\\'text-xs text-red-400\\'>❌ Image failed to load</p>'">
-                ${caption ? `<p class="text-[10px] text-gray-400 mt-1">${escapeHtml(caption)}</p>` : ''}
-                ${displayCode}
-            </div>`;
-        }
-        
-        // Handler: LOCATION message
-        function renderLocationMessage(msg, isMe) {
-            const { address, coordinates } = msg.payload || msg;
-            const addr = escapeHtml(address || 'No address');
-            const hasCoords = coordinates?.lat && coordinates?.lng;
-            const mapsUrl = hasCoords 
-                ? `https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}`
-                : `https://www.google.com/maps/search/${encodeURIComponent(addr)}`;            
-            return `
-            <a href="${mapsUrl}" target="_blank" class="msg-location block hover:bg-gray-100 rounded transition p-1">
-                <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>
-                <span class="text-sm font-medium">${addr}</span>
-                ${hasCoords ? `<span class="text-[10px] text-gray-400 block">📍 ${coordinates.lat}, ${coordinates.lng}</span>` : ''}
-                <span class="text-[10px] text-blue-500 underline mt-1 inline-block">Open in Maps →</span>
-            </a>`;
-        }
-        
-        // Handler: ORDER HISTORY message (customer → admin)
-        async function renderOrderMessage(msg, isMe) {
-            const orderId = msg.payload?.orderId || msg.orderId;
-            if(!orderId) return `<p class="text-xs text-red-400">❌ Order ID missing</p>`;
-            
-            try {
-                // Fetch order details (cached in production via Cloud Functions)
-                const orderSnap = await getDoc(doc(db, "orders", orderId));
-                if(!orderSnap.exists()) return `<p class="text-xs text-gray-400">Order not found</p>`;
-                
-                const order = orderSnap.data();
-                const items = order.items || [];
-                const total = formatRM(order.total || 0);
-                const status = order.status || 'Unknown';
-                
-                return `
-                <div class="order-card bg-white/90 rounded-lg p-3 text-xs border border-purple-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-2 pb-2 border-b">
-                        <span class="font-bold text-purple-700">📦 Order #${order.orderId || orderId.slice(-6)}</span>
-                        <span class="badge ${getBadgeClass(status)}">${status}</span>
-                    </div>
-                    <div class="space-y-1 mb-2 max-h-24 overflow-y-auto">
-                        ${items.slice(0, 3).map(item => `
-                            <div class="flex justify-between">
-                                <span class="truncate" title="${escapeHtml(item.name || '')}">${escapeHtml(item.name || 'Item')}</span>
-                                <span class="font-mono">x${item.quantity || 1}</span>
-                            </div>
-                        `).join('')}
-                        ${items.length > 3 ? `<p class="text-[10px] text-gray-400">+${items.length - 3} more items</p>` : ''}
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t">
-                        <span class="font-bold">Total:</span>
-                        <span class="font-bold text-purple-600">${total}</span>
-                    </div>
-                    ${!isMe ? `<button onclick="viewOrderDetails('${orderId}')" class="mt-2 text-[10px] text-purple-600 hover:underline w-full text-center">🔍 View Full Details</button>` : ''}
-                </div>`;
-                
-            } catch(e) {
-                console.error('Order render error:', e);
-                return `<p class="text-xs text-gray-400">Failed to load order</p>`;            }
-        }
-        
-        // Handler: ACCOUNT INFO message (secure display)
-        function renderAccountMessage(msg, isMe) {
-            const { uac, username, phone, email, status } = msg.payload || msg;
-            // Only show sensitive data to self or admin
-            const canView = isMe || userData.role === 'admin';
-            
-            return `
-            <div class="account-card bg-white/90 rounded-lg p-3 text-xs border border-blue-200 shadow-sm">
-                <div class="flex items-center gap-2 mb-2 pb-2 border-b">
-                    <i class="fas fa-user-circle text-blue-500"></i>
-                    <span class="font-bold text-blue-700">Account Information</span>
-                </div>
-                <div class="space-y-1">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">UAC:</span>
-                        <span class="font-mono">${canView ? (uac || '-') : '••••••••'}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Username:</span>
-                        <span>${escapeHtml(username || '-')}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Phone:</span>
-                        <span>${canView ? (phone || '-') : '••••••••••'}</span>
-                    </div>
-                    ${canView && email ? `
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Email:</span>
-                        <span>${escapeHtml(email)}</span>
-                    </div>` : ''}
-                    ${canView && status ? `
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Status:</span>
-                        <span class="badge ${getBadgeClass(status)}">${status}</span>
-                    </div>` : ''}
-                </div>
-                ${!canView ? `<p class="text-[10px] text-gray-400 mt-2">🔒 Maklumat sensitif dilindungi</p>` : ''}
-            </div>`;
-        }
-        
-        // Handler: SYSTEM message (notifications)
-        function renderSystemMessage(msg, isMe) {
-            const icons = {
-                'order_created': '🛒', 'payment_verified': '✅', 'order_shipped': '📦',
-                'order_delivered': '🎉', 'order_cancelled': '❌', 'default': 'ℹ️'
-            };
-            const icon = icons[msg.payload?.type] || icons.default;            return `<div class="system-msg text-center py-1"><span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">${icon} ${escapeHtml(msg.payload?.text || msg.text || '')}</span></div>`;
-        }
-        
-        // Helper: Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            if(!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Helper: Get badge class for status
-        function getBadgeClass(status) {
-            const map = {
-                'ACTIVE': 'badge-active', 'BLOCKED': 'badge-blocked', 'INACTIVE': 'badge-inactive',
-                'To Pay': 'badge-to-pay', 'To Ship': 'badge-to-ship', 'To Receive': 'badge-to-receive',
-                'Completed': 'badge-completed', 'Cancelled': 'badge-cancelled', 'Return/Refund': 'badge-refund'
-            };
-            return map[status] || 'badge-inactive';
-        }
-        
-        // ─────────────────────────────────────────────────────────────
-        // MESSAGE SENDING CORE (Unified & Validated)
-        // ─────────────────────────────────────────────────────────────
-        
-        // Core function: Send any message type to Firestore
-        async function sendChatMessage(type, payload, meta = {}) {
-            if(!currentUser || !currentChatPartner) {
-                showToast('❌ Sesi chat tidak aktif', 'error');
-                return false;
-            }
-            
-            // Generate consistent chat ID (sorted UIDs)
-            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
-            
-            try {
-                // 1. Add message to subcollection
-                await addDoc(collection(db, `chats/${chatId}/messages`), {
-                    senderId: currentUser.uid,
-                    type: type,
-                    payload: payload,
-                    timestamp: serverTimestamp(),
-                    read: false,
-                    isPinned: false,
-                    ...meta
-                });
-                
-                // 2. Update chat document for list view
-                const preview = getMessagePreview(type, payload);
-                await setDoc(doc(db, "chats", chatId), {                    participants: [currentUser.uid, currentChatPartner].sort(),
-                    lastMessage: preview,
-                    lastTime: serverTimestamp(),
-                    lastMessageType: type
-                }, { merge: true });
-                
-                console.log(`✅ Sent ${type} message`);
-                playSound('msg');
-                return true;
-                
-            } catch(e) {
-                console.error(`❌ Send ${type} error:`, e);
-                showToast('❌ Gagal hantar: ' + (e.message || 'Unknown'), 'error');
-                return false;
-            }
-        }
-        
-        // Generate preview text for chat list
-        function getMessagePreview(type, payload) {
-            switch(type) {
-                case CHAT.MSG_TYPES.TEXT: return (payload?.text || '').substring(0, 40) + '...';
-                case CHAT.MSG_TYPES.IMAGE: return '🖼️ [Image]';
-                case CHAT.MSG_TYPES.LOCATION: return '📍 [Location]';
-                case CHAT.MSG_TYPES.ORDER: return '📦 [Order History]';
-                case CHAT.MSG_TYPES.ACCOUNT: return '👤 [Account Info]';
-                case CHAT.MSG_TYPES.SYSTEM: return '⚙️ [System]';
-                default: return '[Message]';
-            }
-        }
-        
-        // ─────────────────────────────────────────────────────────────
-        // PUBLIC API: Send Functions (Window-exposed)
-        // ─────────────────────────────────────────────────────────────
-        
-        // Send TEXT message
-        window.sendMessage = async () => {
-            const input = document.getElementById('msg-input');
-            const text = input?.value?.trim();
-            if(!text) { showToast('Mesej tidak boleh kosong', 'warning'); return; }
-            if(text.length > CHAT.MAX_TEXT_LENGTH) { showToast(`Mesej terlalu panjang (max ${CHAT.MAX_TEXT_LENGTH})`, 'warning'); return; }
-            
-            input.disabled = true;
-            const success = await sendChatMessage(CHAT.MSG_TYPES.TEXT, { text });
-            if(success) input.value = '';
-            input.disabled = false;
-            input.focus();
-        };
-        
-        // Send IMAGE message (auto-upload + code generation)
-        window.handleFileUpload = async (input) => {            const file = input?.files?.[0];
-            if(!file || !currentChatPartner) { if(input) input.value = ''; return; }
-            
-            // Validate
-            if(file.size > CHAT.MAX_IMAGE_MB * 1024 * 1024) { showToast(`❌ Gambar terlalu besar (max ${CHAT.MAX_IMAGE_MB}MB)`, 'error'); input.value = ''; return; }
-            if(!CHAT.SUPPORTED_IMAGES.includes(file.type)) { showToast('❌ Format tidak disokong (JPG/PNG/WebP)', 'error'); input.value = ''; return; }
-            
-            // UI feedback
-            const btn = input.parentElement?.querySelector('button[title*="Image"]');
-            if(btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true; }
-            
-            try {
-                // Upload to Firebase Storage with unique path
-                const ts = Date.now(), rand = Math.random().toString(36).slice(2,8);
-                const fname = `${ts}_${rand}_${file.name.replace(/[^a-z0-9.]/gi, '_')}`;
-                const storageRef = ref(storage, `chat_images/${currentUser.uid}/${fname}`);
-                
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                
-                // Generate reference code
-                const code = `IMG-${ts.toString().slice(-6)}`;
-                
-                // Send message
-                const success = await sendChatMessage(CHAT.MSG_TYPES.IMAGE, {
-                    url, code, 
-                    caption: '', 
-                    originalName: file.name,
-                    size: file.size,
-                    type: file.type
-                });
-                
-                if(success) showToast('✅ Gambar dihantar', 'success', 1500);
-                
-            } catch(e) {
-                console.error('Image upload error:', e);
-                showToast('❌ Upload gagal: ' + e.message, 'error');
-            } finally {
-                if(btn) { btn.innerHTML = '<i class="fas fa-image"></i>'; btn.disabled = false; }
-                if(input) input.value = '';
-            }
-        };
-        
-        // Send LOCATION message
-        window.sendLocation = async () => {
-            if(!currentChatPartner) { showToast('❌ Sesi chat tidak aktif', 'error'); return; }
-            const addr = prompt("Masukkan alamat/lokasi:", "");
-            if(addr?.trim()) {
-                // Optional: Get coordinates via Geolocation API
-                let coords = null;                if(navigator.geolocation) {
-                    try {
-                        const pos = await new Promise((res, rej) => 
-                            navigator.geolocation.getCurrentPosition(res, rej, {timeout: 5000})
-                        );
-                        coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    } catch(e) { console.log('Geolocation not available'); }
-                }
-                
-                const success = await sendChatMessage(CHAT.MSG_TYPES.LOCATION, { address: addr.trim(), coordinates: coords });
-                if(success) showToast('✅ Lokasi dihantar', 'success', 1500);
-            }
-        };
-        
-        // Send ORDER HISTORY (Customer → Admin)
-        window.sendOrderToAdmin = async (orderId) => {
-            if(!orderId) { showToast('❌ Order ID diperlukan', 'error'); return; }
-            if(userData.role !== 'customer') { showToast('❌ Hanya customer boleh hantar order', 'error'); return; }
-            
-            const success = await sendChatMessage(CHAT.MSG_TYPES.ORDER, { orderId, sentAt: serverTimestamp() });
-            if(success) showToast('✅ Sejarah pesanan dihantar ke Admin', 'success');
-        };
-        
-        // Send ACCOUNT INFO (Customer → Admin, secure)
-        window.sendAccountToAdmin = async () => {
-            if(userData.role !== 'customer') { showToast('❌ Hanya customer boleh hantar maklumat akaun', 'error'); return; }
-            if(!confirm("Hantar maklumat akaun kepada Admin?\n\nMaklumat sensitif akan dilindungi.")) return;
-            
-            const success = await sendChatMessage(CHAT.MSG_TYPES.ACCOUNT, {
-                uac: userData.uac, username: userData.username, phone: userData.phone,
-                email: userData.email || '', status: userData.status, sentAt: serverTimestamp()
-            }, { containsSensitiveData: true });
-            
-            if(success) showToast('✅ Maklumat akaun dihantar', 'success');
-        };
-        
-        // Admin: Request order history from customer
-        window.adminRequestOrder = async (customerId, orderId = null) => {
-            if(userData.role !== 'admin') return;
-            const original = currentChatPartner;
-            currentChatPartner = customerId;
-            
-            const msg = orderId ? `Sila hantar butiran pesanan ${orderId} untuk semakan.` : `Sila hantar sejarah pesanan anda untuk semakan.`;
-            await sendChatMessage(CHAT.MSG_TYPES.TEXT, { text: msg });
-            
-            currentChatPartner = original;
-            showToast('✅ Permintaan dihantar ke customer', 'success');
-        };
-        
-        // ─────────────────────────────────────────────────────────────        // CHAT OPEN/CLOSE & MESSAGE LOADING
-        // ─────────────────────────────────────────────────────────────
-        
-        window.openChat = (partnerId, partnerName) => {
-            if(!currentUser) { showToast('Sila login dahulu', 'error'); return navTo('login'); }
-            
-            currentChatPartner = partnerId;
-            
-            // Update UI
-            const nameEl = document.getElementById('chat-partner-name') || document.getElementById('admin-chat-target');
-            if(nameEl) nameEl.innerText = partnerName;
-            
-            // Switch views
-            document.getElementById('chat-list-view')?.classList.add('hidden-section');
-            document.getElementById('admin-chat-list')?.classList.add('hidden-section');
-            document.getElementById('active-chat-view')?.classList.remove('hidden-section');
-            document.getElementById('admin-active-chat')?.classList.remove('hidden-section');
-            
-            // Load messages
-            loadChatMessages(partnerId);
-            
-            // Ensure auto-refresh is active
-            startAutoRefresh();
-        };
-        
-        // Load messages for specific chat with real-time updates
-        async function loadChatMessages(partnerId) {
-            const chatId = [currentUser.uid, partnerId].sort().join('_');
-            const container = document.getElementById('chat-messages') || document.getElementById('admin-chat-messages');
-            if(!container) return;
-            
-            // Cleanup previous
-            if(chatMsgListener) { try { chatMsgListener(); } catch(e) {} chatMsgListener = null; }
-            
-            container.innerHTML = `<div class="text-center text-gray-400 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading messages...</p></div>`;
-            
-            try {
-                const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"), limit(100));
-                
-                chatMsgListener = onSnapshot(q, (snap) => {
-                    container.innerHTML = "";
-                    
-                    if(snap.empty) {
-                        container.innerHTML = `<div class="text-center text-gray-400 mt-10 text-sm"><i class="fas fa-comments text-3xl mb-2 opacity-50"></i><br>Mula perbualan...</div>`;
-                        return;
-                    }
-                    
-                    snap.forEach(doc => {
-                        const msg = doc.data();
-                        const isMe = msg.senderId === currentUser.uid;                        const content = renderMessage(msg, isMe);
-                        const time = msg.timestamp?.toDate?.()?.toLocaleTimeString('ms-MY', {hour:'2-digit', minute:'2-digit'}) || '';
-                        
-                        container.innerHTML += `<div class="message-bubble ${isMe ? 'msg-me' : 'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right mt-1">${time}</div></div>`;
-                    });
-                    
-                    container.scrollTop = container.scrollHeight;
-                    
-                    // Sound for new messages from others
-                    const last = snap.docs[snap.docs.length-1]?.data();
-                    if(last && last.senderId !== currentUser.uid) playSound('msg');
-                    
-                }, (err) => {
-                    console.error('Message listener error:', err);
-                    container.innerHTML = `<p class="text-center text-red-500 text-xs mt-10">❌ Gagal load mesej.</p>`;
-                });
-                
-            } catch(e) {
-                console.error('Load messages error:', e);
-                container.innerHTML = `<p class="text-center text-red-500 text-xs mt-10">❌ Error: ${e.message}</p>`;
-            }
-        }
-        
-        window.closeChat = () => {
-            cleanupChatListeners();
-            currentChatPartner = null;
-            document.getElementById('active-chat-view')?.classList.add('hidden-section');
-            document.getElementById('chat-list-view')?.classList.remove('hidden-section');
-            loadChatList();
-        };
-        
-        window.closeAdminChat = () => {
-            cleanupChatListeners();
-            currentChatPartner = null;
-            document.getElementById('admin-active-chat')?.classList.add('hidden-section');
-            document.getElementById('admin-chat-list')?.classList.remove('hidden-section');
-            loadChatList();
-        };
-        
-        // ─────────────────────────────────────────────────────────────
-        // UTILITIES & INITIALIZATION
-        // ─────────────────────────────────────────────────────────────
-        
-        // View order details modal (stub - extend as needed)
-        window.viewOrderDetails = (orderId) => {
-            if(userData.role === 'admin') {
-                navTo('admin'); showAdminTab('tab-orders-manage');
-                const search = document.getElementById('order-search');
-                if(search) { search.value = orderId; filterManageOrders(); }
-            } else {                showToast('ℹ️ Butiran pesanan tersedia di Dashboard', 'success', 3000);
-                navTo('dashboard');
-            }
-        };
-        
-        // Copy chat partner ID
-        window.copyChatID = () => {
-            if(currentChatPartner) {
-                navigator.clipboard.writeText(currentChatPartner)
-                    .then(() => showToast('✅ ID disalin!', 'success', 1500))
-                    .catch(() => showToast('❌ Gagal salin', 'error'));
-            }
-        };
-        
-        // Block contact
-        window.blockContact = async () => {
-            if(!currentChatPartner || !confirm("Block pengguna ini?")) return;
-            try {
-                await updateDoc(doc(db, "users", currentChatPartner), { status: 'BLOCKED', blockedAt: serverTimestamp() });
-                showToast('✅ Pengguna diblock', 'success');
-                closeChat();
-            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
-        };
-        
-        // Initialize chat system
-        function initChatSystem() {
-            console.log('🚀 Chat system initialized');
-            
-            // Manage auto-refresh based on page visibility
-            document.addEventListener('visibilitychange', () => {
-                document.visibilityState === 'visible' ? startAutoRefresh() : stopAutoRefresh();
-            });
-            
-            // Cleanup on unload
-            window.addEventListener('beforeunload', cleanupChatListeners);
-            
-            // Initial load if chat view is active
-            if(!document.getElementById('view-chat-list')?.classList.contains('hidden-section') || 
-               !document.getElementById('tab-chat')?.classList.contains('hidden-section')) {
-                loadChatList();
-            }
-        }
-        
-        // Run init when ready
-        if(document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initChatSystem);
         } else {
-            initChatSystem();
+            const adminQ = query(collection(db, "users"), where("role", "==", "admin"), where("status", "==", "ACTIVE"), limit(1));
+            const adminSnap = await getDocs(adminQ);
+            if(adminSnap.empty) { list.innerHTML = '<p class="text-center text-orange-500 mt-10">⚠️ Tiada Admin online</p>'; return; }
+            const admin = adminSnap.docs[0].data();
+            list.innerHTML = `<div onclick="openChat('${adminSnap.docs[0].id}', '${admin.username||'Support'}')" class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><div class="font-bold">MFD Support</div><div class="text-xs text-green-600 flex items-center gap-1"><span class="status-dot online"></span> Online</div></div></div><i class="fas fa-chevron-right text-purple-400"></i></div>`;
         }
+    } catch(e) { console.error('Chat list error:', e); list.innerHTML = '<p class="text-center text-red-500 mt-10 text-xs">❌ Gagal load chat</p>'; }
+}
+
+// ==================== OPEN CHAT ====================
+function openChat(partnerId, partnerName) {
+    if(!currentUser) return navTo('login');
+    chatPartner = partnerId;    chatId = [currentUser.uid, partnerId].sort().join('_');
+    document.getElementById('chat-partner-name').textContent = partnerName;
+    document.getElementById('chat-id-text').textContent = chatId.slice(0, 15) + '...';
+    document.getElementById('chat-list-view').classList.add('hidden-section');
+    document.getElementById('active-chat-view').classList.remove('hidden-section');
+    const adminCtrl = document.getElementById('admin-chat-controls');
+    const blockBtn = document.getElementById('admin-block-btn');
+    if(userData.role === 'admin') { adminCtrl.classList.remove('hidden'); blockBtn.classList.add('hidden'); } 
+    else { adminCtrl.classList.add('hidden'); blockBtn.classList.remove('hidden'); }
+    loadMessages();
+    startAutoUpdate();
+}
+
+function closeActiveChat() {
+    stopAutoUpdate();
+    if(msgListener) { try { msgListener(); } catch(e){} msgListener = null; }
+    chatPartner = null; chatId = null;
+    document.getElementById('active-chat-view').classList.add('hidden-section');
+    document.getElementById('chat-list-view').classList.remove('hidden-section');
+    refreshChatList();
+}
+
+// ==================== LOAD MESSAGES ====================
+function loadMessages() {
+    if(!chatId || !chatPartner) return;
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '<div class="text-center text-gray-400 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading messages...</p></div>';
+    if(msgListener) { try { msgListener(); } catch(e){} }
+    const q = query(collection(db, `chats/${chatId}/messages`), orderBy('timestamp', 'asc'), limit(100));
+    msgListener = onSnapshot(q, (snap) => {
+        container.innerHTML = '';
+        document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString('ms-MY');
+        if(snap.empty) { container.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-comments text-3xl mb-2 opacity-50"></i><br>Mula perbualan...</div>'; return; }
+        snap.forEach(doc => {
+            const msg = { id: doc.id, ...doc.data() };
+            if(msg.deletedFor?.includes(currentUser.uid)) return;
+            const isMe = msg.senderId === currentUser.uid;
+            container.innerHTML += renderBubble(msg, isMe);
+        });
+        container.scrollTop = container.scrollHeight;
+        const last = snap.docs[snap.docs.length-1]?.data();
+        if(last && last.senderId !== currentUser.uid) playSound('msg');
+    });
+}
+
+function renderBubble(msg, isMe) {
+    const time = msg.timestamp?.toDate?.()?.toLocaleTimeString('ms-MY', {hour:'2-digit',minute:'2-digit'}) || '';
+    const status = msg.read ? 'read' : (msg.delivered ? 'unread' : 'sent');
+    const pinned = msg.pinned ? '<div class="pinned">📌 Pinned</div>' : '';
+    let content = '';    if(msg.type === 'image') { content = `<img src="${msg.url}" class="max-h-40 rounded-lg cursor-pointer" onclick="window.open('${msg.url}','_blank')" onerror="this.parentElement.innerHTML='<p class=\\'text-xs text-red-400\\'>❌ Failed</p>'">`; if(msg.caption) content += `<p class="text-[10px] mt-1 opacity-80">${msg.caption}</p>`; } 
+    else if(msg.type === 'voice') { content = `<div class="voice-msg"><button onclick="playVoice('${msg.url}')" class="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center"><i class="fas fa-play text-xs"></i></button><div class="voice-wave"><span></span><span></span><span></span><span></span></div><span class="text-xs">${formatSec(msg.duration||0)}</span></div>`; } 
+    else if(msg.type === 'location') { const maps = msg.coords ? `https://maps.google.com?q=${msg.coords.lat},${msg.coords.lng}` : `https://maps.google.com/search/${encodeURIComponent(msg.address||'')}`; content = `<a href="${maps}" target="_blank" class="block bg-white/50 p-2 rounded"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>${msg.address||'Location'}${msg.coords?`<div class="text-[10px] text-gray-400">📍 ${msg.coords.lat.toFixed(4)}, ${msg.coords.lng.toFixed(4)}</div>`:''}</a>`; } 
+    else if(msg.type === 'order') { content = `<div class="bg-white/90 rounded p-2 text-xs border"><div class="font-bold">📦 Order #${msg.orderId?.slice(-6)||'...'}</div><div>${msg.items?.map(i=>i.name).join(', ')||''}</div><div class="font-bold text-purple-600">${formatRM(msg.total||0)}</div></div>`; } 
+    else if(msg.type === 'account') { content = `<div class="bg-white/90 rounded p-2 text-xs border"><div class="font-bold">👤 Account</div><div>UAC: ${msg.uac||'-'}</div><div>User: ${msg.username||'-'}</div><div>Phone: ${msg.phone||'-'}</div></div>`; } 
+    else { content = `<p class="text-sm break-words">${escapeHtml(msg.text||'')}</p>`; }
+    const actions = `<div class="chat-actions">${isMe ? `<button class="chat-action-btn" onclick="editMsg('${msg.id}')" title="Edit"><i class="fas fa-edit"></i></button>` : ''}<button class="chat-action-btn" onclick="pinMsg('${msg.id}')" title="Pin"><i class="fas fa-thumbtack ${msg.pinned?'text-yellow-500':''}"></i></button><button class="chat-action-btn" onclick="replyMsg('${msg.id}')" title="Reply"><i class="fas fa-reply"></i></button><button class="chat-action-btn" onclick="delMsg('${msg.id}','me')" title="Delete for me"><i class="fas fa-user-minus"></i></button>${(userData.role==='admin'||isMe) ? `<button class="chat-action-btn danger" onclick="delMsg('${msg.id}','all')" title="Delete for everyone"><i class="fas fa-trash-alt"></i></button>` : ''}</div>`;
+    const statusIcon = isMe ? (status==='read'?'<i class="fas fa-check-double"></i>':status==='unread'?'<i class="fas fa-check"></i>':'<i class="fas fa-clock"></i>') : '';
+    return `<div class="chat-bubble ${isMe?'me':'other'} group" data-id="${msg.id}" oncontextmenu="showContext(event,'${msg.id}')">${pinned}${actions}${content}<div class="msg-time">${time}${statusIcon?`<span class="msg-status ${status}">${statusIcon}</span>`:''}</div></div>`;
+}
+
+// ==================== SEND MESSAGES ====================
+async function sendText() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if(!text || !chatId) return;
+    try {
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'text', text, timestamp: serverTimestamp(), delivered: false, read: false });
+        await updateDoc(doc(db, 'chats', chatId), { lastMessage: text.slice(0,40)+'...', lastTime: serverTimestamp() }, {merge:true});
+        input.value = ''; playSound('click');
+    } catch(e) { showToast('❌ Gagal hantar: '+e.message, 'error'); }
+}
+
+async function sendImage(input) {
+    const file = input.files[0];
+    if(!file || !chatId) { input.value=''; return; }
+    if(file.size > 5*1024*1024) { showToast('❌ Gambar terlalu besar (max 5MB)', 'error'); input.value=''; return; }
+    try {
+        const name = `chat_${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi,'_')}`;
+        const ref = storageRef(storage, `chat_images/${currentUser.uid}/${name}`);
+        await uploadBytes(ref, file);
+        const url = await getDownloadURL(ref);
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'image', url, timestamp: serverTimestamp(), delivered: false, read: false });
+        showToast('✅ Gambar dihantar', 'success', 1500);
+    } catch(e) { showToast('❌ Upload gagal: '+e.message, 'error'); }
+    input.value = '';
+}
+
+function toggleVoice() {
+    if(voiceRecorder) { cancelVoice(); return; }
+    if(!navigator.mediaDevices?.getUserMedia) { showToast('❌ Microphone not supported', 'error'); return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+        voiceRecorder = new MediaRecorder(stream);
+        const chunks = [];
+        voiceRecorder.ondataavailable = e => chunks.push(e.data);
+        voiceRecorder.onstop = async () => { const blob = new Blob(chunks, {type:'audio/webm'}); await sendVoiceBlob(blob, Math.floor((Date.now()-voiceStart)/1000)); stream.getTracks().forEach(t=>t.stop()); };
+        voiceStart = Date.now();
+        document.getElementById('voice-ui').classList.add('active');
+        document.getElementById('voice-btn').classList.add('active', 'bg-red-500', 'text-white');
+        voiceTimer = setInterval(() => { const s = Math.floor((Date.now()-voiceStart)/1000); document.getElementById('voice-time').textContent = formatSec(s); if(s >= CFG.MAX_VOICE) sendVoice(); }, 1000);        voiceRecorder.start(); playSound('click');
+    }).catch(() => showToast('❌ Cannot access microphone', 'error'));
+}
+
+function cancelVoice() {
+    if(voiceRecorder?.state === 'recording') voiceRecorder.stop();
+    clearInterval(voiceTimer);
+    document.getElementById('voice-ui').classList.remove('active');
+    document.getElementById('voice-btn').classList.remove('active', 'bg-red-500', 'text-white');
+    voiceRecorder = null;
+}
+
+async function sendVoice() {
+    if(voiceRecorder?.state === 'recording') voiceRecorder.stop();
+    clearInterval(voiceTimer);
+    document.getElementById('voice-ui').classList.remove('active');
+    document.getElementById('voice-btn').classList.remove('active', 'bg-red-500', 'text-white');
+}
+
+async function sendVoiceBlob(blob, duration) {
+    if(!chatId) return;
+    try {
+        const name = `voice_${Date.now()}.webm`;
+        const ref = storageRef(storage, `chat_voice/${currentUser.uid}/${name}`);
+        await uploadBytes(ref, blob);
+        const url = await getDownloadURL(ref);
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'voice', url, duration, timestamp: serverTimestamp(), delivered: false, read: false });
+        showToast('✅ Voice sent', 'success', 1500); playSound('voice-send');
+    } catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+    voiceRecorder = null;
+}
+
+function sendLocation() {
+    if(!chatId) return;
+    const addr = prompt('Masukkan alamat/lokasi:');
+    if(!addr?.trim()) return;
+    if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(pos => { sendLoc(addr, {lat: pos.coords.latitude, lng: pos.coords.longitude}); }, () => sendLoc(addr, null), {timeout:5000}); } 
+    else { sendLoc(addr, null); }
+}
+
+async function sendLoc(address, coords) {
+    try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'location', address, coords, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Location sent', 'success', 1500); } 
+    catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+}
+
+async function sendOrderInfo() {
+    if(!chatId) return;
+    const order = allUserOrders?.[0];
+    if(!order) { showToast('ℹ️ Tiada order untuk dihantar', 'warning'); return; }
+    if(confirm(`Hantar order #${order.orderId?.slice(-6)||'...'}?`)) {        try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'order', orderId: order.orderId, items: order.items, total: order.total, status: order.status, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Order info sent', 'success'); } 
+        catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+    }
+}
+
+async function sendAccountInfo() {
+    if(!chatId) return;
+    if(!confirm('Hantar maklumat akaun kepada support?')) return;
+    try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'account', uac: userData.uac, username: userData.username, phone: userData.phone, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Account info sent', 'success'); } 
+    catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+}
+
+// ==================== MESSAGE ACTIONS ====================
+function showContext(e, msgId) { e.preventDefault(); selectedMsg = msgId; const menu = document.getElementById('msg-context'); menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px'; menu.classList.remove('hidden'); setTimeout(() => document.addEventListener('click', hideContext, {once:true}), 10); }
+function hideContext() { document.getElementById('msg-context').classList.add('hidden'); selectedMsg = null; }
+function msgAction(action) { if(!selectedMsg || !chatId) return; hideContext(); switch(action) { case 'reply': const msg = findMsg(selectedMsg); document.getElementById('msg-input').value = `@${msg?.senderId===currentUser.uid?'Me':'User'}: ${msg?.text?.slice(0,30)||''}\n`; document.getElementById('msg-input').focus(); break; case 'edit': editMsg(selectedMsg); break; case 'pin': pinMsg(selectedMsg); break; case 'delete-me': delMsg(selectedMsg, 'me'); break; case 'delete-all': delMsg(selectedMsg, 'all'); break; } }
+
+async function editMsg(msgId) { const bubble = document.querySelector(`[data-id="${msgId}"]`); const msg = findMsg(msgId); if(!msg || msg.senderId !== currentUser.uid) { showToast('❌ Boleh edit mesej sendiri sahaja', 'error'); return; } const content = bubble.querySelector('p') || bubble.firstChild; if(!content) return; content.outerHTML = `<textarea class="edit-input" rows="2">${escapeHtml(msg.text||'')}</textarea><div class="flex gap-1 mt-1"><button onclick="saveEdit('${msgId}')" class="px-2 py-0.5 text-xs bg-green-500 text-white rounded">Save</button><button onclick="loadMessages()" class="px-2 py-0.5 text-xs bg-gray-300 rounded">Cancel</button></div>`; }
+
+async function saveEdit(msgId) { const txt = document.querySelector(`[data-id="${msgId}"] .edit-input`)?.value.trim(); if(!txt) return showToast('❌ Mesej tidak boleh kosong', 'error'); try { await updateDoc(doc(db, `chats/${chatId}/messages`, msgId), { text: txt, edited: true, editedAt: serverTimestamp() }); showToast('✅ Mesej dikemaskini', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Gagal: '+e.message, 'error'); } }
+
+async function pinMsg(msgId) { try { const ref = doc(db, `chats/${chatId}/messages`, msgId); const snap = await getDoc(ref); const pinned = !snap.data()?.pinned; await updateDoc(ref, { pinned, pinnedAt: pinned ? serverTimestamp() : null }); showToast(pinned ? '📌 Pinned' : '📍 Unpinned', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+async function delMsg(msgId, scope) { try { if(scope === 'me') { await updateDoc(doc(db, `chats/${chatId}/messages`, msgId), { deletedFor: arrayUnion(currentUser.uid) }); } else { if(userData.role !== 'admin') { const msg = findMsg(msgId); if(msg?.senderId !== currentUser.uid) return showToast('❌ Hanya admin atau penghantar boleh padam untuk semua', 'error'); } await deleteDoc(doc(db, `chats/${chatId}/messages`, msgId)); } showToast('✅ Mesej dipadam', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+async function deleteAllMessages() { if(userData.role !== 'admin') return; if(!confirm('⚠️ Padam SEMUA mesej dalam perbualan ini?')) return; const pass = prompt('🔐 Masukkan password admin:'); if(pass !== CFG.ADMIN_PASS) return showToast('❌ Password salah', 'error'); try { const snap = await getDocs(collection(db, `chats/${chatId}/messages`)); await Promise.all(snap.docs.map(d => deleteDoc(d.ref))); await deleteDoc(doc(db, 'chats', chatId)); showToast('✅ Perbualan dipadam', 'success'); closeActiveChat(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+// ==================== ADMIN FEATURES ====================
+function setAdminStatus(status, btn) { if(userData.role !== 'admin') return; adminStatus = status; document.querySelectorAll('.admin-status-btn').forEach(b => b.classList.remove('active')); btn?.classList.add('active'); const dot = document.getElementById('chat-status')?.querySelector('.status-dot'); const text = document.getElementById('chat-status'); if(dot && text) { dot.className = `status-dot ${status}`; text.innerHTML = `<span class="status-dot ${status}"></span> ${status.charAt(0).toUpperCase()+status.slice(1)}`; } updateDoc(doc(db, 'users', currentUser.uid), { adminStatus: status }).catch(()=>{}); }
+
+function adminSecureAction() { if(userData.role !== 'admin') return; const pass = prompt('🔐 Admin password:'); if(pass === CFG.ADMIN_PASS) { showToast('✅ Admin access granted', 'success'); } else { showToast('❌ Wrong password', 'error'); } }
+
+function blockContact() { if(!chatPartner || userData.role === 'admin') return; if(!confirm('Block pengguna ini?')) return; updateDoc(doc(db, 'users', chatPartner), { status: 'BLOCKED', blockedAt: serverTimestamp() }).then(() => { showToast('✅ Pengguna diblock', 'success'); closeActiveChat(); }).catch(e => showToast('❌ Failed: '+e.message, 'error')); }
+
+// ==================== UTILITIES ====================
+function copyChatID() { if(!chatId) return; navigator.clipboard.writeText(chatId).then(() => { const badge = document.getElementById('chat-id-badge'); badge?.classList.add('copied'); setTimeout(() => badge?.classList.remove('copied'), 1500); showToast('✅ Chat ID copied!', 'success', 1500); localStorage.setItem('mfd_chat_id', chatId); localStorage.setItem('mfd_chat_partner', chatPartner||''); }); }
+
+function startAutoUpdate() { stopAutoUpdate(); autoUpdate = setInterval(() => { if(document.visibilityState === 'visible' && chatId) { document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString('ms-MY'); } }, CFG.AUTO_MS); }
+function stopAutoUpdate() { if(autoUpdate) { clearInterval(autoUpdate); autoUpdate = null; } }
+function findMsg(id) { return { id, senderId: currentUser?.uid, text: '' }; }
+function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function formatSec(s) { const m=Math.floor(s/60); return `${m}:${(s%60).toString().padStart(2,'0')}`; }
+function playVoice(url) { new Audio(url).play().catch(()=>{}); }
+
+// ═══════════════════════════════════════════════════════
+// 🎨 ADS WIDGET CONFIG - PREMIUM & EASY TO EDIT
+// ═══════════════════════════════════════════════════════
+// ✅ Cara edit: Ubah nilai dalam ADS_CONFIG sahaja
+// ✅ Tambah gambar: Copy-paste object dalam array 'items'
+// ✅ Jangan ubah kod fungsi di bawah config ini!
+
+const ADS_CONFIG = {
+    // ⚙️ SETTINGS UTAMA
+    speed: 25, // Scroll speed (saat untuk 1 loop penuh) - smaller = faster
+    pauseOnHover: true, // Pause animation bila mouse hover
+    clickOpensNewTab: true, // true = buka link dalam tab baru
+    enableGlow: true, // true = ada glow pulse effect
+    enableShine: true, // true = ada shine effect bila hover
+    
+    // 🖼️ LIST GAMBAR ADS - EDIT SINI SAHAJA!
+    // Format: { url: 'link-destination', img: 'image-url', alt: 'deskripsi' }
+    items: [
+        {
+            url: 'https://mfdstore.vercel.app',
+            img: 'https://i.postimg.cc/QdXvMTYW/file_00000000cd8471faadb060ee16658225.png',
+            alt: 'Promosi Khas MFD Store - Klik untuk lihat'
+        },
+        {
+            url: 'https://mfdstore.vercel.app/vendor.html',
+            img: 'https://i.postimg.cc/QMCPQrr4/file_00000000375c71fa9a9eac33008ac40f.png',
+            alt: 'Deal Exclusive - Jangan lepaskan!'
+        },
+        // ─────────────────────────────────────────────
+        // ➕ NAK TAMBAH GAMBAR BARU? 
+        // Copy block bawah, paste di sini, dan ubah nilai:
+        // ─────────────────────────────────────────────
+        // {
+        //     url: 'https://link-destination-anda.com',
+        //     img: 'https://url-gambar-baru-anda.png',
+        //     alt: 'Deskripsi untuk accessibility'
+        // },
+    ]
+};
+
+// ═══════════════════════════════════════════════════════
+// 🚀 ADS WIDGET RENDERER - JANGAN UBAH KOD BAWAH INI
+// ═══════════════════════════════════════════════════════
+function renderAdsWidget(containerId = 'ads-widget-container') {
+    const container = document.getElementById(containerId);
+    if (!container || !ADS_CONFIG.items?.length) return;
+    
+    // Duplicate items untuk infinite scroll seamless
+    const allSlides = [...ADS_CONFIG.items, ...ADS_CONFIG.items];
+    
+    // Build HTML dengan effect config
+    let html = `<div class="ads-track" style="animation-duration: ${ADS_CONFIG.speed}s">`;
+    
+    allSlides.forEach((item, index) => {
+        const target = ADS_CONFIG.clickOpensNewTab ? '_blank' : '_self';
+        const rel = ADS_CONFIG.clickOpensNewTab ? 'noopener noreferrer' : '';
+        
+        html += `
+        <div class="ads-slide" 
+             onclick="window.open('${item.url}', '${target}', '${rel}')"
+             title="${item.alt}"
+             role="link"
+             tabindex="0"
+             onkeypress="if(event.key==='Enter') this.click()"
+             style="${ADS_CONFIG.enableGlow ? '' : 'animation: none'}">
+            <img src="${item.img}" 
+                 alt="${item.alt}" 
+                 loading="lazy" 
+                 onerror="this.parentElement.style.display='none'; console.warn('Image failed:', '${item.img}')"
+                 style="${ADS_CONFIG.enableShine ? '' : 'pointer-events: none'}">
+        </div>`;
+    });
+    
+    html += `</div>`;
+    container.innerHTML = html;
+    
+    // Hover pause logic
+    if (ADS_CONFIG.pauseOnHover) {
+        const track = container.querySelector('.ads-track');
+        if (track) {
+            container.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+            container.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+        }
+    }
+    
+    console.log(`✅ Ads widget loaded: ${ADS_CONFIG.items.length} items, speed: ${ADS_CONFIG.speed}s`);
+}
+
+// Auto-render when DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => renderAdsWidget());
+} else {
+    renderAdsWidget();
+}
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('mfd_chat_id');
+    const partner = localStorage.getItem('mfd_chat_partner');
+    if(saved && partner && currentUser) { /* optional auto-reconnect */ }
+    if('Notification' in window && Notification.permission === 'default') { Notification.requestPermission(); }});
+document.addEventListener('visibilitychange', () => { document.visibilityState === 'visible' ? startAutoUpdate() : stopAutoUpdate(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') hideContext(); });
+
         // ==================== UI UTILITIES ====================
         
         // QR Code blur toggle
