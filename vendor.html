@@ -1,582 +1,1173 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta name="google-site-verification" content="v7koD54-JpANjYbZKCN46QWnVK7Q3a7sSdQnCcAVczo" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vendors Manager | MFD Store</title>
+    <title>🏪 Vendor Manager - MFD Store</title>
     
-    <!-- Libraries - SAME AS index.html -->
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ===== COPY PASTE CSS DARI index.html ===== */
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-dark: #2d3748;
-            --error-red: #e53e3e;
-            --success-green: #38a169;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: var(--text-dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
-        .glitter-text {
-            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            background-size: 300% auto;
-            animation: shine 4s linear infinite;            font-weight: 800;
-        }
-        @keyframes shine { to { background-position: 300% center; } }
-        .btn-glitter {
-            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
-            background-size: 300% 300%;
-            animation: gradientMove 4s ease infinite;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
-        }
-        .btn-glitter:active { transform: scale(0.95); }
-        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
-        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-        
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
-        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
-        .message-bubble:active { transform: scale(0.98); }
-        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.4); }
-        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
-        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
-        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); -webkit-overflow-scrolling: touch; }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1600px; font-size: 0.62rem; }
-        .custom-table th { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            padding: 12px 8px; text-align: left; font-weight: 700; 
-            border-bottom: 2px solid #e2e8f0; color: white; 
-            position: sticky; top: 0; z-index: 10; white-space: nowrap;
-        }
-        .custom-table td { 
-            padding: 10px 8px; border-bottom: 1px solid #edf2f7; 
-            background: rgba(255,255,255,0.5); vertical-align: middle; 
-            color: #2d3748; white-space: nowrap; max-width: 180px; 
-            overflow: hidden; text-overflow: ellipsis;
-        }
-        .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
-        
-        .hidden-section { display: none !important; }
-        input, select, textarea {
-            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
-        input:disabled, select:disabled, textarea:disabled { background: #edf2f7; cursor: not-allowed; }
-                .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
-        .badge-to-pay { background: #feebc8; color: #744210; }
-        .badge-to-ship { background: #bee3f8; color: #2a4365; }
-        .badge-to-receive { background: #c6f6d5; color: #22543d; }
-        .badge-completed { background: #9ae6b4; color: #22543d; }
-        .badge-cancelled { background: #fed7d7; color: #822727; }
-        .badge-refund { background: #faf089; color: #744210; }
-        .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }
-        .badge-inactive { background: #e2e8f0; color: #4a5568; }
-        .badge-private { background: #e9d8fd; color: #553c9a; }
-        .badge-outstock { background: #cbd5e0; color: #4a5568; }
-        .badge-pending { background: #feebc8; color: #744210; }
-        .badge-approved { background: #c6f6d5; color: #22543d; }
-        .badge-rejected { background: #fed7d7; color: #822727; }
-        .badge-draft { background: #e2e8f0; color: #4a5568; }
-        .badge-verified { background: #bee3f8; color: #2a4365; }
-        .badge-notverified { background: #fed7d7; color: #822727; }
-        
-        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
-        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
-        
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; border: none; }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-edit { background: #bee3f8; color: #2a4365; }
-        .btn-delete { background: #fed7d7; color: #c53030; }
-        .btn-view { background: #c6f6d5; color: #22543d; }
-        
-        .admin-filter-btn { transition: all 0.2s; border: 1px solid transparent; }
-        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); }
-        
-        .password-blur { filter: blur(4px); cursor: pointer; transition: filter 0.2s; user-select: none; }
-        .password-blur:hover { filter: blur(0); }
-        .password-blur.revealed { filter: none; cursor: default; }
-        
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .toast.success { background: var(--success-green); }
-        .toast.error { background: var(--error-red); }
-        .toast.warning { background: #dd6b20; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        @media (max-width: 768px) {
-            .custom-table { min-width: 1200px; font-size: 0.58rem; }            .custom-table th, .custom-table td { padding: 8px 6px; }
-            .glass-panel { border-radius: 16px; }
-            .btn-glitter { padding: 10px 16px; }
-        }
-        
-        .stat-card { transition: all 0.2s; cursor: default; }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(102,126,234,0.3); }
+        :root { --primary: #FFD700; --primary-dark: #FFA500; --secondary: #00CED1; --dark: #1a1a2e; --glass-bg: rgba(255,255,255,0.92); --glass-border: rgba(255,215,0,0.4); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #FFF9E6 0%, #E0FFFF 35%, #FFECB3 100%); background-size: 400% 400%; animation: gradientBG 20s ease infinite; color: var(--dark); min-height: 100vh; }
+        @keyframes gradientBG { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        .glitter-text { background: linear-gradient(90deg, #FFD700, #00CED1, #FF6B6B, #FFD700); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 400% auto; animation: shine 5s linear infinite; font-weight: 700; }
+        @keyframes shine { 0%{background-position:0%} 100%{background-position:400%} }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px rgba(255,215,0,0.2); transition: transform 0.2s; }
+        .glass-panel:hover { transform: translateY(-2px); }
+        .btn-glitter { background: linear-gradient(45deg, #FFD700, #FF8C00, #00CED1); background-size: 400% 400%; animation: gradientMove 6s ease infinite; color: var(--dark); font-weight: 600; transition: all 0.2s; }
+        .btn-glitter:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .btn-glitter:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        @keyframes gradientMove { 0%,100%{background-position:0%} 50%{background-position:100%} }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .input-glass { background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 14px; width: 100%; }
+        .input-glass:focus { outline: none; border-color: var(--secondary); }
+        .input-glass:disabled { background: #f3f4f6; cursor: not-allowed; }
+        .product-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,215,0,0.2); transition: all 0.2s; display: flex; flex-direction: column; cursor: pointer; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,215,0,0.3); }
+        .product-img { height: 140px; background: linear-gradient(135deg, #fff9e6, #e0ffff); display: flex; align-items: center; justify-content: center; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+        .product-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+        .product-price { color: var(--primary-dark); font-weight: 700; }
+        .chat-container { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; height: 70vh; min-height: 500px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background: rgba(255,255,255,0.5); border-radius: 12px; }
+        .msg-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; animation: popIn 0.2s ease; }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--dark); }
+        .msg-other { align-self: flex-start; background: white; border-left: 3px solid var(--secondary); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 12px; color: white; font-weight: 500; z-index: 9999; animation: slideIn 0.3s ease, fadeOut 0.3s 2.7s ease forwards; display: flex; align-items: center; gap: 8px; max-width: 320px; }        .toast.success { background: #22c55e; } .toast.error { background: #ef4444; } .toast.info { background: #3b82f6; }
+        @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes fadeOut { to{opacity:0} }
+        .loader { border: 3px solid rgba(0,0,0,0.1); border-left-color: var(--primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100%{transform:rotate(360deg)} }
+        .table-container { overflow-x: auto; border-radius: 12px; }
+        .custom-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px; }
+        .custom-table th { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 10px 8px; text-align: left; font-weight: 600; color: var(--dark); position: sticky; top: 0; }
+        .custom-table td { padding: 10px 8px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .tab-btn { padding: 8px 16px; border-radius: 10px; font-weight: 500; transition: all 0.2s; background: rgba(255,255,255,0.7); border: 1px solid var(--glass-border); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .status-online { background: #22c55e; } .status-busy { background: #ef4444; } .status-offline { background: #9ca3af; }
+        @media(max-width: 1024px) { .chat-container { grid-template-columns: 1fr; } .contacts-panel { position: fixed; inset: 0; z-index: 20; background: white; margin: 10px; border-radius: 20px; } .contacts-panel.hidden { display: none; } }
+        @media(max-width: 768px) { .product-grid { grid-template-columns: repeat(2,1fr); } }
+        @media(max-width: 480px) { .product-grid { grid-template-columns: 1fr; } .toast { right: 10px; left: 10px; max-width: none; } }
     </style>
 </head>
-<body class="p-0 md:p-4">
+<body class="p-2 md:p-4">
 
-    <!-- AUDIO EFFECTS -->
     <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
     <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
     <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
-    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+    <audio id="snd-chat" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-click-2345.mp3" preload="auto"></audio>
+    <div id="toast" class="toast hidden"></div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
-
-    <!-- NAVBAR -->
-    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
-        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('dashboard')">
-            <i class="fas fa-store"></i> MFD VENDORS
-        </div>
-        <div class="flex items-center gap-2 md:gap-4">
-            <button onclick="playSound('click'); navTo('chat')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
-                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
-                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
-            </button>
-            <button onclick="playSound('click'); window.open('https://mfdstore.vercel.app','_blank')" class="p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Buka MFD Store">
-                <i class="fas fa-external-link-alt text-pink-600 text-lg group-hover:scale-110 transition"></i>
-            </button>
-            <div id="auth-nav">
-                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register Account</button>
+    <nav class="glass-panel sticky top-2 md:top-4 z-50 p-3 flex justify-between items-center gap-2 flex-wrap">
+        <a href="#" class="flex items-center gap-2" onclick="playSound('click'); navTo('catalogue')">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-yellow-400 to-cyan-400 flex items-center justify-center text-white shadow"><i class="fas fa-store"></i></div>
+            <span class="font-bold glitter-text text-sm md:text-base">Vendors Manager</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <div id="auth-nav" class="flex gap-1.5">
+                <button onclick="navTo('login'); playSound('click')" class="px-3 py-1.5 rounded-lg bg-white/80 text-xs md:text-sm font-medium border border-yellow-200">Login</button>
+                <button onclick="navTo('register'); playSound('click')" class="px-3 py-1.5 rounded-lg btn-glitter text-xs md:text-sm">Register</button>
             </div>
-            <div id="vendor-nav" class="hidden-section flex items-center gap-2 md:gap-3">
-                <div class="text-right hidden md:block">
-                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
-                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
-                </div>
-                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm" title="Dashboard"><i class="fas fa-home"></i></button>
-                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            <div id="user-nav" class="hidden flex items-center gap-1.5">
+                <span id="nav-uac" class="text-[10px] md:text-xs font-mono bg-cyan-100 px-1.5 py-0.5 rounded hidden sm:inline"></span>
+                <button onclick="navTo('dashboard'); playSound('click')" class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow flex items-center justify-center"><i class="fas fa-user text-xs"></i></button>
+                <button onclick="doLogout(); playSound('click')" class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 text-white shadow flex items-center justify-center"><i class="fas fa-sign-out text-xs"></i></button>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
-        <!-- 1. LOGIN -->
-        <section id="view-login" class="max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <input type="email" id="login-email" placeholder="Email Address" autocomplete="email" required>
-                <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
-                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="login-btn">LOGIN NOW</button>
-                <div class="relative my-5">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
-                    <div class="relative flex justify-center text-xs"><span class="px-2 bg-transparent text-gray-500">ATAU</span></div>
-                </div>
-                <button onclick="playSound('click'); doGoogleSignIn()" class="w-full py-3 rounded-xl font-bold mt-2 shadow-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" class="w-5 h-5"> Continue with Google
-                </button>
-                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
-            </div>
-        </section>
-
-        <!-- 2. REGISTER -->
-        <section id="view-register" class="hidden-section max-w-lg mx-auto mt-6">
-            <div class="glass-panel p-6 md:p-8">
-                <h2 class="text-2xl md:text-3xl font-bold text-center mb-4 glitter-text">Register Account</h2>
-                <p class="text-center text-xs text-gray-600 mb-4">Sertai rangkaian penjual MFD Store • Komisen adil • Support 24/7</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" id="reg-seller" placeholder="Seller Name (Auto: VENFD-XXX)" readonly class="bg-gray-100">
-                    <input type="text" id="reg-business" placeholder="Business Name *" required maxlength="50">
-                    <input type="tel" id="reg-phone" placeholder="Phone Number (Active) *" pattern="[0-9+\-\s()]{10,}" required>
-                    <input type="email" id="reg-email" placeholder="Email Address (Optional)" autocomplete="email">
-                    <input type="password" id="reg-pass" placeholder="Password (min 6 characters) *" minlength="6" required>
-                    <input type="text" id="reg-ic" placeholder="IC/Passport (Optional)" maxlength="20" class="md:col-span-2">
-                    <textarea id="reg-desc" placeholder="Business Description" class="md:col-span-2" maxlength="200" rows="2"></textarea>
-                </div>
-                <div class="bg-purple-50 p-3 rounded-lg mt-4 text-xs text-purple-800 border border-purple-200">
-                    <strong>📋 Terma & Syarat:</strong>
-                    <ul class="list-disc pl-4 mt-1 space-y-1">
-                        <li>Komisen platform: <strong>RM0.01 - RM5.00</strong> setiap jualan (ditetapkan admin)</li>
-                        <li>Produk perlu diluluskan admin sebelum live</li>
-                        <li>Withdrawal minimum: <strong>RM50</strong>, diproses 1-3 hari bekerja</li>
-                        <li>Vendor bertanggungjawab atas stok & penghantaran</li>
-                    </ul>
-                </div>
-                <label class="flex items-center gap-2 mt-4 text-xs">
-                    <input type="checkbox" id="reg-agree" required class="w-4 h-4 accent-purple-500">
-                    <span>Saya bersetuju dengan <a href="#" class="text-purple-600 underline" onclick="alert('Terma lengkap disediakan oleh admin.')">Terma & Syarat MFD Store</a></span>
-                </label>
-                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="register-btn">REGISTER FREE</button>
-                <p class="text-center mt-4 text-xs text-gray-500">✅ Permohonan disemak dalam 24-48 jam</p>
-            </div>
-        </section>
-        <!-- 3. VENDOR DASHBOARD -->
-        <section id="view-dashboard" class="hidden-section">
-            <div id="approval-notice" class="hidden-section glass-panel p-4 mb-4 bg-yellow-50 border-l-4 border-yellow-400">
-                <div class="flex items-start gap-3"><i class="fas fa-clock text-yellow-600 mt-1"></i><div><h4 class="font-bold text-yellow-800">Permohonan Dalam Semakan</h4><p class="text-xs text-yellow-700">Akaun vendor sedang diproses. Anda akan dimaklumkan melalui email apabila diluluskan.</p></div></div>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-purple-600" id="stat-total-sales">RM 0.00</div><div class="text-[10px] text-gray-600">📈 Total Sales</div></div>
-                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-green-600" id="stat-earnings">RM 0.00</div><div class="text-[10px] text-gray-600">💰 Net Earnings</div></div>
-                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-blue-600" id="stat-pending">0</div><div class="text-[10px] text-gray-600">📦 Pending Orders</div></div>
-                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-pink-600" id="stat-products">0</div><div class="text-[10px] text-gray-600">🛍️ Active Products</div></div>
-            </div>
-
-            <div class="glass-panel p-4 mb-6">
-                <h3 class="font-bold text-purple-700 mb-3 text-sm">⚡ Quick Actions</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <button onclick="navTo('products')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-plus-circle text-purple-600 mb-1"></i><div class="text-[10px] font-bold">Add Product</div></button>
-                    <button onclick="navTo('orders-verify')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-receipt text-blue-600 mb-1"></i><div class="text-[10px] font-bold">Verify Orders</div></button>
-                    <button onclick="navTo('orders-manage')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-truck text-green-600 mb-1"></i><div class="text-[10px] font-bold">Fulfill Orders</div></button>
-                    <button onclick="navTo('profile')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-cog text-gray-600 mb-1"></i><div class="text-[10px] font-bold">Settings</div></button>
-                </div>
-            </div>
-
-            <div class="glass-panel p-4">
-                <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-purple-700 text-sm">🕐 Recent Orders</h3><button onclick="navTo('orders-verify')" class="text-[10px] text-purple-600 hover:underline">View All →</button></div>
-                <div id="recent-orders-list" class="space-y-2 max-h-60 overflow-y-auto"><div class="text-center text-gray-500 py-4 text-xs"><div class="loader mx-auto mb-2"></div>Loading...</div></div>
-            </div>
-        </section>
-
-        <!-- 4. ORDER VERIFICATION -->
-        <section id="view-orders-verify" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">✅ Order Verification</h2>
-                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 border-b border-gray-200">
-                    <button onclick="filterVerifyOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
-                    <button onclick="filterVerifyOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
-                    <button onclick="filterVerifyOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
-                    <button onclick="filterVerifyOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
-                    <button onclick="filterVerifyOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
-                    <button onclick="filterVerifyOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
-                </div>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead><tr>
-                            <th>UAC</th><th>Username</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th>
-                            <th>Payment</th><th>Payment Status</th><th>Tracking</th><th>Order ID</th><th>Status</th><th>Category</th><th>Actions</th>
-                        </tr></thead>
-                        <tbody id="verify-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
-                    </table>                </div>
-            </div>
-        </section>
-
-        <!-- 5. ORDER MANAGEMENT -->
-        <section id="view-orders-manage" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">📦 Order Fulfillment</h2>
-                <div class="flex gap-2 mb-4"><input type="text" id="order-search" placeholder="Search orders..." class="w-40 text-xs py-1 m-0" onkeyup="filterManageOrders()"><select id="order-category" class="w-36 text-xs py-1 m-0" onchange="filterManageOrders()"><option value="all">All</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead><tr>
-                            <th>UAC</th><th>Customer</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th><th>Payment</th><th>Payment Status</th><th>Delivery</th><th>Tracking</th><th>Order ID</th><th>Cancel</th><th>Chat</th>
-                        </tr></thead>
-                        <tbody id="manage-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 6. PRODUCT MANAGEMENT -->
-        <section id="view-products" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6">
-                <h2 class="text-xl font-bold glitter-text mb-4">🛍️ Product Management</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-white/30 p-4 rounded-xl">
-                    <div class="md:col-span-2 lg:col-span-3">
-                        <label class="block text-xs font-bold mb-1">🖼️ Product Image URL (PostImages.org)</label>
-                        <input type="url" id="prod-img-url" placeholder="https://i.postimg.cc/xxxx/product.jpg" class="m-0">
-                        <div id="prod-img-preview" class="mt-2 hidden"><img class="w-20 h-20 object-cover rounded-lg border"></div>
-                        <p class="text-[10px] text-gray-500 mt-1">💡 Upload di <a href="https://postimages.org/" target="_blank" class="text-purple-600 underline">postimages.org</a> → Copy "Direct link" → Paste sini</p>
-                    </div>
-                    <input type="text" id="prod-name" placeholder="Item Name *" required maxlength="100">
-                    <input type="number" id="prod-price" placeholder="Cost Price (RM) - Optional" min="0" step="0.01">
-                    <input type="number" id="prod-sell" placeholder="Selling Price (RM) *" required min="0.01" step="0.01">
-                    <input type="text" id="prod-variation" placeholder="Variation (Size/Color)" maxlength="50">
-                    <textarea id="prod-desc" placeholder="Description" class="md:col-span-2 lg:col-span-3" maxlength="500" rows="2"></textarea>
-                    <input type="text" id="prod-country" placeholder="Country of Origin" maxlength="50">
-                    <input type="url" id="prod-link" placeholder="Optional Link" maxlength="200">
-                    <input type="text" id="prod-label" placeholder="Label (e.g. Best Seller)" maxlength="30">
-                    <input type="text" id="prod-event" placeholder="Event (e.g. Ramadan)" maxlength="30">
-                    <input type="text" id="prod-unique" placeholder="Unique Code (Auto)" readonly class="bg-gray-100">
-                    <select id="prod-status"><option value="draft">💾 Draft</option><option value="pending">📤 Submit for Approval</option></select>
-                    <div class="md:col-span-2 lg:col-span-3 flex gap-4 text-xs"><label class="flex items-center gap-1"><input type="checkbox" id="prod-review" checked> Allow Reviews</label><label class="flex items-center gap-1"><input type="checkbox" id="prod-featured"> Featured</label></div>
-                </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg disabled:opacity-50" id="add-prod-btn"><i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT</button>
-            </div>
-            <div class="glass-panel p-4 md:p-6">
-                <div class="flex justify-between items-center mb-4 flex-wrap gap-2"><h3 class="font-bold text-purple-700">📋 My Products</h3><div class="flex gap-2"><input type="text" id="prod-search" placeholder="Search..." class="w-32 text-xs py-1 m-0" onkeyup="renderProducts()"><select id="prod-filter" class="w-28 text-xs py-1 m-0" onchange="renderProducts()"><option value="all">All</option><option value="Public">Public</option><option value="Private">Private</option><option value="Out of Stock">Out of Stock</option></select></div></div>
-                <div class="table-container">
-                    <table class="custom-table">                        <thead><tr><th>#</th><th>Image</th><th>Name</th><th>Price</th><th>Rating</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Reviews</th><th>Edit</th><th>Delete</th></tr></thead>
-                        <tbody id="product-list"><tr><td colspan="11" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. PROFILE & SETTINGS -->
-        <section id="view-profile" class="hidden-section max-w-3xl mx-auto">
+    <main class="container mx-auto pb-24 fade-in">
+        
+        <!-- Login -->
+        <section id="view-login" class="max-w-sm mx-auto mt-8 md:mt-16">
             <div class="glass-panel p-6">
-                <h2 class="text-xl font-bold glitter-text mb-6">⚙️ Seller Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-bold mb-1">Seller Name</label><input type="text" id="prof-seller" disabled class="bg-gray-100"></div>
-                    <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="prof-business"></div>
-                    <div><label class="block text-xs font-bold mb-1">Description</label><textarea id="prof-desc" rows="2" maxlength="200"></textarea></div>
-                    <div><label class="block text-xs font-bold mb-1">Phone Number</label><input type="tel" id="prof-phone"></div>
-                    <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="prof-email" disabled class="bg-gray-100"></div>
-                    <div><label class="block text-xs font-bold mb-1">UAC</label><input type="text" id="prof-uac" disabled class="bg-gray-100 font-mono"></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Shop Address</label><textarea id="prof-address" rows="3" maxlength="500" placeholder="House No, Building, Street, Unit, Postal Code, Full Name, Phone"></textarea><div class="flex gap-2 mt-1"><label class="text-[10px] flex items-center gap-1"><input type="checkbox" id="prof-frequent"> Frequent</label><select class="w-auto py-0 px-1 text-[10px] m-0"><option>Home</option><option>Work</option></select></div></div>
-                    <div class="md:col-span-2"><h4 class="font-bold text-sm text-purple-700 mb-2 mt-4">💳 Payment Information</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><input type="text" id="prof-bank-name" placeholder="Account Holder Name"><select id="prof-bank-type"><option value="">Select...</option><option value="Maybank">Maybank</option><option value="CIMB">CIMB</option><option value="Public Bank">Public Bank</option><option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option><option value="DuitNow QR">DuitNow QR</option></select><input type="text" id="prof-bank-num" placeholder="Account Number / QR Link" class="md:col-span-2"></div></div>
+                <div class="text-center mb-5">                    <div class="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-yellow-400 to-cyan-400 flex items-center justify-center text-white text-xl mb-3 shadow"><i class="fas fa-store"></i></div>
+                    <h2 class="text-xl md:text-2xl font-bold glitter-text">Vendor Login</h2>
+                    <p class="text-gray-600 text-xs mt-1">Akses panel pengurusan anda</p>
                 </div>
-                <div class="mt-6 flex gap-3"><button onclick="updateProfile()" class="btn-glitter px-6 py-2 rounded-lg shadow-lg">💾 Save Changes</button><button onclick="deleteAccount()" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-xs">🗑️ Delete Account</button></div>
-                <div class="mt-4 p-3 bg-purple-50 rounded-lg text-xs text-purple-800"><strong>🔐 Account Status:</strong> <span id="prof-status" class="badge badge-active">ACTIVE</span> | <strong>Log Cache:</strong> <span id="prof-log">-</span></div>
+                <form onsubmit="doLogin(event)" class="space-y-3">
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email</label><input type="email" id="login-email" required placeholder="you@example.com" class="input-glass" autocomplete="email"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Password</label><input type="password" id="login-pass" required placeholder="••••••••" class="input-glass" autocomplete="current-password"></div>
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow" id="login-btn"><i class="fas fa-sign-in-alt mr-2"></i> Login</button>
+                </form>
+                <div class="my-4 text-center text-xs text-gray-500 relative"><span class="px-3 bg-white">ATAU</span></div>
+                <div class="space-y-2">
+                    <button onclick="doGoogleSignIn(); playSound('click')" class="w-full py-2 rounded-lg border flex items-center justify-center gap-2 text-xs md:text-sm hover:bg-gray-50 transition"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4"> Google</button>
+                    <button onclick="doGithubSignIn(); playSound('click')" class="w-full py-2 rounded-lg bg-gray-900 text-white flex items-center justify-center gap-2 text-xs md:text-sm hover:bg-gray-800 transition"><i class="fab fa-github"></i> GitHub</button>
+                </div>
+                <p class="text-center mt-5 text-xs text-gray-600">Belum ada akaun? <span class="text-yellow-600 font-medium cursor-pointer hover:underline" onclick="navTo('register'); playSound('click')">Daftar Sekarang →</span></p>
             </div>
         </section>
 
-        <!-- 8. LIVE CHAT -->
-        <section id="view-chat" class="hidden-section">
-            <div class="glass-panel p-4 h-[80vh] flex flex-col">
-                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2"><i class="fas fa-headset"></i> Live Chat</h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2"><div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div></div>
-                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
-                        <div class="flex items-center gap-2"><button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button><div><h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3><span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span></div></div>
-                        <div class="flex gap-1"><button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"><i class="fas fa-copy"></i> ID</button><button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded"><i class="fas fa-ban"></i></button></div>
+        <!-- Register -->
+        <section id="view-register" class="max-w-sm mx-auto mt-8 md:mt-16 hidden">
+            <div class="glass-panel p-6">
+                <div class="text-center mb-5">
+                    <div class="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-cyan-400 to-yellow-400 flex items-center justify-center text-white text-xl mb-3 shadow"><i class="fas fa-user-plus"></i></div>
+                    <h2 class="text-xl md:text-2xl font-bold glitter-text">Register Vendor</h2>
+                    <p class="text-gray-600 text-xs mt-1">Mula jualan dengan MFD Store</p>
+                </div>
+                <form onsubmit="doRegister(event)" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Business *</label><input type="text" id="reg-business" required placeholder="My Shop" class="input-glass text-sm"></div>
+                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Phone *</label><input type="tel" id="reg-phone" required placeholder="+60123456789" class="input-glass text-sm"></div>
                     </div>
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
-                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Attach Image"><i class="fas fa-image text-gray-600"></i></button>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email *</label><input type="email" id="reg-email" required placeholder="vendor@business.com" class="input-glass text-sm" autocomplete="email"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Password (min 6) *</label><input type="password" id="reg-pass" required minlength="6" placeholder="••••••••" class="input-glass text-sm" autocomplete="new-password"></div>
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-1" id="register-btn"><i class="fas fa-user-plus mr-2"></i> Register Free</button>
+                </form>
+                <p class="text-center mt-5 text-xs text-gray-600">Sudah ada akaun? <span class="text-cyan-600 font-medium cursor-pointer hover:underline" onclick="navTo('login'); playSound('click')">Login →</span></p>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="hidden">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="glass-panel p-3 text-center"><div class="text-lg md:text-xl font-bold text-yellow-600" id="stat-sales">RM 0.00</div><div class="text-[10px] md:text-xs text-gray-600 mt-1">💰 Total Sales</div></div>
+                <div class="glass-panel p-3 text-center"><div class="text-lg md:text-xl font-bold text-green-600" id="stat-orders">0</div><div class="text-[10px] md:text-xs text-gray-600 mt-1">📦 Active Orders</div></div>
+                <div class="glass-panel p-3 text-center"><div class="text-lg md:text-xl font-bold text-purple-600" id="stat-products">0</div><div class="text-[10px] md:text-xs text-gray-600 mt-1">🛍️ My Products</div></div>
+                <div class="glass-panel p-3 text-center"><div class="text-lg md:text-xl font-bold text-red-600" id="stat-commission">RM 0.00</div><div class="text-[10px] md:text-xs text-gray-600 mt-1">💸 System taxes "must be paid"</div></div>
+            </div>
+            <div class="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+                <button onclick="switchTab('products')" id="tab-products" class="tab-btn active text-xs md:text-sm whitespace-nowrap">📦 Produk</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn text-xs md:text-sm whitespace-nowrap">📋 Pesanan</button>                <button onclick="switchTab('profile')" id="tab-profile" class="tab-btn text-xs md:text-sm whitespace-nowrap">⚙️ Profil</button>
+                <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn text-xs md:text-sm whitespace-nowrap">💬 Live Chat</button>
+                <button onclick="switchTab('admin')" id="tab-admin" class="tab-btn bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs md:text-sm whitespace-nowrap hidden">👑 Admin Development</button>
+            </div>
+
+            <!-- Products -->
+            <div id="content-products" class="glass-panel p-4 mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h3 class="font-semibold text-sm md:text-base">📦 Katalog Produk</h3>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <input type="text" id="product-search" placeholder="Cari..." class="input-glass py-1.5 text-xs sm:text-sm flex-1 sm:flex-initial" oninput="filterProducts(this.value)">
+                        <button onclick="openProductModal()" class="btn-glitter px-3 py-1.5 rounded-lg text-xs sm:text-sm whitespace-nowrap">+ Tambah</button>
                     </div>
-                    <p class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects • All Data Encrypted • © MFD Store 2025</p>
+                </div>
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div class="col-span-full text-center py-8 text-gray-500"><div class="loader mx-auto mb-2"></div><p class="text-xs">Memuatkan produk...</p></div>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div id="content-orders" class="glass-panel p-4 mb-4 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-sm md:text-base">📋 Senarai Pesanan</h3>
+                    <select id="order-filter" onchange="filterOrders(this.value)" class="input-glass py-1.5 text-xs">
+                        <option value="all">Semua</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr><th>ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <tbody id="order-list"><tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto mb-2"></div>Memuatkan...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
+                <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label><input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label><input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Phone</label><input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email</label><input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label><textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label><textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
+                </div>
+                <div class="mt-5 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                        <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
+                        <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>                        <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
+                        <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
+                    </div>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
+                    <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
+                    <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
+                </div>
+            </div>
+
+            <!-- Chat -->
+            <div id="content-chat" class="glass-panel p-0 mb-4 hidden overflow-hidden">
+                <div class="chat-container">
+                    <div class="contacts-panel glass-panel p-2 overflow-y-auto border-r border-gray-200" id="chat-contacts">
+                        <div class="flex justify-between items-center mb-2 pb-2 border-b"><h4 class="font-medium text-xs">👥 Pelanggan</h4><button onclick="toggleMobileContacts()" class="md:hidden text-gray-500"><i class="fas fa-times"></i></button></div>
+                        <div id="contacts-list" class="space-y-1.5"><div class="text-center py-6 text-gray-500 text-xs">Tiada perbualan</div></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="p-3 border-b flex justify-between items-center bg-gradient-to-r from-yellow-50 to-cyan-50">
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleMobileContacts()" class="md:hidden p-1.5 hover:bg-white/50 rounded"><i class="fas fa-list text-gray-600"></i></button>
+                                <div><div id="chat-name" class="font-medium text-sm text-gray-800">Pilih Pelanggan</div><div id="chat-status" class="text-[10px] text-gray-500"><span class="status-dot status-offline"></span> Offline</div></div>
+                            </div>
+                            <select id="agent-status" onchange="updateAgentStatus()" class="text-xs border rounded px-2 py-1 bg-white"><option value="Online">🟢 Online</option><option value="Busy">🔴 Busy</option><option value="Offline">⚫ Offline</option></select>
+                        </div>
+                        <div id="chat-msgs" class="chat-messages bg-white/40 flex-1"><div class="h-full flex items-center justify-center text-gray-400"><div class="text-center"><i class="fas fa-comments text-2xl mb-2 opacity-30"></i><p class="text-xs">Pilih pelanggan untuk mula berborak</p></div></div></div>
+                        <div class="p-2 border-t bg-white/80">
+                            <div class="flex items-end gap-1.5">
+                                <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
+                                <button onclick="document.getElementById('chat-file').click()" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Hantar Gambar"><i class="fas fa-image text-gray-500 text-sm"></i></button>
+                                <textarea id="chat-input" rows="1" placeholder="Taip mesej..." class="flex-1 input-glass text-sm resize-none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+                                <button onclick="sendMessage(); playSound('chat')" class="p-2 bg-gradient-to-br from-yellow-400 to-cyan-400 text-white rounded-lg hover:scale-105 transition shadow"><i class="fas fa-paper-plane text-sm"></i></button>
+                            </div>
+                            <div class="text-[9px] text-gray-400 mt-1 text-center">Enter=hantar • Shift+Enter=baris baru</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin -->
+            <div id="content-admin" class="glass-panel p-4 mb-4 hidden">
+                <h3 class="font-semibold mb-4 text-sm md:text-base text-purple-700 flex items-center gap-2"><i class="fas fa-crown"></i> 👑 Admin Management</h3>
+                <div class="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
+                    <label class="text-xs font-medium text-gray-700 block mb-2">⚙️ Kadar Komisen (RM 0.01 - 5.00)</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="number" id="admin-rate" step="0.01" min="0.01" max="5" placeholder="1.00" class="input-glass text-sm w-24">
+                        <button onclick="updateCommission(); playSound('click')" class="btn-glitter px-4 py-1.5 rounded-lg text-xs whitespace-nowrap">Update</button>
+                        <div class="text-[10px] text-gray-500 self-center sm:self-auto">Semasa: <span id="curr-rate" class="font-medium text-purple-600">RM 1.00</span> / jualan</div>
+                    </div>                </div>
+                <div class="mb-5">
+                    <h4 class="font-medium text-gray-700 mb-2 text-sm">📊 Pengurusan Vendor</h4>
+                    <div class="table-container">
+                        <table class="custom-table">
+                            <thead><tr><th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody id="admin-vendors"><tr><td colspan="6" class="text-center py-4"><div class="loader mx-auto"></div></td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- Catalogue -->
+        <section id="view-catalogue" class="hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-xl md:text-2xl font-bold glitter-text mb-2">✨ Showcase MFD Store</h2>
+                <p class="text-gray-600 text-sm">Produk pilihan untuk anda</p>
+            </div>
+            <div class="flex gap-2 mb-5 overflow-x-auto pb-1 justify-center">
+                <button onclick="loadCatalogue('all')" id="cat-all" class="tab-btn active text-xs">Semua</button>
+                <button onclick="loadCatalogue('recommendations')" id="cat-rec" class="tab-btn text-xs">🌟 Disyorkan</button>
+                <button onclick="loadCatalogue('highest')" id="cat-high" class="tab-btn text-xs">🔥 Paling Laku</button>
+                <button onclick="loadCatalogue('event')" id="cat-event" class="tab-btn text-xs">🎉 Event</button>
+            </div>
+            <div id="catalogue-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div class="col-span-full text-center py-8"><div class="loader mx-auto mb-2"></div><p class="text-gray-500 text-xs">Memuatkan katalog...</p></div>
+            </div>
+        </section>
     </main>
-    <!-- FIREBASE LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs", authDomain: "mfd-store.firebaseapp.com", projectId: "mfd-store", storageBucket: "mfd-store.firebasestorage.app", messagingSenderId: "1039564529069", appId: "1:1039564529069:web:bc7c752f3618e6cb879524" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductModal(); playSound('click')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 hover:bg-red-100 text-gray-600 hover:text-red-500 flex items-center justify-center text-lg transition">&times;</button>
+            <h3 class="font-bold glitter-text mb-4 text-base" id="modal-title">➕ Tambah Produk Baharu</h3>
+            <div class="space-y-3">
+                <div><label class="block text-xs font-medium text-gray-700 mb-1">🖼️ Gambar (Max 500KB)</label><input type="file" id="prod-img" accept="image/*" class="input-glass text-xs py-1.5" onchange="previewImage(this)"><img id="prod-preview" class="w-16 h-16 object-cover rounded-lg border mt-2 hidden"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Nama Item *</label><input type="text" id="prod-name" placeholder="Contoh: Baju Kurung Premium" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Kod Item</label><input type="text" id="prod-code" placeholder="Auto" class="input-glass text-sm" readonly></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Negara Asal</label><input type="text" id="prod-country" placeholder="Malaysia" class="input-glass text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Harga Asal</label><input type="number" id="prod-price" placeholder="0.00" step="0.01" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Harga Jualan *</label><input type="number" id="prod-sale" placeholder="0.00" step="0.01" class="input-glass text-sm" required></div>
+                </div>
+                <div><label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label><textarea id="prod-desc" placeholder="Terangkan produk..." class="input-glass text-sm min-h-[60px]" rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Label/Tag</label><input type="text" id="prod-label" placeholder="Best Seller, New" class="input-glass text-sm"></div>                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Event</label><input type="text" id="prod-event" placeholder="Raya Sale 2024" class="input-glass text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- 💳 PAYMENT INFO VENDOR - TAMBAH KOD INI SELEPAS SECTION HARGA -->
+<div class="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
+    <h4 class="text-xs font-bold text-gray-700 mb-2">💳 Maklumat Pembayaran Vendor</h4>
+    <div class="grid grid-cols-2 gap-2">
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ QR Code URL (Wajib)</label>
+            <input type="url" id="prod-qr-url" placeholder="https://i.postimg.cc/xxx/qr-code.jpg" class="input-glass text-xs" required>
+            <p class="text-[9px] text-gray-400 mt-1">* Upload QR ke postimg.cc / imgur, paste URL di sini</p>
+        </div>
+        <div>
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Nama Bank</label>
+            <input type="text" id="prod-bank-name" placeholder="Maybank / CIMB / Public Bank" class="input-glass text-xs">
+        </div>
+        <div>
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 No. Akaun</label>
+            <input type="text" id="prod-bank-account" placeholder="123456789012" class="input-glass text-xs font-mono">
+        </div>
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">👤 Nama Pemegang Akaun</label>
+            <input type="text" id="prod-account-name" placeholder="AHMAD BIN ABDULLAH" class="input-glass text-xs">
+        </div>
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">📱 WhatsApp Vendor (Optional)</label>
+            <input type="tel" id="prod-whatsapp" placeholder="60123456789" class="input-glass text-xs">
+            <p class="text-[9px] text-gray-400 mt-1">* Untuk butang "Chat via WhatsApp" pada produk</p>
+        </div>
+    </div>
+</div>
+<!-- END PAYMENT INFO VENDOR -->
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Status</label><select id="prod-status" class="input-glass text-sm"><option value="Public">🟢 Public</option><option value="Private">🔒 Private</option><option value="Out of Stock">❌ Out of Stock</option></select></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Variasi</label><input type="text" id="prod-variation" placeholder="S/M/L, Merah/Biru" class="input-glass text-sm"></div>
+                </div>
+                <div><label class="block text-xs font-medium text-gray-700 mb-1">Pautan Tambahan</label><input type="url" id="prod-link" placeholder="https://..." class="input-glass text-sm"></div>
+                <input type="hidden" id="prod-id"><input type="hidden" id="prod-sold" value="0"><input type="hidden" id="prod-rating" value="0"><input type="hidden" id="prod-revenue" value="0">
+                <button onclick="saveProduct(); playSound('click')" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-2" id="save-prod-btn"><i class="fas fa-save mr-2"></i> 💾 Simpan Produk</button>
+            </div>
+        </div>
+    </div>
 
-        let currentUser = null, vendorData = {}, allProducts = [], allOrders = [];
-        let currentChatPartner = null, unsubscribeChat = null, unsubscribeOrders = null, unsubscribeProducts = null;
-        const COMMISSION_DEFAULT = 0.10;
-
-        // ===== UTILITIES =====
-        window.playSound = (type) => { try { const s = {click:document.getElementById('snd-click'),success:document.getElementById('snd-success'),error:document.getElementById('snd-error'),msg:document.getElementById('snd-msg')}; if(s[type]){s[type].currentTime=0;s[type].play().catch(()=>{});} } catch(e){} };
-        function showToast(msg,type='success',dur=3000){const c=document.getElementById('toast-container'),t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'} mr-2"></i>${msg}`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100%)';setTimeout(()=>t.remove(),300);},dur);}
-        function formatRM(a){return'RM '+parseFloat(a||0).toFixed(2);}
-        function formatDate(ts){if(!ts)return'-';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('ms-MY',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-        function isValidImageUrl(u){if(!u||!u.startsWith('https://'))return false;const ext=['.jpg','.jpeg','.png','.webp','.gif'];if(!ext.some(e=>u.toLowerCase().endsWith(e)))return false;const dom=['postimg.cc','i.postimg.cc','postimages.org'];try{if(!dom.includes(new URL(u).hostname))return false;}catch(e){return false;}return u.length<500;}
-        function genUAC(){return"VENFD-"+Math.random().toString(36).substr(2,8).toUpperCase();}
-        function genItemCode(){return"ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase();}
-
-        // ===== NAVIGATION =====
-        window.navTo = (v) => { playSound('click'); document.querySelectorAll('section').forEach(e=>e.classList.add('hidden-section')); const t=document.getElementById(`view-${v}`); if(t)t.classList.remove('hidden-section'); window.scrollTo(0,0); if(v==='dashboard'&&currentUser)loadDashboard(); if(v==='products'&&currentUser)loadProducts(); if(v==='orders-verify'&&currentUser)loadOrders('verify'); if(v==='orders-manage'&&currentUser)loadOrders('manage'); if(v==='profile'&&currentUser)loadProfile(); if(v==='chat'&&currentUser)loadChatList(); };
-
-        // ===== AUTH =====
-        window.doRegister = async () => {
-            const seller = genUAC(), business = document.getElementById('reg-business').value.trim(), phone = document.getElementById('reg-phone').value.trim(), email = document.getElementById('reg-email').value.trim(), pass = document.getElementById('reg-pass').value, agree = document.getElementById('reg-agree').checked, btn = document.getElementById('register-btn');
-            if(!business||!phone||!pass){showToast('Lengkapkan field wajib','error');return;} if(!agree){showToast('Sila bersetuju dengan Terma','error');return;}
-            btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Processing...';
-            try{
-                const cred = await createUserWithEmailAndPassword(auth, email||`vendor-${Date.now()}@mfd.local`, pass);
-                await setDoc(doc(db,"users",cred.user.uid),{username:seller,email:email||'',phone:phone,uac:seller,role:'vendor',status:'PENDING',vendorProfile:{sellerName:seller,businessName:business,description:document.getElementById('reg-desc').value.trim()||'',icNumber:document.getElementById('reg-ic').value.trim()||'',approvalStatus:'pending',commissionRate:COMMISSION_DEFAULT,bankDetails:{},address:''},createdAt:serverTimestamp(),logCache:serverTimestamp()});
-                showToast('✅ Pendaftaran berjaya! Sila login.','success'); navTo('login');
-            }catch(e){console.error(e);let m='Pendaftaran gagal';if(e.code==='auth/email-already-in-use')m='Email sudah digunakan';showToast(`❌ ${m}`,'error');}
-            finally{btn.disabled=false;btn.innerHTML='REGISTER FREE';}
+    <!-- Firebase & App Logic -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
-        window.doLogin = async () => {
-            const email=document.getElementById('login-email').value.trim(),pass=document.getElementById('login-pass').value,btn=document.getElementById('login-btn');
-            if(!email||!pass){showToast('Masukkan email & password','error');return;}
-            btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Loading...';
-            try{await signInWithEmailAndPassword(auth,email,pass);showToast('✅ Login berjaya!','success');}
-            catch(e){let m='Login gagal';if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password')m='Email/password salah';showToast(`❌ ${m}`,'error');}
-            finally{btn.disabled=false;btn.innerHTML='LOGIN NOW';}
-        };
-        window.doGoogleSignIn = async (e) => { if(e&&e.preventDefault)e.preventDefault(); const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});const btn=document.querySelector('button[onclick*="doGoogleSignIn"]');if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i>Connecting...';} try{const result=await signInWithPopup(auth,provider),user=result.user;const userRef=doc(db,"users",user.uid),userSnap=await getDoc(userRef);if(!userSnap.exists()){const uac=genUAC();await setDoc(userRef,{username:user.displayName||`User_${uac.split('-')[1]}`,email:user.email,phone:'',uac:uac,role:'vendor',status:'PENDING',vendorProfile:{sellerName:uac,businessName:user.displayName||'New Business',description:'',approvalStatus:'pending',commissionRate:COMMISSION_DEFAULT,bankDetails:{}},createdAt:serverTimestamp(),logCache:serverTimestamp(),provider:'google',photoURL:user.photoURL||''});showToast('✅ Akaun Google didaftarkan!','success');}else{showToast('✅ Login dengan Google berjaya!','success');}}catch(err){console.error('Google Sign-In Error:',err);let msg='Google login gagal';if(err.code){if(err.code==='auth/popup-closed-by-user')msg='Login dibatalkan';else if(err.code==='auth/popup-blocked')msg='Popup diblocker browser';else if(err.code==='auth/operation-not-allowed')msg='Google Sign-In belum enabled di Firebase';else if(err.code==='auth/unauthorized-domain')msg='Domain tidak authorized';else msg='Error: '+err.code;}showToast('❌ '+msg,'error');}finally{const buttons=document.querySelectorAll('button[onclick*="doGoogleSignIn"]');buttons.forEach(b=>{b.disabled=false;const isReg=b.innerText.includes('Register');b.innerHTML=`<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> ${isReg?'Sign up with Google':'Continue with Google'}`;});}};
-        window.logout = () => { signOut(auth); playSound('click'); showToast('✅ Logged out','success'); navTo('login'); };        window.deleteAccount = async () => { if(!confirm("⚠️ Padam akaun secara kekal?"))return; try{await updateDoc(doc(db,"users",currentUser.uid),{status:'INACTIVE',deletedAt:serverTimestamp(),logCache:serverTimestamp()});await signOut(auth);showToast('✅ Akaun dinyahaktifkan','success');navTo('login');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-
-        // ===== AUTH STATE =====
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if(user){
-                document.getElementById('auth-nav').classList.add('hidden-section');
-                document.getElementById('vendor-nav').classList.remove('hidden-section');
-                try{
-                    const snap = await getDoc(doc(db,"users",user.uid));
-                    if(snap.exists()){
-                        vendorData = snap.data();
-                        if(vendorData.status==='BLOCKED'){showToast('❌ Akaun diblokir','error');signOut(auth);return;}
-                        document.getElementById('nav-username').innerText = vendorData.username;
-                        document.getElementById('nav-uac').innerText = vendorData.uac;
-                        const notice = document.getElementById('approval-notice');
-                        if(vendorData.vendorProfile?.approvalStatus==='pending')notice.classList.remove('hidden-section');
-                        else notice.classList.add('hidden-section');
-                        navTo('dashboard');
-                    }
-                }catch(e){console.error('Auth error:',e);navTo('login');}
-            }else{
-                document.getElementById('auth-nav').classList.remove('hidden-section');
-                document.getElementById('vendor-nav').classList.add('hidden-section');
-                navTo('login');
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // ✅ Enable offline persistence for better data access
+        db.enablePersistence().catch(err => {
+            if (err.code === 'failed-precondition') {
+                console.warn('⚠️ Multiple tabs open - persistence disabled');
+            } else if (err.code === 'unimplemented') {
+                console.warn('⚠️ Browser doesn\'t support persistence');
             }
         });
 
-        // ===== DASHBOARD =====
-        async function loadDashboard(){
-            if(!currentUser||vendorData.role!=='vendor')return;
-            try{
-                const [prodSnap,ordSnap] = await Promise.all([
-                    getDocs(query(collection(db,"products"),where("vendorId","==",currentUser.uid))),
-                    getDocs(query(collection(db,"orders"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc"),limit(5)))
-                ]);
-                let sales=0,earn=0,active=0,pending=0;
-                prodSnap.forEach(d=>{const p=d.data();if(p.status==='Public'||p.status==='approved')active++;});
-                ordSnap.forEach(d=>{const o=d.data();if(o.status==='To Ship')pending++; if(o.status==='Completed'){const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(it){sales+=(it.priceSell||0)*(it.qty||1);earn+=((it.priceSell||0)*(1-(vendorData.vendorProfile?.commissionRate||COMMISSION_DEFAULT)))*(it.qty||1);}}});
-                document.getElementById('stat-total-sales').innerText=formatRM(sales);
-                document.getElementById('stat-earnings').innerText=formatRM(earn);
-                document.getElementById('stat-pending').innerText=pending;
-                document.getElementById('stat-products').innerText=active;
-                const list=document.getElementById('recent-orders-list');
-                if(ordSnap.empty){list.innerHTML='<p class="text-center text-gray-500 py-4 text-xs">Tiada pesanan terkini</p>';}
-                else{list.innerHTML=ordSnap.docs.slice(0,3).map(d=>{const o=d.data(),it=o.items?.find(i=>i.vendorId===currentUser.uid);return`<div class="p-2 bg-white/50 rounded text-xs flex justify-between items-center"><div><strong class="text-purple-700">${it?.name||'Produk'}</strong><br><span class="text-gray-500">${formatDate(o.createdAt)}</span></div><span class="badge ${o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':'badge-pending'}">${o.status}</span></div>`;}).join('');}
-            }catch(e){console.error('Dashboard error:',e);}
+        // State
+        let user = null, profile = null, chatId = null, chatUnsub = null, editPid = null, imgBase64 = null, products = [], orders = [];
+
+        // ===== UTILITIES =====
+        function playSound(t) { 
+            const s = document.getElementById(`snd-${t}`); 
+            if(s) { s.currentTime = 0; s.play().catch(()=>{}); }         }
+        
+        function showToast(m, t='info') {
+            const el = document.getElementById('toast');
+            const icon = t==='success'?'✅':t==='error'?'❌':t==='warning'?'⚠️':'🔔';
+            el.innerHTML = `<span>${icon}</span><span>${m}</span>`;
+            el.className = `toast ${t}`; el.classList.remove('hidden');
+            setTimeout(()=>el.classList.add('hidden'), 3000);
+            playSound(t==='error'?'error':'success');
+        }
+        
+        function navTo(v) {
+            playSound('click');
+            document.querySelectorAll('section[id^="view-"]').forEach(e=>e.classList.add('hidden'));
+            const target = document.getElementById(`view-${v}`);
+            if(target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+            if(v==='dashboard' && user) loadDashboard();
+            if(v==='catalogue') loadCatalogue();
+            history.replaceState(null, null, `#${v}`);
+        }
+        
+        function switchTab(t) {
+            playSound('click');
+            document.querySelectorAll('[id^="content-"]').forEach(e=>e.classList.add('hidden'));
+            document.getElementById(`content-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.getElementById(`tab-${t}`).classList.add('active');
+            if(t==='chat') loadChats();
+            if(t==='admin' && profile?.role==='admin') loadAdmin();
+        }
+        
+        function formatRM(n) { return 'RM ' + (parseFloat(n)||0).toFixed(2); }
+        function formatTime(ts) { 
+            if(!ts) return '-';
+            try { return ts.toDate ? ts.toDate().toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'}) : new Date(ts).toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'}); }
+            catch(e) { return '-'; }
+        }
+        
+        function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e||''); }
+        function isValidPhone(p) { return /^[\+]?[0-9\s\-\(\)]{10,}$/.test((p||'').replace(/[\s\-\(\)]/g,'')); }
+
+        // ===== AUTHENTICATION =====
+        function doRegister(e) {
+            e?.preventDefault();
+            const email = (document.getElementById('reg-email')?.value||'').trim();
+            const pass = document.getElementById('reg-pass')?.value||'';
+            const business = (document.getElementById('reg-business')?.value||'').trim();
+            const phone = (document.getElementById('reg-phone')?.value||'').trim();
+            const btn = document.getElementById('register-btn');
+                        if(!email||!pass||!business||!phone) return showToast('Isi semua medan *', 'error');
+            if(pass.length<6) return showToast('Password min 6 karakter', 'error');
+            if(!isValidEmail(email)) return showToast('Format email tidak sah', 'error');
+            if(!isValidPhone(phone)) return showToast('Nombor telefon tidak sah', 'error');
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                const uac = "VEN-"+Math.random().toString(36).slice(2,8).toUpperCase();
+                const venId = "VENFD-"+Date.now().toString(36).toUpperCase();
+                return db.collection('vendors').doc(cred.user.uid).set({
+                    uid: cred.user.uid, email, phone, businessName: business, sellerName: business, description: '',
+                    uac, venId, status: 'ACTIVE', role: 'vendor', commissionRate: 1, paymentInfo: '', address: '',
+                    agentStatus: 'Online', createdAt: firebase.firestore.FieldValue.serverTimestamp(), logCache: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(()=>{ showToast('✅ Daftar berjaya! Sila login.','success'); navTo('login'); })
+            .catch(err=> { 
+                console.error('Register error:', err);
+                let msg = err.message?.replace('Firebase: ','')||'Unknown error';
+                if(msg.includes('email-already')) msg = 'Email sudah digunakan';
+                if(msg.includes('weak-password')) msg = 'Password terlalu lemah';
+                if(msg.includes('network')) msg = 'Sambungan internet bermasalah';
+                showToast('❌ '+msg,'error'); 
+            })
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='<i class="fas fa-user-plus mr-2"></i> Register Free'; });
+        }
+        
+        function doLogin(e) {
+            e?.preventDefault();
+            const email = (document.getElementById('login-email')?.value||'').trim();
+            const pass = document.getElementById('login-pass')?.value||'';
+            const btn = document.getElementById('login-btn');
+            
+            if(!email||!pass) return showToast('Sila masukkan email dan password', 'error');
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+            
+            auth.signInWithEmailAndPassword(email, pass)
+            .catch(err=> {
+                console.error('Login error:', err);
+                let msg = err.message||'Unknown error';
+                if(msg.includes('user-not-found')||msg.includes('wrong-password')) msg = 'Email atau password salah';
+                if(msg.includes('network')) msg = 'Sambungan internet bermasalah';
+                showToast('❌ '+msg,'error');
+            })
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt mr-2"></i> Login'; });
+        }
+        
+        function doGoogleSignIn() {
+            showToast('Connecting to Google...','info');            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err=> {
+                console.error('Google sign-in error:', err);
+                let msg = err.message||'Unknown error';
+                if(msg.includes('popup-blocked')) msg = 'Popup diblocker browser';
+                if(msg.includes('unauthorized-domain')) msg = 'Domain tidak authorized di Firebase';
+                showToast('❌ '+msg,'error');
+            });
+        }
+        
+        function doGithubSignIn() {
+            showToast('Connecting to GitHub...','info');
+            const provider = new firebase.auth.GithubAuthProvider();
+            auth.signInWithPopup(provider).catch(err=> {
+                console.error('GitHub sign-in error:', err);
+                showToast('❌ '+(err.message||'Unknown error'),'error');
+            });
+        }
+        
+        function doLogout() {
+            auth.signOut().then(()=>{ showToast('✅ Logout','success'); navTo('login'); })
+            .catch(err=> showToast('❌ '+(err.message||'Logout failed'),'error'));
         }
 
-        // ===== PRODUCTS =====        document.getElementById('prod-img-url')?.addEventListener('input',function(e){const u=e.target.value.trim(),pv=document.getElementById('prod-img-preview'),img=pv.querySelector('img');if(isValidImageUrl(u)){img.src=u;img.onerror=()=>showToast('⚠️ Link gambar tidak valid','warning');pv.classList.remove('hidden');}else{pv.classList.add('hidden');}});
-        document.getElementById('prod-name')?.addEventListener('input',function(){const el=document.getElementById('prod-unique');if(el&&!el.value)el.value=genItemCode();});
+        // Auth state listener - FIXED: Proper null checks and error handling
+        auth.onAuthStateChanged(async u => {
+            user = u;
+            if(u) {
+                document.getElementById('auth-nav')?.classList.add('hidden');
+                document.getElementById('user-nav')?.classList.remove('hidden');
+                try {
+                    // ✅ Safe document access with null check
+                    const userRef = db.collection('vendors').doc(u.uid);
+                    const snap = await userRef.get();
+                    
+                    if(snap?.exists) {
+                        profile = snap.data() || {};
+                        
+                        // ✅ Security check with safe access
+                        if(profile?.status === 'BLOCKED') { 
+                            showToast('❌ Akaun diblokir','error'); 
+                            auth.signOut(); 
+                            return; 
+                        }
+                        
+                        // ✅ Safe property access with fallbacks
+                        document.getElementById('nav-uac').textContent = profile?.uac||'';
+                        document.getElementById('disp-uac').textContent = profile?.uac||'-';
+                        document.getElementById('disp-venid').textContent = profile?.venId||'-';
+                        document.getElementById('disp-status').textContent = profile?.status||'ACTIVE';                        document.getElementById('disp-status').className = `font-medium ${profile?.status==='ACTIVE'?'text-green-600':'text-red-600'}`;
+                        
+                        if(profile?.logCache?.toDate) {
+                            document.getElementById('disp-logcache').textContent = profile.logCache.toDate().toLocaleString('ms-MY');
+                        }
+                        
+                        if(profile?.role==='admin') document.getElementById('tab-admin')?.classList.remove('hidden');
+                        
+                        // ✅ Safe form population
+                        const safeVal = (v,d='') => (v??d);
+                        document.getElementById('prof-seller').value = safeVal(profile?.sellerName,'');
+                        document.getElementById('prof-business').value = safeVal(profile?.businessName,'');
+                        document.getElementById('prof-phone').value = safeVal(profile?.phone,'');
+                        document.getElementById('prof-email').value = safeVal(profile?.email,'');
+                        document.getElementById('prof-address').value = safeVal(profile?.address,'');
+                        document.getElementById('prof-payment').value = safeVal(profile?.paymentInfo,'');
+                        document.getElementById('agent-status').value = safeVal(profile?.agentStatus,'Online');
+                        document.getElementById('curr-rate').textContent = formatRM(profile?.commissionRate??1);
+                    } else {
+                        // ✅ Create profile if doesn't exist
+                        console.log('Profile not found, creating...');
+                        const uac = "VEN-"+Math.random().toString(36).slice(2,8).toUpperCase();
+                        const venId = "VENFD-"+Date.now().toString(36).toUpperCase();
+                        await db.collection('vendors').doc(u.uid).set({
+                            uid: u.uid, email: u.email||'', phone: '', businessName: 'My Business', sellerName: 'Vendor',
+                            uac, venId, status: 'ACTIVE', role: 'vendor', commissionRate: 1, paymentInfo: '', address: '',
+                            agentStatus: 'Online', createdAt: firebase.firestore.FieldValue.serverTimestamp(), logCache: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        showToast('✅ Profil dicipta','success');
+                        profile = { uac, venId, status: 'ACTIVE', role: 'vendor' };
+                    }
+                    navTo('dashboard');
+                } catch(err) {
+                    console.error('Auth state error:', err);
+                    // ✅ Fallback: still show dashboard with minimal data
+                    profile = profile || { status: 'ACTIVE', role: 'vendor' };
+                    showToast('⚠️ Gagal load profil penuh','warning');
+                    navTo('dashboard');
+                }
+            } else {
+                profile = null;
+                document.getElementById('auth-nav')?.classList.remove('hidden');
+                document.getElementById('user-nav')?.classList.add('hidden');
+                const hash = location.hash.slice(1);
+                navTo(hash==='catalogue'?'catalogue':'login');
+            }
+        });
 
-        window.addProduct = async () => {
-            const name=document.getElementById('prod-name').value.trim(),sell=parseFloat(document.getElementById('prod-sell').value),img=document.getElementById('prod-img-url').value.trim(),btn=document.getElementById('add-prod-btn');
-            if(!name||!sell||!img){showToast('Lengkapkan field wajib','error');return;} if(!isValidImageUrl(img)){showToast('URL gambar tidak sah','error');return;}
-            btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Processing...';
-            try{
-                await addDoc(collection(db,"products"),{name:name,price:parseFloat(document.getElementById('prod-price').value)||0,priceSell:sell,imageUrl:img,stock:100,status:document.getElementById('prod-status').value||'draft',vendorId:currentUser.uid,vendorName:vendorData.username,description:document.getElementById('prod-desc').value.trim()||'',variation:document.getElementById('prod-variation').value.trim()||'',country:document.getElementById('prod-country').value.trim()||'',link:document.getElementById('prod-link').value.trim()||'',label:document.getElementById('prod-label').value.trim()||'',event:document.getElementById('prod-event').value.trim()||'',uniqueCode:document.getElementById('prod-unique').value||genItemCode(),totalSold:0,rating:5.0,revenue:0,allowReviews:document.getElementById('prod-review').checked,featured:document.getElementById('prod-featured').checked,reviews:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-                showToast('✅ Produk berjaya dihantar!','success');
-                document.querySelectorAll('#view-products input:not([readonly]), #view-products textarea').forEach(i=>{if(i.type!=='checkbox')i.value='';});
-                document.getElementById('prod-img-preview').classList.add('hidden');document.getElementById('prod-unique').value='';
-                loadProducts();
-            }catch(e){console.error('Add product error:',e);showToast('❌ Gagal: '+(e.message||'Unknown'),'error');}
-            finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT';}
-        };
+        // ===== PRODUCTS - FIXED DATA OPERATIONS =====
+        function previewImage(input) {            const file = input?.files?.[0]; 
+            if(!file) return;
+            if(file.size > 500*1024) return showToast('❌ Gambar >500KB','error');
+            if(!file.type?.startsWith('image/')) return showToast('❌ Hanya gambar','error');
+            const reader = new FileReader();
+            reader.onload = e => { 
+                imgBase64 = e?.target?.result; 
+                const img = document.getElementById('prod-preview'); 
+                if(img && imgBase64) { img.src = imgBase64; img.classList.remove('hidden'); }
+                showToast('✅ Gambar dimuatnaik','success'); 
+            };
+            reader.onerror = () => showToast('❌ Gagal baca gambar','error');
+            reader.readAsDataURL(file);
+        }
+        
+        function openProductModal(pid=null) {
+            playSound('click'); 
+            editPid = pid; 
+            imgBase64 = null;
+            document.querySelectorAll('#product-modal input:not([readonly]),#product-modal textarea,#product-modal select')?.forEach(i=>{ if(i?.value!==undefined) i.value=''; });
+            document.getElementById('prod-preview')?.classList.add('hidden');
+            document.getElementById('modal-title').textContent = pid ? '✏️ Edit Produk' : '➕ Tambah Produk';
+            if(!pid) document.getElementById('prod-code').value = "ITEM-"+Date.now().toString(36).slice(-8).toUpperCase();
+            document.getElementById('product-modal')?.classList.remove('hidden');
+            if(pid) loadProductEdit(pid);
+        }
+        
+        function closeProductModal() { 
+            playSound('click'); 
+            document.getElementById('product-modal')?.classList.add('hidden'); 
+            editPid=null; imgBase64=null; 
+        }
+        
+        async function loadProductEdit(id) {
+            try {
+                if(!id) return;
+                const snap = await db.collection('products').doc(id).get();
+                if(snap?.exists) {
+                    const p = snap.data() || {};
+                    // ✅ Safe property access with fallbacks
+                    const safeSet = (elId, val, def='') => { const el = document.getElementById(elId); if(el) el.value = (val??def); };
+                    safeSet('prod-id', id);
+                    safeSet('prod-name', p?.name);
+                    safeSet('prod-code', p?.itemCode);
+                    safeSet('prod-price', p?.price);
+                    safeSet('prod-sale', p?.salePrice);
+                    safeSet('prod-desc', p?.description);
+                    safeSet('prod-country', p?.country);
+                    safeSet('prod-label', p?.label);
+                    safeSet('prod-event', p?.event);                    safeSet('prod-link', p?.link);
+                    safeSet('prod-status', p?.status, 'Public');
+                    safeSet('prod-variation', p?.variation);
+                    // 💳 LOAD PAYMENT INFO UNTUK EDIT - TAMBAH KOD INI
+safeSet('prod-qr-url', p?.paymentInfo?.qrUrl);
+safeSet('prod-bank-name', p?.paymentInfo?.bankName);
+safeSet('prod-bank-account', p?.paymentInfo?.accountNumber);
+safeSet('prod-account-name', p?.paymentInfo?.accountName);
+safeSet('prod-whatsapp', p?.paymentInfo?.whatsapp);
+// END LOAD PAYMENT INFO
+                    safeSet('prod-sold', p?.totalSold, 0);
+                    safeSet('prod-rating', p?.rating, 0);
+                    safeSet('prod-revenue', p?.revenue, 0);
+                    if(p?.imageUrl) { 
+                        imgBase64 = p.imageUrl; 
+                        const img = document.getElementById('prod-preview'); 
+                        if(img) { img.src = imgBase64; img.classList.remove('hidden'); }
+                    }
+                } else {
+                    showToast('❌ Produk tidak dijumpai','error');
+                }
+            } catch(err) { 
+                console.error('Load product error:', err);
+                showToast('❌ Gagal load data produk','error'); 
+            }
+        }
+        
+        async function saveProduct() {
+            const name = (document.getElementById('prod-name')?.value||'').trim();
+            const sale = document.getElementById('prod-sale')?.value||'';
+            const btn = document.getElementById('save-prod-btn');
+            
+            if(!name||!sale) return showToast('❌ Nama & Harga Jualan wajib','error');
+            const salePrice = parseFloat(sale); 
+            if(isNaN(salePrice)||salePrice<=0) return showToast('❌ Harga tidak sah','error');
+            
+            const data = {
+                vendorId: user?.uid, 
+                vendorUAC: profile?.uac, 
+                name,
+                itemCode: (document.getElementById('prod-code')?.value||'').trim() || `ITEM-${Date.now().toString(36).slice(-8).toUpperCase()}`,
+                price: parseFloat(document.getElementById('prod-price')?.value)||0, 
+                salePrice,
+                description: (document.getElementById('prod-desc')?.value||'').trim(), 
+                country: (document.getElementById('prod-country')?.value||'').trim(),
+                label: (document.getElementById('prod-label')?.value||'').trim(), 
+                event: (document.getElementById('prod-event')?.value||'').trim(),
+                link: (document.getElementById('prod-link')?.value||'').trim(), 
+                status: document.getElementById('prod-status')?.value||'Public',
+                variation: (document.getElementById('prod-variation')?.value||'').trim(), 
+                imageUrl: imgBase64,
+                totalSold: parseInt(document.getElementById('prod-sold')?.value)||0,
+                rating: parseFloat(document.getElementById('prod-rating')?.value)||0,
+                revenue: parseFloat(document.getElementById('prod-revenue')?.value)||0,
+                // 🔽 TAMBAH FIELD INI DALAM OBJECT `data` SEBELUM `updatedAt`:
 
-        async function loadProducts(){
-            if(!currentUser)return; if(unsubscribeProducts)unsubscribeProducts();
-            unsubscribeProducts=onSnapshot(query(collection(db,"products"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")),(snap)=>{allProducts=[];snap.forEach(d=>allProducts.push({id:d.id,...d.data()}));renderProducts();});
+// 💳 PAYMENT INFO VENDOR - TAMBAH KOD INI
+paymentInfo: {
+    qrUrl: (document.getElementById('prod-qr-url')?.value || '').trim(),
+    bankName: (document.getElementById('prod-bank-name')?.value || '').trim(),
+    accountNumber: (document.getElementById('prod-bank-account')?.value || '').trim(),
+    accountName: (document.getElementById('prod-account-name')?.value || '').trim(),
+    whatsapp: (document.getElementById('prod-whatsapp')?.value || '').trim()
+},
+// END PAYMENT INFO
+                reviews: [], 
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+            
+            try {
+                if(editPid) {
+                    // ✅ Update existing
+                    await db.collection('products').doc(editPid).update(data);
+                    showToast('✅ Produk dikemaskini','success');
+                } else {
+                    // ✅ Create new
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('products').add(data);
+                    showToast('✅ Produk ditambah','success');
+                }
+                closeProductModal(); 
+                loadDashboard();
+            } catch(err) { 
+                console.error('Save product error:', err);
+                let msg = err.message||'Unknown error';
+                if(msg.includes('quota')||msg.includes('limit')) msg = 'Had simpanan Firestore dicapai';
+                if(msg.includes('permission-denied')) msg = 'Tiada kebenaran tulis data';
+                showToast('❌ Gagal simpan: '+msg,'error'); 
+            } finally {
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-save mr-2"></i> 💾 Simpan Produk';
+            }
         }
-        window.renderProducts = () => {
-            const tbody=document.getElementById('product-list'),search=(document.getElementById('prod-search')?.value||'').toLowerCase(),filter=document.getElementById('prod-filter')?.value||'all';
-            let filtered=allProducts.filter(p=>{const s=!search||p.name?.toLowerCase().includes(search);const f=filter==='all'||p.status===filter;return s&&f;});
-            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="11" class="text-center py-8 text-gray-500 text-xs">Tiada produk</td></tr>`;return;}
-            tbody.innerHTML=filtered.map((p,i)=>{const sold=p.totalSold||0,rev=sold*(p.priceSell||0)*(1-(vendorData.vendorProfile?.commissionRate||COMMISSION_DEFAULT)),badge=p.status==='Public'?'badge-active':p.status==='Private'?'badge-private':'badge-outstock';return`<tr><td>${i+1}</td><td><img src="${p.imageUrl||'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover bg-gray-200" onerror="this.src='https://via.placeholder.com/40'"></td><td class="font-bold text-xs max-w-[150px] truncate" title="${p.name}">${p.name}</td><td class="font-bold text-purple-600">${formatRM(p.priceSell)}</td><td>⭐${(p.rating||5).toFixed(1)}</td><td><span class="badge ${badge}">${p.status}</span></td><td class="text-center">${sold}</td><td class="font-bold text-green-600">${formatRM(rev)}</td><td class="text-center">${(p.reviews?.length||0)}</td><td><button onclick="editProduct('${p.id}')" class="action-btn btn-edit">Edit</button></td><td><button onclick="deleteProduct('${p.id}')" class="action-btn btn-delete">Padam</button></td></tr>`;}).join('');
-        };
-        window.editProduct = (id) => { showToast('Edit produk: Sila hubungi admin untuk update','warning'); };
-        window.deleteProduct = async (id) => { if(!confirm('Padam produk ini?'))return; try{await updateDoc(doc(db,"products",id),{status:'deleted',deletedAt:serverTimestamp()});showToast('✅ Produk dipadam','success');loadProducts();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+        
+        async function deleteProduct(id) {
+            if(!id || !confirm('Padam produk ini?')) return;
+            try { 
+                await db.collection('products').doc(id).delete(); 
+                showToast('✅ Dipadam','success'); 
+                loadDashboard(); 
+            } catch(err) { 
+                console.error('Delete error:', err);
+                showToast('❌ Gagal padam: '+(err.message||''),'error'); 
+            }
+        }
 
-        // ===== ORDERS =====
-        async function loadOrders(type){
-            if(!currentUser)return; if(unsubscribeOrders)unsubscribeOrders();
-            unsubscribeOrders=onSnapshot(query(collection(db,"orders"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")),(snap)=>{allOrders=[];snap.forEach(d=>allOrders.push({id:d.id,...d.data()}));if(type==='verify')filterVerifyOrders('all');else filterManageOrders();});
+        // ===== DASHBOARD - FIXED DATA LOADING =====
+        function loadDashboard() {
+            if(!user||!profile) {
+                console.warn('No user or profile, skipping dashboard load');
+                return;
+            }
+            
+            // ✅ Products with real-time sync + error handling
+            try {
+                const productsRef = db.collection('products');                const q = productsRef.where('vendorId','==',user.uid).orderBy('createdAt','desc');
+                
+                q.onSnapshot(snap => {
+                    products = []; 
+                    const grid = document.getElementById('product-grid'); 
+                    let html='', total=0;
+                    
+                    if(!snap?.empty) {
+                        snap.forEach(d => {
+                            try {
+                                const p = d?.data() || {};
+                                products.push({id: d?.id, ...p});
+                                const sold = p?.totalSold||0; 
+                                total += (p?.salePrice||0)*sold;
+                                
+                                // ✅ Safe image handling
+                                const imgSrc = p?.imageUrl || 'https://via.placeholder.com/140?text=No+Image';
+                                const imgTag = `<img src="${imgSrc}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-xl\\\\'>'" alt="${p?.name||'Product'}">`;
+                                
+                                html += `<div class="product-card" onclick="openProductModal('${d?.id}')">
+                                    <div class="product-img">${imgTag}</div>
+                                    <div class="product-info">
+                                        <div class="product-title truncate">${p?.name||'Unnamed'}</div>
+                                        <div class="flex items-baseline gap-1 mb-1">${p?.price>0?`<span class="product-sale">RM${p.price}</span>`:''}<span class="product-price">RM${p?.salePrice||0}</span></div>
+                                        <div class="flex justify-between items-center text-[10px] text-gray-500"><span>📦 ${sold}</span><span class="badge badge-${p?.status==='Public'?'success':'warning'}">${p?.status||'Unknown'}</span></div>
+                                        <div class="flex gap-1 mt-2"><button onclick="event.stopPropagation();openProductModal('${d?.id}')" class="flex-1 py-1 text-[10px] bg-yellow-100 rounded">✏️</button><button onclick="event.stopPropagation();deleteProduct('${d?.id}')" class="flex-1 py-1 text-[10px] bg-red-100 text-red-600 rounded">🗑️</button></div>
+                                    </div>
+                                </div>`;
+                            } catch(e) { console.warn('Error processing product:', e); }
+                        });
+                        grid.innerHTML = html; 
+                        document.getElementById('stat-products').textContent = snap.size;
+                    } else {
+                        grid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500"><i class="fas fa-box-open text-2xl mb-2 opacity-30"></i><p class="text-xs">Tiada produk</p><button onclick="openProductModal()" class="btn-glitter mt-3 px-3 py-1.5 rounded text-xs">+ Tambah</button></div>`; 
+                        document.getElementById('stat-products').textContent='0';
+                    }
+                    document.getElementById('stat-sales').textContent = formatRM(total);
+                    document.getElementById('stat-commission').textContent = formatRM(total * (profile?.commissionRate??1) / 100);
+                }, err => {
+                    console.error('Products snapshot error:', err);
+                    document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-8 text-red-500 text-xs">⚠️ Gagal muat produk: ${err.message||'Unknown'}</div>`;
+                });
+            } catch(err) {
+                console.error('Products query error:', err);
+                showToast('⚠️ Gagal akses data produk','warning');
+            }
+            
+            // ✅ Orders with real-time sync + error handling
+            try {
+                const ordersRef = db.collection('orders');                const q = ordersRef.where('vendorId','==',user.uid).orderBy('createdAt','desc');
+                
+                q.onSnapshot(snap => {
+                    orders = []; 
+                    const tbody = document.getElementById('order-list'); 
+                    let html='', active=0;
+                    
+                    if(!snap?.empty) {
+                        snap.forEach(d => {
+                            try {
+                                const o = d?.data() || {};
+                                orders.push({id: d?.id, ...o});
+                                if(!['Completed','Cancelled'].includes(o?.status)) active++;
+                                const items = o?.items?.map?.(i=>i?.name).join(', ')||'-';
+                                const paymentBadge = o?.paymentStatus==='Verified'?'success':'warning';
+                                const statusBadge = o?.status==='Completed'?'success':o?.status==='Cancelled'?'danger':'info';
+                                
+                                html += `<tr><td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td><td>${o?.username||'-'}</td><td class="truncate max-w-[120px]">${items}</td><td class="font-bold text-yellow-600">${formatRM(o?.total)}</td><td><span class="badge badge-${paymentBadge}">${o?.paymentStatus||'Pending'}</span></td><td><span class="badge badge-${statusBadge}">${o?.status||'New'}</span></td><td><button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
+                            } catch(e) { console.warn('Error processing order:', e); }
+                        });
+                        tbody.innerHTML = html;
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>';
+                    }
+                    document.getElementById('stat-orders').textContent = active;
+                }, err => {
+                    console.error('Orders snapshot error:', err);
+                    document.getElementById('order-list').innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal muat pesanan</td></tr>`;
+                });
+            } catch(err) {
+                console.error('Orders query error:', err);
+                showToast('⚠️ Gagal akses data pesanan','warning');
+            }
         }
-        window.filterVerifyOrders = (status) => {
-            const tbody=document.getElementById('verify-order-list'),filtered=status==='all'?allOrders:allOrders.filter(o=>o.status===status);
-            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="14" class="text-center py-8 text-gray-500 text-xs">Tiada pesanan</td></tr>`;return;}
-            tbody.innerHTML=filtered.map(o=>{const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(!it)return'';const badgeP=o.paymentStatus==='Verified'?'badge-verified':'badge-notverified',badgeC=o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':o.status==='Cancelled'?'badge-cancelled':'badge-to-pay';return`<tr><td class="font-mono text-[10px]">${o.uac||'-'}</td><td class="text-xs">${o.username||'-'}</td><td class="text-xs max-w-[120px] truncate" title="${it.name}">${it.name}</td><td class="font-mono text-[10px]">${it.uniqueCode||'-'}</td><td class="text-[10px] max-w-[100px] truncate" title="${o.address}">${o.address}</td><td class="text-center">${it.qty||1}</td><td class="font-bold">${formatRM((it.priceSell||0)*(it.qty||1))}</td><td class="text-[10px]">${o.paymentMethod||'-'}</td><td><span class="badge ${badgeP}">${o.paymentStatus||'-'}</span></td><td class="font-mono text-[10px]">${o.trackingNo||'-'}</td><td class="font-mono text-[10px]">${o.orderId||'-'}</td><td><input value="${o.currentStatus||o.status||''}" onchange="updateOrderField('${o.id}','currentStatus',this.value)" class="text-[10px] p-1 w-28 rounded border" placeholder="Status..."></td><td><span class="badge ${badgeC}">${o.category||o.status||'-'}</span></td><td class="text-center"><select onchange="updateOrderStatus('${o.id}',this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700"><option value="To Pay" ${o.status==='To Pay'?'selected':''}>To Pay</option><option value="To Ship" ${o.status==='To Ship'?'selected':''}>To Ship</option><option value="To Receive" ${o.status==='To Receive'?'selected':''}>To Receive</option><option value="Completed" ${o.status==='Completed'?'selected':''}>Completed</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>Cancelled</option></select></td></tr>`;}).join('');
-        };
-        window.filterManageOrders = () => {
-            const tbody=document.getElementById('manage-order-list'),search=(document.getElementById('order-search')?.value||'').toLowerCase(),cat=document.getElementById('order-category')?.value||'all';
-            let filtered=allOrders.filter(o=>{const s=!search||o.username?.toLowerCase().includes(search)||o.items?.some(i=>i.name?.toLowerCase().includes(search));const c=cat==='all'||o.status===cat;return s&&c;});
-            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="14" class="text-center py-8 text-gray-500 text-xs">Tiada pesanan</td></tr>`;return;}
-            tbody.innerHTML=filtered.map(o=>{const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(!it)return'';const badgeP=o.paymentStatus==='Verified'?'badge-verified':'badge-notverified',badgeD=o.deliveryStatus==='Delivered'?'badge-completed':'badge-to-ship';return`<tr><td class="font-mono text-[10px]">${o.uac||'-'}</td><td class="text-xs">${o.username||'-'}</td><td class="text-xs max-w-[120px] truncate" title="${it.name}">${it.name}</td><td class="font-mono text-[10px]">${it.uniqueCode||'-'}</td><td class="text-[10px] max-w-[100px] truncate" title="${o.address}">${o.address}</td><td class="text-center">${it.qty||1}</td><td class="font-bold">${formatRM((it.priceSell||0)*(it.qty||1))}</td><td class="text-[10px]">${o.paymentMethod||'-'}</td><td><span class="badge ${badgeP}">${o.paymentStatus||'-'}</span></td><td><span class="badge ${badgeD}">${o.deliveryStatus||'Pending'}</span></td><td><input value="${o.trackingNo||''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 rounded border" placeholder="Tracking..."></td><td class="font-mono text-[10px]">${o.orderId||'-'}</td><td class="text-center">${o.status!=='Cancelled'?`<button onclick="cancelOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>`:'<span class="text-gray-400 text-[10px]">Dibatalkan</span>'}</td><td class="text-center"><button onclick="openChatWithCustomer('${o.userId}','${o.username}')" class="action-btn btn-view">Chat</button></td></tr>`;}).join('');
-        };
-        window.updateOrderField = async (id,field,val) => { try{await updateDoc(doc(db,"orders",id),{[field]:val,updatedAt:serverTimestamp()});playSound('click');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-        window.updateOrderStatus = async (id,newStatus) => { if(!confirm(`Tukar status kepada ${newStatus}?`)){loadOrders('verify');return;} try{await updateDoc(doc(db,"orders",id),{status:newStatus,category:newStatus,updatedAt:serverTimestamp()});showToast('✅ Status dikemaskini','success');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-        window.cancelOrder = async (id) => { if(!confirm('Batal pesanan ini?'))return; try{await updateDoc(doc(db,"orders",id),{status:'Cancelled',category:'Cancelled',updatedAt:serverTimestamp()});showToast('❌ Pesanan dibatalkan','warning');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
-        window.openChatWithCustomer = (uid,name) => { currentChatPartner=uid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(uid); };
-        // ===== PROFILE =====
-        async function loadProfile(){
-            if(!currentUser)return; const vp=vendorData.vendorProfile||{};
-            document.getElementById('prof-seller').value=vendorData.username;document.getElementById('prof-business').value=vp.businessName||'';document.getElementById('prof-desc').value=vp.description||'';document.getElementById('prof-phone').value=vendorData.phone||'';document.getElementById('prof-email').value=vendorData.email||'';document.getElementById('prof-uac').value=vendorData.uac;document.getElementById('prof-address').value=vp.address||'';document.getElementById('prof-status').innerText=vendorData.status;document.getElementById('prof-status').className=`badge ${vendorData.status==='ACTIVE'?'badge-active':vendorData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;document.getElementById('prof-log').innerText=formatDate(vendorData.logCache);
-            const bd=vp.bankDetails||{};document.getElementById('prof-bank-name').value=bd.accountName||'';document.getElementById('prof-bank-type').value=bd.bankName||'';document.getElementById('prof-bank-num').value=bd.accountNumber||'';
-        }
-        window.updateProfile = async () => {
-            const phone=document.getElementById('prof-phone').value.trim(),desc=document.getElementById('prof-desc').value.trim(),addr=document.getElementById('prof-address').value.trim(),bn=document.getElementById('prof-bank-name').value.trim(),bt=document.getElementById('prof-bank-type').value,bn2=document.getElementById('prof-bank-num').value.trim();
-            try{await updateDoc(doc(db,"users",currentUser.uid),{phone, 'vendorProfile.description':desc, 'vendorProfile.address':addr, 'vendorProfile.bankDetails':{accountName:bn,bankName:bt,accountNumber:bn2,updatedAt:serverTimestamp()},logCache:serverTimestamp()});showToast('✅ Profil dikemaskini!','success');loadProfile();}catch(e){showToast('❌ Gagal: '+e.message,'error');}
-        };
 
-        // ===== CHAT =====
-        async function loadChatList(){
-            if(!currentUser)return; const list=document.getElementById('chat-list-view');
-            const adminQ=query(collection(db,"users"),where("role","==","admin"),limit(1));
-            try{const adminSnap=await getDocs(adminQ);if(adminSnap.empty){list.innerHTML="<p class='text-center text-red-500'>Tiada Admin tersedia.</p>";return;}const adminDoc=adminSnap.docs[0];list.innerHTML=`<div onclick="openChat('${adminDoc.id}','${adminDoc.data().username||'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;}catch(e){list.innerHTML="<p class='text-center text-red-500'>Gagal memuat support.</p>";}
+        // ===== PROFILE - FIXED SAVE OPERATION =====
+        function saveProfile() {
+            if(!user) { showToast('❌ Sila login dahulu','error'); return; }
+            const btn = document.getElementById('save-profile-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            const updateData = {
+                sellerName: (document.getElementById('prof-seller')?.value||'').trim(),
+                businessName: (document.getElementById('prof-business')?.value||'').trim(),
+                phone: (document.getElementById('prof-phone')?.value||'').trim(),
+                address: (document.getElementById('prof-address')?.value||'').trim(),
+                paymentInfo: (document.getElementById('prof-payment')?.value||'').trim(),
+                logCache: firebase.firestore.FieldValue.serverTimestamp()
+            };
+                        db.collection('vendors').doc(user.uid).update(updateData)
+            .then(()=>{ 
+                showToast('✅ Profil dikemaskini','success'); 
+                if(profile) profile.logCache = firebase.firestore.Timestamp.now(); 
+            })
+            .catch(err=> {
+                console.error('Profile update error:', err);
+                let msg = err.message||'Unknown error';
+                if(msg.includes('permission-denied')) msg = 'Tiada kebenaran kemaskini';
+                showToast('❌ Gagal: '+msg,'error');
+            })
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='💾 Simpan'; });
         }
-        function loadChatMessages(partnerId){
-            const chatId=[currentUser.uid,partnerId].sort().join('_'),msgContainer=document.getElementById('chat-messages');
-            if(unsubscribeChat)unsubscribeChat();
-            unsubscribeChat=onSnapshot(query(collection(db,`chats/${chatId}/messages`),orderBy("timestamp","asc"),limit(100)),(snap)=>{msgContainer.innerHTML="";snap.forEach(d=>{const m=d.data(),isMe=m.senderId===currentUser.uid;let c='';if(m.type==='text')c=`<p class="text-sm">${m.text||''}</p>`;else if(m.type==='image')c=`<img src="${m.url||''}" class="msg-img" alt="Image">`;else if(m.type==='location')c=`<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address||''}</div>`;msgContainer.innerHTML+=`<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${c}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate?.()).toLocaleTimeString():''}</div></div>`;});msgContainer.scrollTop=msgContainer.scrollHeight;if(snap.size>0)playSound('msg');});
+        
+        function changePassword() {
+            const p = prompt("🔐 Password baru (min 6):"); 
+            if(!p||p.length<6) return showToast('❌ Password terlalu pendek','error');
+            user?.updatePassword(p)
+            .then(()=> showToast('✅ Password ditukar','success'))
+            .catch(err=> {
+                let msg = err.message||'Unknown error';
+                if(msg.includes('recent')) msg = 'Login semula untuk tukar password';
+                showToast('❌ '+msg,'error');
+            });
         }
-        window.openChat = (pid,name) => { currentChatPartner=pid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(pid); };
-        window.closeChat = () => { if(unsubscribeChat)unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
-        window.sendMessage = async () => { const input=document.getElementById('msg-input'),text=input?.value?.trim(); if(!text||!currentChatPartner)return; await saveMessage(text,'text'); input.value=''; };
-        async function saveMessage(text,type,url=null,address=null){
-            const chatId=[currentUser.uid,currentChatPartner].sort().join('_');
-            await addDoc(collection(db,`chats/${chatId}/messages`),{senderId:currentUser.uid,text:text||'',type,url,address,timestamp:serverTimestamp(),read:false,isPinned:false});
-            await setDoc(doc(db,"chats",chatId),{participants:[currentUser.uid,currentChatPartner],lastMessage:type==='text'?text:'[Media]',lastTime:serverTimestamp()},{merge:true});
-            playSound('msg');
+        
+        function deleteAccount() {
+            if(!confirm('⚠️ Akaun akan dinyahaktifkan kekal. Teruskan?')) return;
+            showToast('Menyahaktifkan...','info');
+            db.collection('vendors').doc(user?.uid).update({
+                status:'INACTIVE',
+                deletedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(()=>{ auth.signOut(); showToast('✅ Akaun dinyahaktifkan','success'); navTo('login'); })
+            .catch(err=> showToast('❌ '+(err.message||''),'error'));
         }
-        window.handleFileUpload = async (input) => { const file=input?.files?.[0]; if(!file||!currentChatPartner)return; if(file.size>5*1024*1024){showToast('❌ Gambar terlalu besar (max 5MB)','error');input.value='';return;} if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showToast('❌ Format tidak disokong','error');input.value='';return;} try{const u=URL.createObjectURL(file);await saveMessage('','image',u);showToast('✅ Gambar dihantar','success',1500);}catch(e){showToast('❌ Upload gagal: '+e.message,'error');}finally{if(input)input.value='';} };
-        window.sendLocation = async () => { const addr=prompt("Masukkan alamat/lokasi:"); if(addr?.trim()){await saveMessage('','location',null,addr.trim());} };
-        window.copyChatID = () => { if(currentChatPartner){navigator.clipboard.writeText(currentChatPartner);showToast('✅ ID disalin!','success',1500);} };
-        window.blockContact = async () => { if(!confirm("Block pengguna ini?"))return; try{await updateDoc(doc(db,"users",currentChatPartner),{status:'BLOCKED'});showToast('✅ Pengguna diblock','success');closeChat();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+
+        // ===== CHAT - FIXED DATA ACCESS =====
+        function loadChats() {
+            if(!user) return;
+            try {
+                db.collection('chats').where('participants','array-contains',user.uid).orderBy('lastTime','desc')
+                .onSnapshot(snap => {
+                    const el = document.getElementById('contacts-list');
+                    if(!el) return;
+                    
+                    if(!snap?.empty) {
+                        let html = '';
+                        snap.forEach(d => {
+                            try {                                const c = d?.data() || {};
+                                const other = c?.participants?.find?.(id=>id!==user.uid);
+                                const name = c?.otherUserName || `Customer ${other?.slice?.(0,6)||'???'}...`;
+                                const status = c?.otherStatus || 'Offline';
+                                const dot = status==='Online'?'status-online':status==='Busy'?'status-busy':'status-offline';
+                                html += `<div onclick="openChat('${d?.id}','${other}')" class="p-2 border border-gray-100 rounded-lg hover:bg-yellow-50 cursor-pointer transition">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="status-dot ${dot}"></span>
+                                            <div><div class="font-medium text-xs">${name}</div><div class="text-[10px] text-gray-500 truncate max-w-[160px]">${c?.lastMessage||'No messages'}</div></div>
+                                        </div>
+                                        <div class="text-[9px] text-gray-400">${formatTime(c?.lastTime)}</div>
+                                    </div>
+                                </div>`;
+                            } catch(e) { console.warn('Error processing chat:', e); }
+                        });
+                        el.innerHTML = html;
+                    } else {
+                        el.innerHTML = '<div class="text-center py-6 text-gray-500 text-xs"><i class="fas fa-inbox text-lg mb-1 opacity-30"></i><p>Tiada perbualan</p></div>';
+                    }
+                }, err => {
+                    console.error('Chats snapshot error:', err);
+                    document.getElementById('contacts-list').innerHTML = '<div class="text-center py-6 text-red-500 text-xs">⚠️ Gagal load chat</div>';
+                });
+            } catch(err) {
+                console.error('Chats query error:', err);
+                showToast('⚠️ Gagal akses data chat','warning');
+            }
+        }
+        
+        function openChat(cid, pid) {
+            if(!cid) return;
+            chatId = cid; 
+            playSound('chat');
+            document.getElementById('chat-name').textContent = "💬 Customer Service";
+            document.getElementById('chat-status').innerHTML = `<span class="status-dot status-online"></span> Online`;
+            if(window.innerWidth<768) document.querySelector('.contacts-panel')?.classList.add('hidden');
+            if(chatUnsub) { try { chatUnsub(); } catch(e){} chatUnsub = null; }
+            
+            try {
+                chatUnsub = db.collection(`chats/${cid}/messages`).orderBy('timestamp','asc').onSnapshot(snap => {
+                    const el = document.getElementById('chat-msgs');
+                    if(!el) return;
+                    
+                    if(!snap?.empty) {
+                        let html = '';
+                        snap.forEach(d => {
+                            try {
+                                const m = d?.data() || {};
+                                const me = m?.senderId===user?.uid;                                html += `<div class="msg-bubble ${me?'msg-me':'msg-other'}">
+                                    ${m?.text?`<div class="text-xs">${m.text}</div>`:''}
+                                    ${m?.imageUrl?`<img src="${m.imageUrl}" class="msg-image" onerror="this.style.display='none'">`:''}
+                                    <div class="msg-time">${formatTime(m?.timestamp)}</div>
+                                </div>`;
+                            } catch(e) { console.warn('Error processing message:', e); }
+                        });
+                        el.innerHTML = html; 
+                        el.scrollTop = el.scrollHeight;
+                    } else {
+                        el.innerHTML = '<div class="text-center text-gray-400 py-4 text-xs"><i class="fas fa-comments text-lg mb-1 opacity-30"></i><p>Mula perbualan...</p></div>';
+                    }
+                }, err => {
+                    console.error('Messages snapshot error:', err);
+                    document.getElementById('chat-msgs').innerHTML = '<div class="text-center text-red-500 text-xs">⚠️ Gagal load mesej</div>';
+                });
+            } catch(err) {
+                console.error('Messages query error:', err);
+                showToast('⚠️ Gagal akses mesej','warning');
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chat-input'); 
+            const txt = (input?.value||'').trim();
+            if(!txt||!chatId) { if(!chatId) showToast('❌ Pilih pelanggan dahulu','warning'); return; }
+            try {
+                await db.collection(`chats/${chatId}/messages`).add({
+                    senderId: user?.uid,
+                    senderName: profile?.sellerName||'Vendor',
+                    text: txt,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await db.collection('chats').doc(chatId).update({
+                    lastMessage: txt.slice(0,40),
+                    lastTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                input.value = ''; 
+                playSound('chat');
+            } catch(err) { 
+                console.error('Send message error:', err);
+                showToast('❌ Gagal hantar: '+(err.message||''),'error'); 
+            }
+        }
+        
+        async function sendImage(input) {
+            const file = input?.files?.[0]; 
+            if(!file||!chatId) { if(input) input.value=''; return; }
+            if(file.size>500*1024) return showToast('❌ Gambar >500KB','error');
+            if(!file.type?.startsWith('image/')) return showToast('❌ Hanya gambar','error');            const reader = new FileReader();
+            reader.onload = async e => {
+                try {
+                    showToast('Menghantar...','info');
+                    await db.collection(`chats/${chatId}/messages`).add({
+                        senderId: user?.uid,
+                        senderName: profile?.sellerName||'Vendor',
+                        imageUrl: e?.target?.result,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await db.collection('chats').doc(chatId).update({
+                        lastMessage: '[Image]',
+                        lastTime: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('✅ Gambar dihantar','success');
+                } catch(err) { 
+                    console.error('Send image error:', err);
+                    showToast('❌ Gagal: '+(err.message||''),'error'); 
+                }
+            };
+            reader.onerror = () => showToast('❌ Gagal baca gambar','error');
+            reader.readAsDataURL(file); 
+            if(input) input.value = '';
+        }
+        
+        function updateAgentStatus() {
+            const s = document.getElementById('agent-status')?.value;
+            if(!s || !user) return;
+            db.collection('vendors').doc(user.uid).update({
+                agentStatus: s,
+                logCache: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(()=> showToast(`✅ Status: ${s}`,'success'))
+            .catch(err=> showToast('❌ '+(err.message||''),'error'));
+        }
+        
+        function toggleMobileContacts() { 
+            document.querySelector('.contacts-panel')?.classList.toggle('hidden'); 
+        }
+
+        // ===== ADMIN - FIXED DATA ACCESS =====
+        function loadAdmin() {
+            if(profile?.role!=='admin') return;
+            document.getElementById('admin-rate').value = profile?.commissionRate??1;
+            
+            try {
+                db.collection('vendors').orderBy('createdAt','desc').onSnapshot(snap => {
+                    const tbody = document.getElementById('admin-vendors'); 
+                    if(!tbody) return;
+                                        let html='';
+                    if(!snap?.empty) {
+                        snap.forEach(d => {
+                            try {
+                                const v = d?.data() || {};
+                                if(v?.uid===user?.uid) return; // Skip self
+                                const sales = v?.totalSales||0, comm = sales * ((v?.commissionRate??1)/100);
+                                html += `<tr><td class="font-mono text-[10px]">${v?.uac||'-'}</td><td>${v?.sellerName||'-'}</td><td class="font-bold text-yellow-600">${formatRM(sales)}</td><td class="text-purple-600">${formatRM(comm)}</td><td><span class="badge badge-${v?.status==='ACTIVE'?'success':'danger'}">${v?.status||'Unknown'}</span></td><td><button class="text-blue-500 text-xs">✏️</button></td></tr>`;
+                            } catch(e) { console.warn('Error processing vendor:', e); }
+                        });
+                    }
+                    tbody.innerHTML = html||'<tr><td colspan="6" class="text-center py-4 text-gray-500 text-xs">Tiada vendor</td></tr>';
+                }, err => {
+                    console.error('Admin vendors error:', err);
+                    document.getElementById('admin-vendors').innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load data</td></tr>';
+                });
+            } catch(err) {
+                console.error('Admin query error:', err);
+                showToast('⚠️ Gagal akses data admin','warning');
+            }
+        }
+        
+        function updateCommission() {
+            const r = parseFloat(document.getElementById('admin-rate')?.value);
+            if(isNaN(r)||r<0.01||r>5) return showToast('❌ Kadar RM 0.01-5.00','error');
+            db.collection('vendors').doc(user?.uid).update({
+                commissionRate: r,
+                logCache: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(()=>{ 
+                document.getElementById('curr-rate').textContent = formatRM(r); 
+                showToast('✅ Komisen dikemaskini','success'); 
+            })
+            .catch(err=> showToast('❌ '+(err.message||''),'error'));
+        }
+
+        // ===== SEARCH & CATALOGUE - FIXED =====
+        function filterProducts(kw) {
+            const grid = document.getElementById('product-grid');
+            if(!grid) return;
+            if(!kw) { loadDashboard(); return; }
+            const f = products.filter(p => 
+                (p?.name?.toLowerCase?.()?.includes?.(kw.toLowerCase()))||
+                (p?.itemCode?.toLowerCase?.()?.includes?.(kw.toLowerCase()))||
+                (p?.label?.toLowerCase?.()?.includes?.(kw.toLowerCase()))
+            );
+            if(!f.length) { 
+                grid.innerHTML = '<div class="col-span-full text-center py-6 text-gray-500 text-xs">🔍 Tiada hasil</div>'; 
+                return; 
+            }            let html = '';
+            f.forEach(p => {
+                const imgSrc = p?.imageUrl || 'https://via.placeholder.com/140?text=No+Image';
+                html += `<div class="product-card" onclick="openProductModal('${p?.id}')">
+                    <div class="product-img"><img src="${imgSrc}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-xl\\\\'>'"></div>
+                    <div class="product-info">
+                        <div class="product-title truncate">${p?.name||'Unnamed'}</div>
+                        <div class="product-price">RM${p?.salePrice||0}</div>
+                        <button onclick="event.stopPropagation();openProductModal('${p?.id}')" class="w-full mt-2 py-1 text-[10px] bg-yellow-100 rounded">✏️ Edit</button>
+                    </div>
+                </div>`;
+            });
+            grid.innerHTML = html;
+        }
+        
+        async function loadCatalogue(filter='all') {
+            const grid = document.getElementById('catalogue-grid');
+            if(!grid) return;
+            grid.innerHTML = '<div class="col-span-full text-center py-8"><div class="loader mx-auto mb-2"></div><p class="text-gray-500 text-xs">Memuatkan...</p></div>';
+            document.querySelectorAll('#view-catalogue .tab-btn')?.forEach(b=>b?.classList.remove('active'));
+            const activeBtn = document.getElementById(`cat-${filter==='all'?'all':filter==='highest'?'high':filter==='event'?'event':'rec'}`);
+            if(activeBtn) activeBtn.classList.add('active');
+            
+            try {
+                let q = db.collection('products').where('status','==','Public');
+                if(filter==='highest') q = q.orderBy('totalSold','desc');
+                else if(filter==='event') q = q.where('event','!=','').orderBy('createdAt','desc');
+                else q = q.orderBy('createdAt','desc');
+                q = q.limit(20);
+                
+                const snap = await q.get();
+                if(!snap?.empty) {
+                    let html = '';
+                    snap.forEach(d => {
+                        try {
+                            const p = d?.data() || {};
+                            const imgSrc = p?.imageUrl || 'https://via.placeholder.com/140?text=No+Image';
+                            html += `<div class="product-card">
+                                <div class="product-img"><img src="${imgSrc}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-xl\\\\'>'" alt="${p?.name||'Product'}"></div>
+                                <div class="product-info">
+                                    <div class="product-title truncate">${p?.name||'Unnamed'}</div>
+                                    <div class="flex items-baseline gap-1 mb-1">${p?.price>0?`<span class="product-sale text-[10px]">RM${p.price}</span>`:''}<span class="product-price text-sm">RM${p?.salePrice||0}</span></div>
+                                    <div class="flex justify-between items-center text-[10px] text-gray-500"><span>⭐ ${(p?.rating??0).toFixed(1)}</span><span>📦 ${p?.totalSold||0}</span></div>
+                                    ${p?.label?`<span class="badge badge-info mt-1 text-[9px]">${p.label}</span>`:''}
+                                </div>
+                            </div>`;
+                        } catch(e) { console.warn('Error processing catalogue item:', e); }
+                    });
+                    grid.innerHTML = html;
+                } else {                    grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 text-xs"><i class="fas fa-shopping-bag text-xl mb-2 opacity-30"></i><p>Tiada produk</p></div>';
+                }
+            } catch(err) { 
+                console.error('Catalogue load error:', err);
+                grid.innerHTML = `<div class="col-span-full text-center py-8 text-red-500 text-xs">❌ Gagal: ${err.message||'Unknown'}</div>`; 
+            }
+        }
+
+        // ===== HELPERS =====
+        function msgCustomer(uid, oid) { 
+            showToast(`💬 Chat: ${uid||'Unknown'}`,'info'); 
+            switchTab('chat'); 
+        }
+        
+        function filterOrders(status) {
+            const tbody = document.getElementById('order-list');
+            if(!tbody) return;
+            const filtered = status==='all' ? orders : orders.filter(o=>o?.status===status);
+            if(!filtered?.length) { 
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>'; 
+                return; 
+            }
+            let html = '';
+            filtered.forEach(o => {
+                const items = o?.items?.map?.(i=>i?.name).join(', ')||'-';
+                const paymentBadge = o?.paymentStatus==='Verified'?'success':'warning';
+                const statusBadge = o?.status==='Completed'?'success':o?.status==='Cancelled'?'danger':'info';
+                html += `<tr><td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td><td>${o?.username||'-'}</td><td class="truncate max-w-[120px]">${items}</td><td class="font-bold text-yellow-600">${formatRM(o?.total)}</td><td><span class="badge badge-${paymentBadge}">${o?.paymentStatus||'Pending'}</span></td><td><span class="badge badge-${statusBadge}">${o?.status||'New'}</span></td><td><button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
+            });
+            tbody.innerHTML = html;
+        }
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('audio').forEach(a=>a.load());});
-        document.addEventListener('visibilitychange',()=>{if(document.hidden)console.log('Page hidden');else console.log('Page visible');});
+        document.addEventListener('DOMContentLoaded', () => {
+            const h = location.hash.slice(1);
+            if(h && ['login','register','dashboard','catalogue'].includes(h)) setTimeout(()=>navTo(h), 100);
+            console.log("✅ Vendor Manager Loaded | MFD Store | Firestore: mfd-store");
+        });
+        window.addEventListener('hashchange', () => { 
+            const h=location.hash.slice(1)||'login'; 
+            navTo(user&&h!=='catalogue'?'dashboard':h); 
+        });
+        window.addEventListener('resize', () => { 
+            if(window.innerWidth>=768) document.querySelector('.contacts-panel')?.classList.remove('hidden'); 
+        });
     </script>
 </body>
 </html>
