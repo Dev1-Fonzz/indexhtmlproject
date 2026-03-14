@@ -165,21 +165,54 @@
             </div>
 
             <!-- Orders -->
-            <div id="content-orders" class="glass-panel p-4 mb-4 hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-semibold text-sm md:text-base">📋 Senarai Pesanan</h3>
-                    <select id="order-filter" onchange="filterOrders(this.value)" class="input-glass py-1.5 text-xs">
-                        <option value="all">Semua</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead><tr><th>ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Aksi</th></tr></thead>
-                        <tbody id="order-list"><tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto mb-2"></div>Memuatkan...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- 🔽===== PASTE START: VENDOR ORDER MANAGEMENT TABLE (MACAM ADMIN) =====🔽 -->
+<div id="content-orders" class="glass-panel p-4 mb-4 hidden">
+    <!-- Header + Filter -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <h3 class="font-semibold text-sm md:text-base">📋 Pesanan Masuk</h3>
+        <div class="flex gap-2 w-full sm:w-auto">
+            <select id="order-filter" onchange="filterVendorOrders(this.value)" class="input-glass py-1.5 text-xs sm:text-sm">
+                <option value="all">Semua Status</option>
+                <option value="To Pay">⏳ To Pay</option>
+                <option value="To Ship">🚚 To Ship</option>
+                <option value="To Receive">📦 To Receive</option>
+                <option value="Completed">✅ Completed</option>
+                <option value="Cancelled">❌ Cancelled</option>
+            </select>
+            <input type="text" id="order-search" placeholder="Cari order..." class="input-glass py-1.5 text-xs sm:text-sm w-32" onkeyup="filterVendorOrders(document.getElementById('order-filter').value)">
+        </div>
+    </div>
 
+    <!-- Order Table -->
+    <div class="table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Pelanggan</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Tracking</th>
+                    <th>Tarikh</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="vendor-order-list">
+                <tr><td colspan="10" class="text-center py-4 text-gray-500"><div class="loader mx-auto mb-2"></div>Memuatkan pesanan...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="no-orders" class="hidden text-center py-8 text-gray-500">
+        <i class="fas fa-inbox text-3xl mb-2 opacity-30"></i>
+        <p class="text-sm">Tiada pesanan untuk produk anda</p>
+    </div>
+</div>
+<!-- 🔼===== PASTE END: VENDOR ORDER MANAGEMENT TABLE =====🔼 -->
             <!-- Profile -->
             <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
                 <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
@@ -392,16 +425,19 @@
             history.replaceState(null, null, `#${v}`);
         }
         
-        function switchTab(t) {
-            playSound('click');
-            document.querySelectorAll('[id^="content-"]').forEach(e=>e.classList.add('hidden'));
-            document.getElementById(`content-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-            document.getElementById(`tab-${t}`).classList.add('active');
-            if(t==='chat') loadChats();
-            if(t==='admin' && profile?.role==='admin') loadAdmin();
-        }
-        
+        // 🔽===== PASTE START: FIX switchTab TO LOAD ORDERS =====🔽
+function switchTab(t) {
+    playSound('click');
+    document.querySelectorAll('[id^="content-"]').forEach(e => e.classList.add('hidden'));
+    document.getElementById(`content-${t}`).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${t}`).classList.add('active');
+    
+    // 🔥 Load data based on tab
+    if (t === 'chat') loadChats();
+    if (t === 'orders') loadVendorOrders(); // 🔥 Load orders when tab switched
+    if (t === 'admin' && profile?.role === 'admin') loadAdmin();
+}
         function formatRM(n) { return 'RM ' + (parseFloat(n)||0).toFixed(2); }
         function formatTime(ts) { 
             if(!ts) return '-';
@@ -1136,24 +1172,201 @@ paymentInfo: {
             switchTab('chat'); 
         }
         
-        function filterOrders(status) {
-            const tbody = document.getElementById('order-list');
-            if(!tbody) return;
-            const filtered = status==='all' ? orders : orders.filter(o=>o?.status===status);
-            if(!filtered?.length) { 
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>'; 
-                return; 
-            }
-            let html = '';
-            filtered.forEach(o => {
-                const items = o?.items?.map?.(i=>i?.name).join(', ')||'-';
-                const paymentBadge = o?.paymentStatus==='Verified'?'success':'warning';
-                const statusBadge = o?.status==='Completed'?'success':o?.status==='Cancelled'?'danger':'info';
-                html += `<tr><td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td><td>${o?.username||'-'}</td><td class="truncate max-w-[120px]">${items}</td><td class="font-bold text-yellow-600">${formatRM(o?.total)}</td><td><span class="badge badge-${paymentBadge}">${o?.paymentStatus||'Pending'}</span></td><td><span class="badge badge-${statusBadge}">${o?.status||'New'}</span></td><td><button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
-            });
-            tbody.innerHTML = html;
-        }
+        // 🔽===== PASTE START: VENDOR ORDER MANAGEMENT FUNCTIONS =====🔽
 
+// Load vendor orders with real-time sync
+async function loadVendorOrders() {
+    if(!user) return;
+    const tbody = document.getElementById('vendor-order-list');
+    const noOrders = document.getElementById('no-orders');
+    if(!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        // 🔥 Query: Hanya order untuk vendor ini
+        const q = db.collection('orders')
+            .where('vendorId', '==', user.uid)
+            .orderBy('createdAt', 'desc')
+            .limit(50);
+        
+        q.onSnapshot(snap => {
+            orders = [];
+            let html = '';
+            
+            if(!snap?.empty) {
+                snap.forEach(d => {
+                    try {
+                        const o = d?.data() || {};
+                        orders.push({id: d?.id, ...o});
+                        
+                        const items = o?.items?.map(i => i?.name).join(', ') || '-';
+                        const totalQty = Object.values(o?.itemCounts || {}).reduce((a,b) => a+b, 0) || o?.items?.length || 1;
+                        const paymentBadge = o?.paymentStatus === 'Verified' ? 'success' : 'warning';
+                        const statusBadge = {
+                            'To Pay': 'warning', 'To Ship': 'info', 'To Receive': 'info',
+                            'Completed': 'success', 'Cancelled': 'danger'
+                        }[o?.status] || 'info';
+                        
+                        // 🔥 Vendor boleh update status & tracking
+                        const statusOptions = ['To Pay','To Ship','To Receive','Completed','Cancelled'].map(s => 
+                            `<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('');
+                        
+                        html += `<tr class="hover:bg-yellow-50 transition">
+                            <td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td>
+                            <td class="text-xs">${o?.username||'-'}</td>
+                            <td class="truncate max-w-[150px] text-xs" title="${items}">${items}</td>
+                            <td class="text-center text-xs">${totalQty}</td>
+                            <td class="font-bold text-yellow-600 text-xs">${formatRM(o?.total)}</td>
+                            <td><span class="badge badge-${paymentBadge} text-[10px]">${o?.paymentStatus||'Pending'}</span></td>
+                            <td>
+                                <select onchange="updateVendorOrderStatus('${d?.id}', this.value)" class="text-[10px] p-1 rounded border bg-white/80" ${o?.status==='Completed'||o?.status==='Cancelled'?'disabled':''}>
+                                    ${statusOptions}                                </select>
+                            </td>
+                            <td>
+                                <input type="text" value="${o?.trackingNo||''}" placeholder="Tracking..." 
+                                       onchange="updateVendorOrderField('${d?.id}','trackingNo',this.value)"
+                                       class="text-[10px] p-1 w-20 rounded border">
+                            </td>
+                            <td class="text-[10px] text-gray-500">${formatTime(o?.createdAt)}</td>
+                            <td class="text-center">
+                                <button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600 hover:text-cyan-800" title="Chat"><i class="fas fa-comment"></i></button>
+                                ${o?.status==='To Pay' ? `<button onclick="cancelVendorOrder('${d?.id}')" class="text-red-500 hover:text-red-700 ml-1" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+                            </td>
+                        </tr>`;
+                    } catch(e) { console.warn('Order render error:', e); }
+                });
+                tbody.innerHTML = html;
+                noOrders?.classList.add('hidden');
+            } else {
+                tbody.innerHTML = '';
+                noOrders?.classList.remove('hidden');
+            }
+            
+            // Update stats
+            const active = orders.filter(o => !['Completed','Cancelled'].includes(o?.status)).length;
+            document.getElementById('stat-orders').textContent = active;
+            
+        }, err => {
+            console.error('Vendor orders error:', err);
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load pesanan</td></tr>`;
+        });
+        
+    } catch(err) {
+        console.error('Load vendor orders error:', err);
+        showToast('⚠️ Gagal akses data pesanan','warning');
+    }
+}
+
+// Filter vendor orders by status + search
+window.filterVendorOrders = (status) => {
+    const tbody = document.getElementById('vendor-order-list');
+    const search = (document.getElementById('order-search')?.value||'').toLowerCase();
+    const noOrders = document.getElementById('no-orders');
+    
+    const filtered = orders.filter(o => {
+        const matchStatus = status === 'all' || o?.status === status;
+        const matchSearch = !search || 
+            (o?.orderId?.toLowerCase?.()?.includes?.(search)) ||
+            (o?.username?.toLowerCase?.()?.includes?.(search)) ||
+            (o?.items?.some?.(i => i?.name?.toLowerCase?.()?.includes?.(search)));
+        return matchStatus && matchSearch;    });
+    
+    if(!filtered?.length) {
+        tbody.innerHTML = '';
+        noOrders?.classList.remove('hidden');
+        return;
+    }
+    noOrders?.classList.add('hidden');
+    
+    // Re-render filtered (same logic as loadVendorOrders but with filtered array)
+    let html = '';
+    filtered.forEach(o => {
+        const items = o?.items?.map(i => i?.name).join(', ') || '-';
+        const totalQty = Object.values(o?.itemCounts || {}).reduce((a,b) => a+b, 0) || o?.items?.length || 1;
+        const paymentBadge = o?.paymentStatus === 'Verified' ? 'success' : 'warning';
+        const statusBadge = {
+            'To Pay': 'warning', 'To Ship': 'info', 'To Receive': 'info',
+            'Completed': 'success', 'Cancelled': 'danger'
+        }[o?.status] || 'info';
+        
+        const statusOptions = ['To Pay','To Ship','To Receive','Completed','Cancelled'].map(s => 
+            `<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('');
+        
+        html += `<tr class="hover:bg-yellow-50 transition">
+            <td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td>
+            <td class="text-xs">${o?.username||'-'}</td>
+            <td class="truncate max-w-[150px] text-xs" title="${items}">${items}</td>
+            <td class="text-center text-xs">${totalQty}</td>
+            <td class="font-bold text-yellow-600 text-xs">${formatRM(o?.total)}</td>
+            <td><span class="badge badge-${paymentBadge} text-[10px]">${o?.paymentStatus||'Pending'}</span></td>
+            <td>
+                <select onchange="updateVendorOrderStatus('${orders.find(x=>x.orderId===o?.orderId)?.id||''}', this.value)" class="text-[10px] p-1 rounded border bg-white/80" ${o?.status==='Completed'||o?.status==='Cancelled'?'disabled':''}>
+                    ${statusOptions}
+                </select>
+            </td>
+            <td>
+                <input type="text" value="${o?.trackingNo||''}" placeholder="Tracking..." 
+                       onchange="updateVendorOrderField('${orders.find(x=>x.orderId===o?.orderId)?.id||''}','trackingNo',this.value)"
+                       class="text-[10px] p-1 w-20 rounded border">
+            </td>
+            <td class="text-[10px] text-gray-500">${formatTime(o?.createdAt)}</td>
+            <td class="text-center">
+                <button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600 hover:text-cyan-800" title="Chat"><i class="fas fa-comment"></i></button>
+                ${o?.status==='To Pay' ? `<button onclick="cancelVendorOrder('${orders.find(x=>x.orderId===o?.orderId)?.id||''}')" class="text-red-500 hover:text-red-700 ml-1" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+};
+// Update order status (vendor)
+window.updateVendorOrderStatus = async (orderId, newStatus) => {
+    if(!confirm(`Tukar status pesanan #${orderId?.slice?.(-6)||'...'} kepada ${newStatus}?`)) {
+        loadVendorOrders(); return;
+    }
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: newStatus,
+            category: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast(`✅ Status: ${newStatus}`, 'success');
+    } catch(err) {
+        console.error('Update status error:', err);
+        showToast('❌ Gagal update: '+(err.message||''), 'error');
+    }
+};
+
+// Update order field (tracking, etc)
+window.updateVendorOrderField = async (orderId, field, value) => {
+    try {
+        await db.collection('orders').doc(orderId).update({
+            [field]: value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch(err) { console.error('Update field error:', err); }
+};
+
+// Cancel order (vendor)
+window.cancelVendorOrder = async (orderId) => {
+    if(!confirm('Batal pesanan ini? Pelanggan akan dimaklumkan.')) return;
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: 'Cancelled',
+            category: 'Cancelled',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('❌ Pesanan dibatalkan', 'warning');
+    } catch(err) { showToast('❌ Gagal: '+(err.message||''), 'error'); }
+};
+
+// Chat customer from order
+window.msgCustomer = (uid, oid) => {
+    showToast(`💬 Buka chat untuk order #${oid?.slice?.(-6)||'...'}`,'info');
+    switchTab('chat');
+    // Auto-open chat logic can be added here
+};
+// 🔼===== PASTE END: VENDOR ORDER MANAGEMENT FUNCTIONS =====🔼
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
             const h = location.hash.slice(1);
