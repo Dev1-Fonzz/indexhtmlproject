@@ -213,51 +213,78 @@
     </div>
 </div>
 <!-- 🔼===== PASTE END: VENDOR ORDER MANAGEMENT TABLE =====🔼 -->
-            <!-- Profile -->
-            <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
-                <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label><input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label><input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Phone</label><input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email</label><input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label><textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label><textarea id="prof-payment"
-                    <!-- 🔽===== PASTE START: DEFAULT PAYMENT SETTINGS =====🔽 -->
-<div class="mt-4 pt-4 border-t border-yellow-200">
-    <h4 class="text-xs font-bold text-gray-700 mb-2">⚙️ Default Payment Settings</h4>
-    <p class="text-[9px] text-gray-400 mb-2">*Maklumat ini akan auto-fill bila tambah produk baru</p>
+<div id="content-profile" class="glass-panel p-4 mb-4 hidden">
+    <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
     
-    <div class="grid grid-cols-2 gap-2">
-        <div class="col-span-2">
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🔗 Default Payment Link (Sociabuzz/Donate)</label>
-            <input type="url" id="prof-payment-link" placeholder="https://sociabuzz.com/yourname/give" class="input-glass text-xs">
+    <!-- Profile Fields -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label>
+            <input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm">
         </div>
         <div>
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ Default QR URL</label>
-            <input type="url" id="prof-qr-default" placeholder="https://i.postimg.cc/xxx/qr.jpg" class="input-glass text-xs">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label>
+            <input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm">
         </div>
         <div>
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Default Bank</label>
-            <input type="text" id="prof-bank-default" placeholder="Maybank" class="input-glass text-xs">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+            <input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm">
         </div>
-        <div class="col-span-2">
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 Default Account No + Name</label>
-            <input type="text" id="prof-account-default" placeholder="123456789012 - AHMAD BIN ABDULLAH" class="input-glass text-xs font-mono">
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label>
+            <textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label>
+            <textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
         </div>
     </div>
-</div>
-                        <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
-                        <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>                        <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
-                        <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
-                    </div>
-                </div>
-                <div class="mt-5 flex flex-wrap gap-2">
-                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
-                    <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
-                    <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
-                </div>
+    
+    <!-- Default Payment Settings (Auto-fill for new products) -->
+    <div class="mt-4 pt-4 border-t border-yellow-200">
+        <h4 class="text-xs font-bold text-gray-700 mb-2">⚙️ Default Payment Settings</h4>
+        <p class="text-[9px] text-gray-400 mb-2">*Maklumat ini akan auto-fill bila tambah produk baru</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🔗 Default Payment Link (Sociabuzz/Donate)</label>
+                <input type="url" id="prof-payment-link" placeholder="https://sociabuzz.com/yourname/give" class="input-glass text-xs">
             </div>
+            <div>
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ Default QR URL</label>
+                <input type="url" id="prof-qr-default" placeholder="https://i.postimg.cc/xxx/qr.jpg" class="input-glass text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Default Bank</label>
+                <input type="text" id="prof-bank-default" placeholder="Maybank" class="input-glass text-xs">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 Default Account No + Name</label>
+                <input type="text" id="prof-account-default" placeholder="123456789012 - AHMAD BIN ABDULLAH" class="input-glass text-xs font-mono">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Display -->
+    <div class="mt-5 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
+            <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>
+            <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
+            <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="mt-5 flex flex-wrap gap-2">
+        <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
+        <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
+        <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
+    </div>
+</div>
 
             <!-- Chat -->
             <div id="content-chat" class="glass-panel p-0 mb-4 hidden overflow-hidden">
@@ -665,19 +692,23 @@ if (t === 'admin' && profile?.role === 'admin') {
                         if(profile?.role==='admin') document.getElementById('tab-admin')?.classList.remove('hidden');
                         
                         // ✅ Safe form population
-                        const safeVal = (v,d='') => (v??d);
-                        document.getElementById('prof-seller').value = safeVal(profile?.sellerName,'');
-                        document.getElementById('prof-business').value = safeVal(profile?.businessName,'');
-                        document.getElementById('prof-phone').value = safeVal(profile?.phone,'');
-                        document.getElementById('prof-email').value = safeVal(profile?.email,'');
-                        document.getElementById('prof-address').value = safeVal(profile?.address,'');
-                        document.getElementById('prof-payment').value = safeVal(profile?.paymentInfo,'');
-                        document.getElementById('prof-payment-link').value = safeVal(profile?.paymentInfo?.paymentLink, '');
+const safeVal = (v, d = '') => (v ?? d);
+document.getElementById('prof-seller').value = safeVal(profile?.sellerName, '');
+document.getElementById('prof-business').value = safeVal(profile?.businessName, '');
+document.getElementById('prof-phone').value = safeVal(profile?.phone, '');
+document.getElementById('prof-email').value = safeVal(profile?.email, '');
+document.getElementById('prof-address').value = safeVal(profile?.address, '');
+document.getElementById('prof-payment').value = safeVal(profile?.paymentInfo, '');
+
+// 🔽===== PASTE START: LOAD DEFAULT PAYMENT FIELDS =====🔽
+document.getElementById('prof-payment-link').value = safeVal(profile?.paymentInfo?.paymentLink, '');
 document.getElementById('prof-qr-default').value = safeVal(profile?.paymentInfo?.qrDefault, '');
 document.getElementById('prof-bank-default').value = safeVal(profile?.paymentInfo?.bankDefault, '');
 document.getElementById('prof-account-default').value = safeVal(profile?.paymentInfo?.accountDefault, '');
-                        document.getElementById('agent-status').value = safeVal(profile?.agentStatus,'Online');
-                        document.getElementById('curr-rate').textContent = formatRM(profile?.commissionRate??1);
+// 🔼===== PASTE END: LOAD DEFAULT PAYMENT FIELDS =====🔼
+
+document.getElementById('agent-status').value = safeVal(profile?.agentStatus, 'Online');
+document.getElementById('curr-rate').textContent = formatRM(profile?.commissionRate ?? 1);
                     } else {
                         // ✅ Create profile if doesn't exist
                         console.log('Profile not found, creating...');
@@ -735,23 +766,35 @@ document.getElementById('prof-account-default').value = safeVal(profile?.payment
             document.getElementById('product-modal')?.classList.remove('hidden');
             if(pid) loadProductEdit(pid);
         }
-// Auto-fill payment fields from vendor profile defaults (only for NEW products)
-if (!pid && profile?.paymentInfo) {
-    const p = profile.paymentInfo;
-    if (p.qrDefault) document.getElementById('prod-qr-url').value = p.qrDefault;
-    if (p.bankDefault) document.getElementById('prod-bank').value = p.bankDefault;
-    if (p.accountDefault) {
-        const [acc, name] = p.accountDefault.split(' - ');
-        document.getElementById('prod-account').value = acc || '';
-        document.getElementById('prod-holder').value = name || '';
+       function openProductModal(pid = null) {
+    playSound('click');
+    editPid = pid;
+    imgBase64 = null;
+    document.querySelectorAll('#product-modal input:not([readonly]),#product-modal textarea,#product-modal select')?.forEach(i => { if (i?.value !== undefined) i.value = ''; });
+    document.getElementById('prod-preview')?.classList.add('hidden');
+    document.getElementById('modal-title').textContent = pid ? '✏️ Edit Produk' : '➕ Tambah Produk';
+    if (!pid) document.getElementById('prod-code').value = "ITEM-" + Date.now().toString(36).slice(-8).toUpperCase();
+    document.getElementById('product-modal')?.classList.remove('hidden');
+    
+    // 🔽===== PASTE AUTO-FILL CODE HERE (INSIDE FUNCTION) =====🔽
+    if (!pid && profile?.paymentInfo) {
+        const p = profile.paymentInfo;
+        if (p.qrDefault) document.getElementById('prod-qr-url').value = p.qrDefault;
+        if (p.bankDefault) document.getElementById('prod-bank').value = p.bankDefault;
+        if (p.accountDefault) {
+            const [acc, name] = p.accountDefault.split(' - ');
+            document.getElementById('prod-account').value = acc || '';
+            document.getElementById('prod-holder').value = name || '';
+        }
+        if (p.paymentLink && !p.qrDefault) {
+            document.getElementById('prod-qr-url').value = p.paymentLink;
+        }
+        showToast('💳 Payment info auto-filled dari profile', 'info', 2000);
     }
-    if (p.paymentLink) {
-        // If no QR URL but has payment link, use it as fallback
-        if (!p.qrDefault) document.getElementById('prod-qr-url').value = p.paymentLink;
-    }
-    showToast('💳 Payment info auto-filled dari profile', 'info', 2000);
-}
-        
+    // 🔼===== END AUTO-FILL =====🔼
+    
+    if (pid) loadProductEdit(pid);
+} // ← Function closes HERE
         function closeProductModal() { 
             playSound('click'); 
             document.getElementById('product-modal')?.classList.add('hidden'); 
@@ -777,13 +820,11 @@ if (!pid && profile?.paymentInfo) {
                     safeSet('prod-event', p?.event);                    safeSet('prod-link', p?.link);
                     safeSet('prod-status', p?.status, 'Public');
                     safeSet('prod-variation', p?.variation);
-                    // 🔽===== PASTE START: LOAD PAYMENT INFO UNTUK EDIT =====🔽
 safeSet('prod-qr-url', p?.paymentInfo?.qrUrl);
 safeSet('prod-bank', p?.paymentInfo?.bank);
 safeSet('prod-account', p?.paymentInfo?.account);
 safeSet('prod-holder', p?.paymentInfo?.holder);
 safeSet('prod-wa', p?.paymentInfo?.whatsapp);
-// 🔼===== PASTE END: LOAD PAYMENT INFO UNTUK EDIT =====🔼
                     safeSet('prod-sold', p?.totalSold, 0);
                     safeSet('prod-rating', p?.rating, 0);
                     safeSet('prod-revenue', p?.revenue, 0);
@@ -979,17 +1020,22 @@ paymentInfo: {
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             const updateData = {
-                sellerName: (document.getElementById('prof-seller')?.value||'').trim(),
-                businessName: (document.getElementById('prof-business')?.value||'').trim(),
-                phone: (document.getElementById('prof-phone')?.value||'').trim(),
-                address: (document.getElementById('prof-address')?.value||'').trim(),
-                paymentInfo: (document.getElementById('prof-payment')?.value||'').trim(),
-paymentLink: (document.getElementById('prof-payment-link')?.value || '').trim(),
-    qrDefault: (document.getElementById('prof-qr-default')?.value || '').trim(),
-    bankDefault: (document.getElementById('prof-bank-default')?.value || '').trim(),
-    accountDefault: (document.getElementById('prof-account-default')?.value || '').trim(),
-                logCache: firebase.firestore.FieldValue.serverTimestamp()
-            };
+    sellerName: (document.getElementById('prof-seller')?.value || '').trim(),
+    businessName: (document.getElementById('prof-business')?.value || '').trim(),
+    phone: (document.getElementById('prof-phone')?.value || '').trim(),
+    address: (document.getElementById('prof-address')?.value || '').trim(),
+    
+    // ✅ Nest all payment-related fields inside paymentInfo object
+    paymentInfo: {
+        general: (document.getElementById('prof-payment')?.value || '').trim(),
+        paymentLink: (document.getElementById('prof-payment-link')?.value || '').trim(),
+        qrDefault: (document.getElementById('prof-qr-default')?.value || '').trim(),
+        bankDefault: (document.getElementById('prof-bank-default')?.value || '').trim(),
+        accountDefault: (document.getElementById('prof-account-default')?.value || '').trim()
+    },
+    
+    logCache: firebase.firestore.FieldValue.serverTimestamp()
+};
                         db.collection('vendors').doc(user.uid).update(updateData)
             .then(()=>{ 
                 showToast('✅ Profil dikemaskini','success'); 
@@ -1221,7 +1267,7 @@ paymentLink: (document.getElementById('prof-payment-link')?.value || '').trim(),
             })
             .catch(err=> showToast('❌ '+(err.message||''),'error'));
         }
-// 🔽===== PASTE S
+// 🔽===== PASTE START: ADMIN FUNCTIONS =====🔽
 // Switch admin section tabs
 window.showAdminSection = (section) => {
     ['vendors','transactions','settings'].forEach(s => {
