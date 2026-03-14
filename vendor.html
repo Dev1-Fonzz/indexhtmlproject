@@ -268,26 +268,101 @@
             </div>
 
             <!-- Admin -->
-            <div id="content-admin" class="glass-panel p-4 mb-4 hidden">
-                <h3 class="font-semibold mb-4 text-sm md:text-base text-purple-700 flex items-center gap-2"><i class="fas fa-crown"></i> 👑 Admin Management</h3>
-                <div class="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
-                    <label class="text-xs font-medium text-gray-700 block mb-2">⚙️ Kadar Komisen (RM 0.01 - 5.00)</label>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="number" id="admin-rate" step="0.01" min="0.01" max="5" placeholder="1.00" class="input-glass text-sm w-24">
-                        <button onclick="updateCommission(); playSound('click')" class="btn-glitter px-4 py-1.5 rounded-lg text-xs whitespace-nowrap">Update</button>
-                        <div class="text-[10px] text-gray-500 self-center sm:self-auto">Semasa: <span id="curr-rate" class="font-medium text-purple-600">RM 1.00</span> / jualan</div>
-                    </div>                </div>
-                <div class="mb-5">
-                    <h4 class="font-medium text-gray-700 mb-2 text-sm">📊 Pengurusan Vendor</h4>
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead><tr><th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Aksi</th></tr></thead>
-                            <tbody id="admin-vendors"><tr><td colspan="6" class="text-center py-4"><div class="loader mx-auto"></div></td></tr></tbody>
-                        </table>
+<div id="content-admin" class="glass-panel p-4 mb-4 hidden">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4 pb-3 border-b border-purple-200">
+        <h3 class="font-bold text-purple-700 text-sm flex items-center gap-2">
+            <i class="fas fa-crown"></i> 👑 Admin Management Center
+        </h3>
+        <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 rounded">Super Admin</span>
+    </div>
+
+    <!-- Admin Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-3 rounded-lg border border-yellow-200 text-center">
+            <div class="text-lg font-bold text-yellow-600" id="admin-stat-vendors">-</div>
+            <div class="text-[9px] text-gray-500">Total Vendors</div>
+        </div>
+        <div class="bg-gradient-to-br from-cyan-50 to-blue-50 p-3 rounded-lg border border-cyan-200 text-center">
+            <div class="text-lg font-bold text-cyan-600" id="admin-stat-orders">-</div>
+            <div class="text-[9px] text-gray-500">Total Orders</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200 text-center">
+            <div class="text-lg font-bold text-green-600" id="admin-stat-revenue">RM -</div>
+            <div class="text-[9px] text-gray-500">Total Revenue</div>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-pink-50 p-3 rounded-lg border border-red-200 text-center">
+            <div class="text-lg font-bold text-red-600" id="admin-stat-blocked">-</div>
+            <div class="text-[9px] text-gray-500">Blocked Vendors</div>
+        </div>
+    </div>
+
+    <!-- Admin Tabs -->
+    <div class="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+        <button onclick="showAdminSection('vendors')" id="admin-tab-vendors" class="tab-btn active text-[10px] whitespace-nowrap">👥 Vendors</button>
+        <button onclick="showAdminSection('transactions')" id="admin-tab-transactions" class="tab-btn text-[10px] whitespace-nowrap">💰 Transactions</button>
+        <button onclick="showAdminSection('settings')" id="admin-tab-settings" class="tab-btn text-[10px] whitespace-nowrap">⚙️ Settings</button>
+    </div>
+
+    <!-- SECTION: VENDOR MANAGEMENT -->
+    <div id="admin-section-vendors">
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-semibold text-xs text-gray-700">📋 Senarai Vendor</h4>
+            <input type="text" id="admin-vendor-search" placeholder="Cari vendor..." class="input-glass py-1 text-[10px] w-32" onkeyup="filterAdminVendors()">
+        </div>
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>UAC</th><th>Vendor</th><th>Email</th><th>Sales</th><th>Status</th><th>Joined</th><th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-vendor-list">
+                    <tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION: TRANSACTION MANAGEMENT -->
+    <div id="admin-section-transactions" class="hidden">
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-semibold text-xs text-gray-700">📊 Semua Transaksi</h4>
+            <select id="admin-order-filter" onchange="filterAdminOrders(this.value)" class="input-glass py-1 text-[10px]">
+                <option value="all">Semua</option><option value="To Pay">To Pay</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th><th>Vendor</th><th>Customer</th><th>Item</th><th>Total</th><th>Status</th><th>Tarikh</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-order-list">
+                    <tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION: SETTINGS -->
+    <div id="admin-section-settings" class="hidden">
+        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200 text-xs">
+            <h5 class="font-bold text-yellow-700 mb-2">⚙️ System Settings</h5>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>Kadar Komisen Default:</span>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="admin-commission-rate" value="1.00" step="0.01" min="0" max="10" class="input-glass py-1 w-16 text-xs">
+                        <span class="text-[10px] text-gray-500">RM / jualan</span>
                     </div>
                 </div>
+                <button onclick="updateAdminSettings()" class="btn-glitter px-3 py-1.5 rounded text-[10px]">💾 Save Settings</button>
             </div>
-        </section>
+        </div>
+    </div>
+</div>
 
         <!-- Catalogue -->
         <section id="view-catalogue" class="hidden">
@@ -433,6 +508,12 @@ function switchTab(t) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`tab-${t}`).classList.add('active');
     
+    // 🔽 TAMBAH DALAM switchTab() - selepas if(t==='admin'...):
+if (t === 'admin' && profile?.role === 'admin') {
+    loadAdmin(); // existing
+    loadAdminStats(); // 🔥 NEW: load stats
+    loadAdminVendors(); // 🔥 NEW: load vendor list
+}
     // 🔥 Load data based on tab
     if (t === 'chat') loadChats();
     if (t === 'orders') loadVendorOrders(); // 🔥 Load orders when tab switched
@@ -1095,7 +1176,177 @@ paymentInfo: {
             })
             .catch(err=> showToast('❌ '+(err.message||''),'error'));
         }
+// 🔽===== PASTE S
+// Switch admin section tabs
+window.showAdminSection = (section) => {
+    ['vendors','transactions','settings'].forEach(s => {
+        document.getElementById(`admin-section-${s}`).classList.add('hidden');
+        document.getElementById(`admin-tab-${s}`).classList.remove('active');
+    });
+    document.getElementById(`admin-section-${section}`).classList.remove('hidden');
+    document.getElementById(`admin-tab-${section}`).classList.add('active');
+    
+    if(section === 'vendors') loadAdminVendors();
+    if(section === 'transactions') loadAdminOrders();
+};
 
+// Load all vendors for admin
+async function loadAdminVendors() {
+    const tbody = document.getElementById('admin-vendor-list');
+    if(!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        const snap = await db.collection('vendors').orderBy('createdAt','desc').get();
+        let html = '', total = 0, blocked = 0, totalRevenue = 0;
+        
+        snap.forEach(d => {
+            const v = d.data() || {};
+            total++;
+            if(v.status === 'BLOCKED') blocked++;
+            totalRevenue += v.totalSales || 0;
+            
+            const statusBadge = v.status === 'ACTIVE' ? 'success' : v.status === 'BLOCKED' ? 'danger' : 'warning';
+            
+            html += `<tr>
+                <td class="font-mono text-[9px]">${v.uac||'-'}</td>
+                <td class="text-xs font-medium">${v.sellerName||v.businessName||'-'}</td>
+                <td class="text-[10px] truncate max-w-[100px]">${v.email||'-'}</td>
+                <td class="text-xs font-bold text-yellow-600">${formatRM(v.totalSales||0)}</td>
+                <td><span class="badge badge-${statusBadge} text-[9px]">${v.status||'UNKNOWN'}</span></td>
+                <td class="text-[9px] text-gray-400">${v.createdAt?.toDate?.()?.toLocaleDateString('ms-MY')||'-'}</td>
+                <td class="text-center">
+                    ${v.status !== 'BLOCKED' 
+                        ? `<button onclick="blockVendor('${d.id}')" class="text-red-500 hover:text-red-700" title="Block"><i class="fas fa-ban"></i></button>` 
+                        : `<button onclick="unblockVendor('${d.id}')" class="text-green-500 hover:text-green-700" title="Unblock"><i class="fas fa-check"></i></button>`}
+                </td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="7" class="text-center py-4 text-gray-400 text-xs">Tiada vendor</td></tr>';
+                // Update stats
+        document.getElementById('admin-stat-vendors').textContent = total;
+        document.getElementById('admin-stat-blocked').textContent = blocked;
+        document.getElementById('admin-stat-revenue').textContent = formatRM(totalRevenue);
+        
+    } catch(err) {
+        console.error('Load admin vendors error:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load</td></tr>';
+    }
+}
+
+// Filter admin vendor list
+window.filterAdminVendors = () => {
+    const kw = (document.getElementById('admin-vendor-search')?.value||'').toLowerCase();
+    const rows = document.querySelectorAll('#admin-vendor-list tr');
+    rows.forEach((row, i) => {
+        if(i === 0) return; // Skip header
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(kw) ? '' : 'none';
+    });
+};
+
+// Block/Unblock vendor
+window.blockVendor = async (vid) => {
+    if(!confirm('Block vendor ini? Mereka tidak boleh login atau jual produk.')) return;
+    try {
+        await db.collection('vendors').doc(vid).update({ status: 'BLOCKED', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('✅ Vendor diblock', 'success');
+        loadAdminVendors();
+    } catch(err) { showToast('❌ Gagal: '+err.message, 'error'); }
+};
+
+window.unblockVendor = async (vid) => {
+    if(!confirm('Unblock vendor ini?')) return;
+    try {
+        await db.collection('vendors').doc(vid).update({ status: 'ACTIVE', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('✅ Vendor diunblock', 'success');
+        loadAdminVendors();
+    } catch(err) { showToast('❌ Gagal: '+err.message, 'error'); }
+};
+
+// Load all orders for admin
+async function loadAdminOrders() {
+    const tbody = document.getElementById('admin-order-list');
+    if(!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        const snap = await db.collection('orders').orderBy('createdAt','desc').limit(100).get();
+        let html = '', totalOrders = 0;        
+        snap.forEach(d => {
+            const o = d.data() || {};
+            totalOrders++;
+            const items = o.items?.map(i => i.name).join(', ') || '-';
+            const statusBadge = { 'To Pay':'warning', 'Completed':'success', 'Cancelled':'danger' }[o.status] || 'info';
+            
+            // Get vendor name
+            let vendorName = '-';
+            if(o.vendorId) {
+                // Could fetch vendor doc, but for simplicity show ID
+                vendorName = o.vendorUAC || o.vendorId.slice(0,8)+'...';
+            }
+            
+            html += `<tr>
+                <td class="font-mono text-[9px]">${o.orderId||'N/A'}</td>
+                <td class="text-[10px]">${vendorName}</td>
+                <td class="text-xs">${o.username||'-'}</td>
+                <td class="text-[10px] truncate max-w-[120px]" title="${items}">${items}</td>
+                <td class="font-bold text-yellow-600 text-xs">${formatRM(o.total||0)}</td>
+                <td><span class="badge badge-${statusBadge} text-[9px]">${o.status||'-'}</span></td>
+                <td class="text-[9px] text-gray-400">${o.createdAt?.toDate?.()?.toLocaleDateString('ms-MY')||'-'}</td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="7" class="text-center py-4 text-gray-400 text-xs">Tiada transaksi</td></tr>';
+        document.getElementById('admin-stat-orders').textContent = totalOrders;
+        
+    } catch(err) {
+        console.error('Load admin orders error:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load</td></tr>';
+    }
+}
+
+// Filter admin orders
+window.filterAdminOrders = (status) => {
+    const rows = document.querySelectorAll('#admin-order-list tr');
+    rows.forEach((row, i) => {
+        if(i === 0) return;
+        const text = row.textContent;
+        row.style.display = status === 'all' || text.includes(status) ? '' : 'none';
+    });
+};
+
+// Update admin settings
+window.updateAdminSettings = () => {
+    const rate = parseFloat(document.getElementById('admin-commission-rate')?.value) || 1;
+    // Save to Firestore config document (create if not exists)
+    db.collection('config').doc('system').set({ defaultCommissionRate: rate, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true})
+    .then(() => showToast('✅ Settings saved', 'success'))    .catch(err => showToast('❌ Gagal: '+err.message, 'error'));
+};
+
+// Load admin stats on section open
+async function loadAdminStats() {
+    try {
+        const [vendors, orders] = await Promise.all([
+            db.collection('vendors').get(),
+            db.collection('orders').get()
+        ]);
+        
+        const totalVendors = vendors.size;
+        const totalOrders = orders.size;
+        const totalRevenue = orders.docs.reduce((sum, d) => {
+            const o = d.data();
+            return o.status === 'Completed' ? sum + (o.total||0) : sum;
+        }, 0);
+        const blocked = vendors.docs.filter(d => d.data().status === 'BLOCKED').length;
+        
+        document.getElementById('admin-stat-vendors').textContent = totalVendors;
+        document.getElementById('admin-stat-orders').textContent = totalOrders;
+        document.getElementById('admin-stat-revenue').textContent = formatRM(totalRevenue);
+        document.getElementById('admin-stat-blocked').textContent = blocked;
+    } catch(err) { console.error('Stats load error:', err); }
+}
         // ===== SEARCH & CATALOGUE - FIXED =====
         function filterProducts(kw) {
             const grid = document.getElementById('product-grid');
