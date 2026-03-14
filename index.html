@@ -678,7 +678,6 @@
                         <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
-                
                 <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">                        <span>My Orders</span>
@@ -1235,6 +1234,40 @@
             <div id="reviews-content" class="space-y-3 max-h-60 overflow-y-auto"></div>
         </div>
     </div>
+<!-- Tracking Section - Inline (No Modal) -->
+<div class="glass-panel p-4 mb-4">
+    <h3 class="font-bold text-purple-700 mb-3 text-center text-sm">📦 Jejak Pesanan Fizikal</h3>
+    
+    <!-- Warning -->
+    <p class="text-[10px] text-center text-gray-500 bg-yellow-50 p-2 rounded mb-3">
+      ⚠️ Untuk barang yang menggunakan jasa POS/KURIER/LOGISTIK sahaja. Bukan untuk produk digital kerana ini untuk produk fizikal.
+    </p>
+    
+    <!-- Tracking Code (Your Example - UNCHANGED) -->
+    <div style="background: linear-gradient(135deg, rgb(106, 13, 173), rgb(255, 105, 180)); border-radius: 15px; box-shadow: rgba(255, 105, 180, 0.6) 0px 0px 20px; font-family: Arial, sans-serif; margin: 10px auto; max-width: 500px; padding: 20px; text-align: center;">
+      <h2 style="color: white; text-shadow: rgb(255, 105, 180) 0px 0px 10px; margin:0 0 10px 0; font-size:1.2rem;">Parcel Tracking Online</h2>
+      <input id="TrackNo" maxlength="50" placeholder="Contoh: SPXMY065315469009" style="border-radius: 10px; border: none; font-size: 14px; margin-bottom: 10px; outline: none; padding: 10px 15px; width: 70%;"/>
+      <br>
+      <input onclick="inputTrack()" style="background: linear-gradient(45deg, rgb(255, 105, 180), rgb(106, 13, 173)); border-radius: 10px; border: none; box-shadow: rgb(255, 105, 180) 0px 0px 15px, rgb(106, 13, 173) 0px 0px 30px; color: white; cursor: pointer; font-weight: bold; padding: 10px 20px; transition: 0.3s;" type="button" value="TRACK"/>
+    </div>
+    
+    <!-- Embedded Result -->
+    <div id="embedTrack" style="background: linear-gradient(135deg, rgb(106, 13, 173), rgb(255, 105, 180)); border-radius: 15px; box-shadow: rgba(255, 105, 180, 0.5) 0px 0px 25px; margin: 15px auto; max-width: 600px; padding: 15px;"></div>
+    
+    <!-- Hover Style -->
+    <style>input[type="button"]:hover{transform:scale(1.05);box-shadow:0 0 20px #ff69b4,0 0 40px #6a0dad;}</style>
+    
+    <!-- Scripts -->
+    <script src="//www.tracking.my/track-button.js"></script>
+    <script>
+      function inputTrack(){
+        var v=document.getElementById("TrackNo").value.trim();
+        if(v===""){alert("Sila masukkan nombor tracking");return;}
+        TrackButton.track({tracking_number:v});
+        TrackButton.embed({selector:"#embedTrack",tracking_number:v});
+      }
+    </script>
+</div>
 
     <!-- FIREBASE LOGIC - PRODUCTION READY -->
     <script type="module">
