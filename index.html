@@ -1988,27 +1988,60 @@ if (avatarEl && userData.photoURL) {
 // 🔽===== PASTE START: VENDOR PAYMENT & DIRECT CHAT FUNCTIONS =====🔽
 
 // Load vendor payment info for cart items
+// 🔽===== PASTE START: LOAD VENDOR PAYMENT FROM VENDOR DOC =====🔽
 async function loadVendorPayment() {
     const [load, content, err] = ['pay-load','pay-content','pay-err'].map(id=>document.getElementById(id));
     if(!load||!content||!err) return;
     load.classList.remove('hidden'); content.classList.add('hidden'); err.classList.add('hidden');
+    
     try {
-        const prod = cart[0]; if(!prod?.vendorId) throw new Error('Vendor ID missing');
-        const snap = await getDoc(doc(db,"products",prod.id));
-        if(!snap.exists()) throw new Error('Product not found');
-        const p = snap.data(), pay = p?.paymentInfo;
-        if(!pay?.qrUrl) throw new Error('Payment info incomplete');
-        document.getElementById('v-qr').src = pay.qrUrl;
-        ['bank','account','holder'].forEach((f,i)=>{
-            const el = document.getElementById(`v-${f==='holder'?'name':f}`);
-            if(el) el.textContent = pay[f] || '-';
-        });
+        const prod = cart[0]; 
+        if(!prod?.vendorId) throw new Error('Vendor ID missing');
+        
+        // 🔥 FETCH PAYMENT INFO DARI VENDOR DOC (bukan product doc)
+        const vendorSnap = await getDoc(doc(db, "vendors", prod.vendorId));
+        if(!vendorSnap.exists()) throw new Error('Vendor not found');
+        
+        const vendor = vendorSnap.data();
+        const pay = vendor?.paymentInfo || {};
+        
+        // Handle paymentInfo structure (object or string fallback)
+        const payment = typeof pay === 'object' ? pay : { general: pay };
+        
+        if(!payment.qrDefault && !payment.paymentLink) throw new Error('Payment info incomplete');
+        
+        // Populate UI
+        const qrUrl = payment.qrDefault || payment.paymentLink;
+        document.getElementById('v-qr').src = qrUrl;
+        
+        // Auto-generate QR from link if needed
+        if(payment.paymentLink && !payment.qrDefault) {
+            document.getElementById('v-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payment.paymentLink)}`;
+            document.getElementById('qr-hint').innerHTML = '🔗 Klik untuk buka payment link';
+        }
+        
+        document.getElementById('v-bank').textContent = payment.bankDefault || '-';
+        document.getElementById('v-acc').textContent = payment.accountDefault?.split(' - ')?.[0] || '-';
+        document.getElementById('v-name').textContent = payment.accountDefault?.split(' - ')?.[1] || payment.holder || '-';
+        
+        // WhatsApp button
         const wa = document.getElementById('v-wa-btn');
-        if(pay.whatsapp) { wa.href = `https://wa.me/${pay.whatsapp.replace(/\D/g,'')}`; wa.classList.remove('hidden'); }
-        else wa.classList.add('hidden');
+        if(payment.whatsapp) { 
+            wa.href = `https://wa.me/${payment.whatsapp.replace(/\D/g,'')}`; 
+            wa.classList.remove('hidden'); 
+        } else {
+            wa.classList.add('hidden');
+        }
+        
         load.classList.add('hidden'); content.classList.remove('hidden');
-    } catch(e) { console.error('Payment load error:',e); load.classList.add('hidden'); err.classList.remove('hidden'); err.textContent = `❌ ${e.message}`; }
+    } catch(e) { 
+        console.error('Payment load error:',e); 
+        load.classList.add('hidden'); 
+        err.classList.remove('hidden'); 
+        err.textContent = `❌ ${e.message || 'Gagal load payment info'}`; 
+    }
 }
+// 🔼===== PASTE END: LOAD VENDOR PAYMENT FROM VENDOR DOC =====🔼
 
 // Override cart modal to load vendor payment
 const _origCart = window.toggleCartModal;
